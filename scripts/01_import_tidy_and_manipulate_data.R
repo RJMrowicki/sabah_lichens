@@ -40,7 +40,16 @@ dd_lichens_func <-  # create new data frame
   # replace all NA values with 0:
   replace(is.na(.), 0) %>%
   # sum all numeric variables by `func_grp`:
-  # (NB -- only if the 2 `crsco` values represent duplicates)
+  # (NB -- only if the 2 'crsco' values represent duplicates)
   group_by(`func_grp`) %>% summarise_if(is.numeric, sum) %>%
   # transpose to make rows = samples and columns = taxa:
   gather(`tree`, `n`, `D11`:`SF12`) %>% spread(`func_grp`, `n`)
+
+# tree functional trait data:
+dd_trees_func <-  # create new data frame
+  ddR_trees_func %>%
+  # rename all variables (except `girth`):
+  rename(`tree` = 1, `bark` = 3, `buttress` = 4, `func_grp` = 5) %>%
+  # change 'character' variables (excluding `tree`) to 'factor' type:
+  mutate_at(3:5, factor)
+  
