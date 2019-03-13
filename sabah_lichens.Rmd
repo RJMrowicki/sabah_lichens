@@ -11,3 +11,15 @@ output:
 ```{r setup, include = FALSE}
 source('./scripts/00_setup.R')  # run setup script
 ```
+
+```{r source_scripts, include = FALSE}
+# run data scripts:
+source('./scripts/01_import_tidy_and_manipulate_data.R')
+```
+
+## Queries
+
+1. In both lichen abundance datasets, there are two _D810_ columns -- is this a mistake (should these be combined into a single column in each case)?
+
+1. The _crsco_ taxfree code is duplicated in the lichen functional group abundance dataset -- should the abundance variables be summed for these two rows?
+
