@@ -15,7 +15,12 @@ source('./scripts/00_setup.R')  # run setup script
 ```{r source_scripts, include = FALSE}
 # run data scripts:
 source('./scripts/01_import_tidy_and_manipulate_data.R')
+source('./scripts/02_analyse_data.R')
 ```
+
+## Sites
+
+Sampling was conducted at three sites within different areas of lowland forest in northeast Borneo, including two old growth reserve sites, (1) Danum Valley Conservation Area ('D') and (2) Maliau Conservation Area ('M'), and one selectively logged site, (3) the Stability of Altered Forest Ecosystems (SAFE) Project area ('S').
 
 ## Queries
 

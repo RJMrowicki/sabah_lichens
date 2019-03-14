@@ -12,3 +12,4 @@ Sys.setenv(TZ = "UTC")  # set timezone (avoid `as.POSIX*` warnings)
 
 # load required packages:
 library(tidyverse)
+library(vegan)
