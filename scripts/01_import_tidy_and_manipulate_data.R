@@ -20,6 +20,10 @@ ddR_trees_func <- read_csv('./data/trees_func.csv')
 
 # lichen abundance data:
 # ~ taxonomic groups:
+
+# create vector of unique lichen taxa:
+lichen_taxa <- unique(ddR_lichens_taxa$`Genus code`)
+
 dd_lichens_taxa <-  # create new data frame
   ddR_lichens_taxa %>%
   # # remove `D810` (empty duplicate) and rename `D810_1` to `D810`:
@@ -30,9 +34,17 @@ dd_lichens_taxa <-  # create new data frame
   # remove `Fam code` and rename `Genus code` to `taxon`:
   select(-`Fam code`) %>% rename(`taxon` = `Genus code`) %>%
   # transpose to make rows = samples and columns = taxa:
-  gather(`tree`, `n`, `D11`:`SF12`) %>% spread(`taxon`, `n`)
+  gather(`tree`, `n`, `D11`:`SF12`) %>% spread(`taxon`, `n`) %>%
+  # create factor `site` based on first character of `tree` values:
+  mutate(`site` = factor(str_sub(`tree`, end = 1))) %>%
+  # re-order columns so that `site` is at the beginning:
+  select(`site`, `tree`, lichen_taxa)
 
 # ~ functional groups:
+
+# create vector of unique lichen functional groups:
+lichen_func_grps <- unique(ddR_lichens_func$`tree no.`)
+
 dd_lichens_func <-  # create new data frame
   ddR_lichens_func %>%
   # rename `tree no.` to `func_grp`:
@@ -43,13 +55,18 @@ dd_lichens_func <-  # create new data frame
   # (NB -- only if the 2 'crsco' values represent duplicates)
   group_by(`func_grp`) %>% summarise_if(is.numeric, sum) %>%
   # transpose to make rows = samples and columns = taxa:
-  gather(`tree`, `n`, `D11`:`SF12`) %>% spread(`func_grp`, `n`)
+  gather(`tree`, `n`, `D11`:`SF12`) %>% spread(`func_grp`, `n`) %>%
+  # create factor `site` based on first character of `tree` values:
+  mutate(`site` = factor(str_sub(`tree`, end = 1))) %>%
+  # re-order columns so that `site` is at the beginning:
+  select(`site`, `tree`, lichen_func_grps)
 
 # tree functional trait data:
 dd_trees_func <-  # create new data frame
   ddR_trees_func %>%
   # rename all variables (except `girth`):
   rename(`tree` = 1, `bark` = 3, `buttress` = 4, `func_grp` = 5) %>%
-  # change 'character' variables (excluding `tree`) to 'factor' type:
-  mutate_at(3:5, factor)
-  
+  # create variable `site` based on first character of `tree` values:
+  mutate(`site` = str_sub(`tree`, end = 1)) %>%
+  # change 'character' variables (excluding `tree`) to 'factors':
+  mutate_at(3:ncol(.), factor)
