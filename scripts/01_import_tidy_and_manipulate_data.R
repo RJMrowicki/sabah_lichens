@@ -37,8 +37,10 @@ dd_lichens_taxa <-  # create new data frame
   gather(`tree`, `n`, `D11`:`SF12`) %>% spread(`taxon`, `n`) %>%
   # create factor `site` based on first character of `tree` values:
   mutate(`site` = factor(str_sub(`tree`, end = 1))) %>%
+  # add `dummy` variable for zero-adjusted Bray-Curtis:
+  mutate(`dummy` = 1) %>%
   # re-order columns so that `site` is at the beginning:
-  select(`site`, `tree`, lichen_taxa)
+  select(`site`, `tree`, lichen_taxa, `dummy`)
 
 # ~ functional groups:
 
@@ -58,8 +60,10 @@ dd_lichens_func <-  # create new data frame
   gather(`tree`, `n`, `D11`:`SF12`) %>% spread(`func_grp`, `n`) %>%
   # create factor `site` based on first character of `tree` values:
   mutate(`site` = factor(str_sub(`tree`, end = 1))) %>%
+  # add `dummy` variable for zero-adjusted Bray-Curtis:
+  mutate(`dummy` = 1) %>%
   # re-order columns so that `site` is at the beginning:
-  select(`site`, `tree`, lichen_func_grps)
+  select(`site`, `tree`, lichen_func_grps, `dummy`)
 
 # tree functional trait data:
 dd_trees_func <-  # create new data frame

@@ -22,6 +22,10 @@ source('./scripts/02_analyse_data.R')
 
 Sampling was conducted at three sites within different areas of lowland forest in northeast Borneo, including two old growth reserve sites, (1) Danum Valley Conservation Area ('D') and (2) Maliau Conservation Area ('M'), and one selectively logged site, (3) the Stability of Altered Forest Ecosystems (SAFE) Project area ('S').
 
+## Analysis
+
+Community dissimilarities were calculated using the zero-adjusted Bray-Curtis coefficient (Clarke _et al._, 2006, _J. Exp. Mar. Biol. Ecol._ 330:55--80).
+
 ## Queries
 
 1. In both lichen abundance datasets, there are two _D810_ columns -- is this a mistake (should these be combined into a single column in each case)?
