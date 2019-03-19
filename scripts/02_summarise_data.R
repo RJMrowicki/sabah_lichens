@@ -1,6 +1,8 @@
 # sabah_lichens
 # Summarise data
 
+# Calculate summary statistics per site =============================
+
 # No. of observations -----------------------------------------------
 
 # lichen abundance data:

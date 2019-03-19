@@ -19,13 +19,15 @@ source('./scripts/02_summarise_data.R')
 source('./scripts/03_analyse_data.R')
 ```
 
-## Sites
+## Field sites
 
 Sampling was conducted at three sites within different areas of lowland forest in northeast Borneo, including two old growth reserve sites, (1) Danum Valley Conservation Area ('D') and (2) Maliau Conservation Area ('M'), and one selectively logged site, (3) the Stability of Altered Forest Ecosystems (SAFE) Project area ('S').
 
 At each site, ...
 
-## Analysis
+## Data analysis
+
+Taxonomic/functional group richness (_S_) and Shannon-Wiener diversity (H') were calculated for each tree.
 
 Community dissimilarities were calculated using the zero-adjusted Bray-Curtis coefficient (Clarke _et al._, 2006, _J. Exp. Mar. Biol. Ecol._ 330:55--80).
 
@@ -35,4 +37,4 @@ Community dissimilarities were calculated using the zero-adjusted Bray-Curtis co
 
 1. The _crsco_ taxfree code is duplicated in the lichen functional group abundance dataset -- should the abundance variables be summed for these two rows?
 
-1. There is no observation for tree _SA4_ in the lichen functional group abundance dataset (in addition to _D710_ -- see above).
+1. There are no data for tree _SA4_ in the lichen functional group abundance dataset (in addition to _D710_ -- see above).
