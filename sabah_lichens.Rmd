@@ -15,12 +15,15 @@ source('./scripts/00_setup.R')  # run setup script
 ```{r source_scripts, include = FALSE}
 # run data scripts:
 source('./scripts/01_import_tidy_and_manipulate_data.R')
-source('./scripts/02_analyse_data.R')
+source('./scripts/02_summarise_data.R')
+source('./scripts/03_analyse_data.R')
 ```
 
 ## Sites
 
 Sampling was conducted at three sites within different areas of lowland forest in northeast Borneo, including two old growth reserve sites, (1) Danum Valley Conservation Area ('D') and (2) Maliau Conservation Area ('M'), and one selectively logged site, (3) the Stability of Altered Forest Ecosystems (SAFE) Project area ('S').
+
+At each site, ...
 
 ## Analysis
 
@@ -28,7 +31,8 @@ Community dissimilarities were calculated using the zero-adjusted Bray-Curtis co
 
 ## Queries
 
-1. In both lichen abundance datasets, there are two _D810_ columns -- is this a mistake (should these be combined into a single column in each case)?
+1. In both lichen abundance datasets, there are two _D810_ columns -- is this a mistake (should these be combined into a single column in each case)? OR should one of these be labelled _D710_, as this tree is not present in either dataset?
 
 1. The _crsco_ taxfree code is duplicated in the lichen functional group abundance dataset -- should the abundance variables be summed for these two rows?
 
+1. There is no observation for tree _SA4_ in the lichen functional group abundance dataset (in addition to _D710_ -- see above).

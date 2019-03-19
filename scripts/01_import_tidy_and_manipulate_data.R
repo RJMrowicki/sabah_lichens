@@ -27,7 +27,8 @@ lichen_taxa <- unique(ddR_lichens_taxa$`Genus code`)
 dd_lichens_taxa <-  # create new data frame
   ddR_lichens_taxa %>%
   # # remove `D810` (empty duplicate) and rename `D810_1` to `D810`:
-  # # (NB -- only if this column actually represents a duplicate)
+  # # (NB -- only if this column actually represents a duplicate;
+  # # OR is one `D810` column supposed to be `D710`???)
   # select(-`D810`) %>% rename(`D810` = `D810_1`) %>%
   # replace all NA values with 0:
   replace(is.na(.), 0) %>%
@@ -65,7 +66,11 @@ dd_lichens_func <-  # create new data frame
   # re-order columns so that `site` is at the beginning:
   select(`site`, `tree`, lichen_func_grps, `dummy`)
 
+
+
+
 # tree functional trait data:
+
 dd_trees_func <-  # create new data frame
   ddR_trees_func %>%
   # rename all variables (except `girth`):
@@ -74,3 +79,17 @@ dd_trees_func <-  # create new data frame
   mutate(`site` = str_sub(`tree`, end = 1)) %>%
   # change 'character' variables (excluding `tree`) to 'factors':
   mutate_at(3:ncol(.), factor)
+
+
+
+
+# Manipulate data ---------------------------------------------------
+
+# create vector of unique tree numbers:
+tree_nos <- unique(dd_trees_func$tree)
+
+# determine which trees are missing either lichen dataset:
+missing_trees <- tree_nos[
+  !tree_nos %in% dd_lichens_func$tree |
+    !tree_nos %in% dd_lichens_taxa$tree
+  ]
