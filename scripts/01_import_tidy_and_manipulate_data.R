@@ -94,19 +94,16 @@ missing_trees <- tree_nos[
 
 # Manipulate data ===================================================
 
-# ~ calculate diversity indices -------------------------------------
+# ~ Calculate lichen diversity indices ------------------------------
 
-# ~~ lichen taxonomic groups:
-dd_lichens_taxa <-
-  dd_lichens_taxa %>%
-  # species richness (S):
-  mutate(`S` = specnumber(.[, lichen_taxa])) %>%
-  # Shannon-Wiener diversity (H'):
-  mutate(`H'` = diversity(.[, lichen_taxa], "shannon"))
+dd_lichens_taxa <-  # taxonomic groups
+  dd_lichens_taxa %>% mutate(
+    `S` = specnumber(.[, lichen_taxa]),  # species richness
+    `H'` = diversity(.[, lichen_taxa], "shannon")  # Shannon-Wiener
+  )
 
-# ~~ lichen functional groups:
-dd_lichens_func <-
-  dd_lichens_func %>%
-  # functional group richness:
-  mutate(`S` = specnumber(.[, lichen_func_grps])) %>%
-  mutate(`H'` = diversity(.[, lichen_func_grps], "shannon"))
+dd_lichens_func <-  # functional groups
+  dd_lichens_func %>% mutate(
+    `S` = specnumber(.[, lichen_func_grps]),  # func group richness
+    `H'` = diversity(.[, lichen_func_grps], "shannon")
+  )
