@@ -19,9 +19,9 @@ mds <- function(  # perform MDS analysis
 
 
 z_std <- function(  # z-standardise data frame
-  dat) {  # accepts data frame
+  dat) {  # accepts data frame, tibble, etc.
   
   dat_z <- apply(dat, MARGIN = 2, function(x) {
-    (x - mean(x)) / sd(x)})
+    (x - mean(x, na.rm = TRUE)) / sd(x, na.rm = TRUE)})
   return(as.data.frame(dat_z))  # output standardised data
 }
