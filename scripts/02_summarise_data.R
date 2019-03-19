@@ -3,7 +3,7 @@
 
 # Calculate summary statistics per site =============================
 
-# No. of observations -----------------------------------------------
+# ~ No. of observations -----------------------------------------------
 
 # lichen abundance data:
 # ~ taxonomic groups:
@@ -19,7 +19,7 @@ nobs_site_tr_func <- dd_trees_func %>% count(`site`)
 
 
 
-# Mean lichen diversity ---------------------------------------------
+# ~ Mean lichen diversity ---------------------------------------------
 
 mean_div_li_taxa <-  # taxonomic groups
   dd_lichens_taxa %>%

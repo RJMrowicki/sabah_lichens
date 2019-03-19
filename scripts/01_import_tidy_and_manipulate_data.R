@@ -77,8 +77,11 @@ dd_trees_func <-  # create new data frame
   rename(`tree` = 1, `bark` = 3, `buttress` = 4, `func_grp` = 5) %>%
   # create variable `site` based on first character of `tree` values:
   mutate(`site` = str_sub(`tree`, end = 1)) %>%
-  # change 'character' variables (excluding `tree`) to 'factors':
-  mutate_at(3:ncol(.), factor)
+  # recode `bark` to numerical (ordinal) based on relative roughness:
+  mutate(`bark_ord` = recode(
+    `bark`, 'S' = 0, 'C' = 1, 'R' = 2, 'DR' = 3)) %>%
+  # change relevant 'character' variables to 'factors':
+  mutate_at(c('bark', 'func_grp', 'site'), factor)
 
 # create vector of unique tree numbers:
 tree_nos <- unique(dd_trees_func$tree)
@@ -107,3 +110,20 @@ dd_lichens_func <-  # functional groups
     `S` = specnumber(.[, lichen_func_grps]),  # func. group richness
     `H'` = diversity(.[, lichen_func_grps], "shannon")
   )
+
+
+
+
+# ~ Combine lichen and tree datasets --------------------------------
+
+dd_tree_lichens_taxa <-  # taxonomic groups
+  # perform 'left join' with tree dataset as 'x'
+  left_join(dd_trees_func, dd_lichens_taxa, by = c('tree', 'site'))
+
+dd_tree_lichens_func <-  # functional groups
+  left_join(dd_trees_func, dd_lichens_func, by = c('tree', 'site'))
+
+
+
+
+# ~ Subset environmental variables ------------------------------------

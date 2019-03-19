@@ -14,3 +14,14 @@ mds <- function(  # perform MDS analysis
   return(mds.out)  # output result
   
 }
+
+
+
+
+z_std <- function(  # z-standardise data frame
+  dat) {  # accepts data frame
+  
+  dat_z <- apply(dat, MARGIN = 2, function(x) {
+    (x - mean(x)) / sd(x)})
+  return(as.data.frame(dat_z))  # output standardised data
+}
