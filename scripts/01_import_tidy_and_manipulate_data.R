@@ -1,7 +1,7 @@
 # sabah_lichens
 # Import, tidy and manipulate data
 
-# Import data -------------------------------------------------------
+# Import data =======================================================
 
 # lichen abundance data:
 # ~ taxonomic groups:
@@ -16,7 +16,7 @@ ddR_trees_func <- read_csv('./data/trees_func.csv')
 
 
 
-# Tidy data ---------------------------------------------------------
+# Tidy data =========================================================
 
 # lichen abundance data:
 # ~ taxonomic groups:
@@ -80,16 +80,33 @@ dd_trees_func <-  # create new data frame
   # change 'character' variables (excluding `tree`) to 'factors':
   mutate_at(3:ncol(.), factor)
 
-
-
-
-# Manipulate data ---------------------------------------------------
-
 # create vector of unique tree numbers:
 tree_nos <- unique(dd_trees_func$tree)
 
-# determine which trees are missing either lichen dataset:
+# determine which trees are missing from either lichen dataset:
 missing_trees <- tree_nos[
   !tree_nos %in% dd_lichens_func$tree |
     !tree_nos %in% dd_lichens_taxa$tree
   ]
+
+
+
+
+# Manipulate data ===================================================
+
+# ~ calculate diversity indices -------------------------------------
+
+# ~~ lichen taxonomic groups:
+dd_lichens_taxa <-
+  dd_lichens_taxa %>%
+  # species richness (S):
+  mutate(`S` = specnumber(.[, lichen_taxa])) %>%
+  # Shannon-Wiener diversity (H'):
+  mutate(`H'` = diversity(.[, lichen_taxa], "shannon"))
+
+# ~~ lichen functional groups:
+dd_lichens_func <-
+  dd_lichens_func %>%
+  # functional group richness:
+  mutate(`S` = specnumber(.[, lichen_func_grps])) %>%
+  mutate(`H'` = diversity(.[, lichen_func_grps], "shannon"))
