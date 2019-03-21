@@ -12,7 +12,6 @@ mds <- function(  # perform MDS analysis
     if(mds.out$converged == TRUE) break
   }
   return(mds.out)  # output result
-  
 }
 
 

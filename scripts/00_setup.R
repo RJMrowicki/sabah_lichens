@@ -23,6 +23,7 @@ library(car)  # Anova()
 library(Hmisc)  # rcorr()
 library(vegan)
 
+library(gridExtra)  # grid.arrange()
 library(knitr)  # kable()
 
 

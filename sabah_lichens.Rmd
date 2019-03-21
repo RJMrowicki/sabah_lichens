@@ -17,6 +17,7 @@ source('./scripts/00_setup.R')  # run setup script
 source('./scripts/01_import_tidy_and_manipulate_data.R')
 source('./scripts/02_summarise_data.R')
 source('./scripts/03_analyse_data.R')
+source('./scripts/04_plotting.R')
 ```
 
 ## Field sites
@@ -62,6 +63,10 @@ kable(mean_div_li_taxa, caption = 'Taxonomic group data')
 # ~ functional groups:
 kable(mean_div_li_func, caption = 'Functional group data')
 ```
+
+![Boxplot of lichen taxonomic group richness (_S_) and diversity (_H\'_) versus site (D = Danum Valley Conservation Area, M = Maliau Conservation Area, S = Stability of Altered Forest Ecosystems (SAFE) Project area).](./figs/boxplots_taxa.pdf)
+
+![Boxplot of lichen functional group richness and diversity versus site.](./figs/boxplots_func.pdf)
 
 As expected, lichen richness and diversity (in terms of both taxonomic and functional groups) appeared to be lower at the disturbed site compared to the other two sites. While ANOVAs indicated significant differences in all cases, these results must be interpreted with caution owing to the poor fit of data to models -- specifically, assumptions of normality and/or homoscedasticity were contravened. (Perhaps the data are zero-inflated?)
 
