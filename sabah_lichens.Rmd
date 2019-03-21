@@ -27,13 +27,50 @@ At each site, ...
 
 The following functional traits were recorded for each tree: (1) girth, measured as ...; (2) bark type (S = smooth, C = scaly, R = ridged/rough, DR = dry ancient); and (3) the presence of buttresses or flutes.
 
+Numbers of observations per site:
+
+```{r nobs_tables, echo = FALSE}
+# insert tables for numbers of observations vs. site
+# ~ lichen taxonomic groups:
+kable(nobs_site_li_taxa, caption = 'Lichen taxonomic group data')
+# ~ lichen functional groups:
+kable(nobs_site_li_func, caption = 'Lichen functional group data')
+# ~ tree functional traits:
+kable(nobs_site_tr_func, caption = 'Tree functional trait data')
+```
+
+
+
+
 ## Data analysis
 
-Taxonomic/functional group richness (_S_) and Shannon-Wiener diversity (H') were calculated for each tree.
+Taxonomic/functional group richness (_S_) and Shannon-Wiener diversity (_H\'_) were calculated for each tree.
 
-Tree bark type was coded numerically in relation to increasing roughness, i.e. smooth = 0, scaly = 1, ridged/rough = 2, ancient dry = 3.
+Tree bark type was coded numerically in relation to increasing roughness, i.e. smooth = 0, scaly = 1, ridged/rough = 2, ancient dry = 3. (See _Queries_ below.)
 
 Community dissimilarities were calculated using the zero-adjusted Bray-Curtis coefficient (Clarke _et al._, 2006, _J. Exp. Mar. Biol. Ecol._ 330:55--80).
+
+
+
+
+## Preliminary results
+
+Mean lichen diversity (_H\'_ and _S_) per site:
+
+```{r mean_div_tables, echo = FALSE}
+# insert tables for mean lichen diversity vs. site:
+# ~ taxonomic groups:
+kable(mean_div_li_taxa, caption = 'Taxonomic group data')
+# ~ functional groups:
+kable(mean_div_li_func, caption = 'Functional group data')
+```
+
+As expected, lichen richness and diversity (in terms of both taxonomic and functional groups) were lower at the disturbed site compared to the other two sites.
+
+
+
+
+
 
 ## Queries
 

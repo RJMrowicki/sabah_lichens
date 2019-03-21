@@ -38,16 +38,16 @@ perm_li_func <-
 # ~ MDS ordinations of lichen community structure -------------------
 # (NB -- no convergence after multiple iterations)
 
-# ~~ taxonomic groups:
-mds_li_taxa <-
-  mds(  # custom mds function
-    # log10(x+1)-transformed data and zero-adjusted Bray-Curtis:
-    log10(dd_lichens_taxa[, c(lichen_taxa, 'dummy')] + 1)
-  )
-
-# ~~ functional groups:
-mds_li_func <-
-  mds(log10(dd_lichens_func[, c(lichen_func_grps, 'dummy')] + 1))
+# # ~~ taxonomic groups:
+# mds_li_taxa <-
+#   mds(  # custom mds function
+#     # log10(x+1)-transformed data and zero-adjusted Bray-Curtis:
+#     log10(dd_lichens_taxa[, c(lichen_taxa, 'dummy')] + 1)
+#   )
+# 
+# # ~~ functional groups:
+# mds_li_func <-
+#   mds(log10(dd_lichens_func[, c(lichen_func_grps, 'dummy')] + 1))
 
 
 
@@ -142,7 +142,7 @@ delta_sq_taxa <-  # create empty vector
   vector(length = length(bioenv_vars_taxa))
 
 for(i in 1:length(bioenv_vars_taxa)) {
-  delta_sq[i] <-  # assign to relevant 
+  delta_sq_taxa[i] <-  # assign to relevant 
     cor(  # calculate Pearson correlation coefficient
       summary(cap_taxa)$sites[, i],  # site scores
       summary(cap_taxa)$constraints[, i],  # site constraints
@@ -237,11 +237,11 @@ if (length(bioenv_vars_func) > 1) {
 }
 
 # calculate squared canonical correlation(s):
-delta_sq_taxa <-  # create empty vector
+delta_sq_func <-  # create empty vector
   vector(length = length(bioenv_vars_func))
 
 for(i in 1:length(bioenv_vars_func)) {
-  delta_sq[i] <-  # assign to relevant 
+  delta_sq_func[i] <-  # assign to relevant 
     cor(  # calculate Pearson correlation coefficient
       summary(cap_func)$sites[, i],  # site scores
       summary(cap_func)$constraints[, i],  # site constraints

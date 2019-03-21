@@ -20,6 +20,7 @@ n_perm <- 9999  # specify no. permutations for multivariate analyses
 suppressPackageStartupMessages(library(tidyverse))
 library(Hmisc)  # rcorr()
 library(vegan)
+library(knitr)  # kable()
 
 
 
