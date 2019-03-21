@@ -5,6 +5,87 @@
 
 # ~ ANOVAs of lichen diversity vs. site -----------------------------
 
+# ~~ taxonomic groups:
+
+# ~~~ richness:
+lm_li_taxa_s <-  # make model
+  # (transformation corrects heteroscedasticity but not normality)
+  lm(`S`^0.5 ~ site, data = dd_lichens_taxa)
+
+# # diagnostic plots of model residuals:
+# par(mfrow = c(2, 3))
+# plot(lm_li_taxa_s); hist(residuals(lm_li_taxa_s))
+
+# Shapiro-Wilk normality test:
+norm_li_taxa_s <- shapiro.test(residuals(lm_li_taxa_s))
+# Levene's test for homoscedasticity:
+het_li_taxa_s <- leveneTest(`S`^0.5 ~ site, data = dd_lichens_taxa)
+
+# ANOVA table (based on Type II SS):
+anova_li_taxa_s <- Anova(lm_li_taxa_s, type = 'II')
+
+
+
+
+# ~~~ diversity:
+lm_li_taxa_h <-  # make model
+  # (transformation doesn't correct normality)
+  lm(`H'` ~ site, data = dd_lichens_taxa)
+
+# # diagnostic plots of model residuals:
+# par(mfrow = c(2, 3))
+# plot(lm_li_taxa_h); hist(residuals(lm_li_taxa_h))
+
+# Shapiro-Wilk normality test:
+norm_li_taxa_h <- shapiro.test(residuals(lm_li_taxa_h))
+# Levene's test for homoscedasticity:
+het_li_taxa_h <- leveneTest(`H'` ~ site, data = dd_lichens_taxa)
+
+# ANOVA table (based on Type II SS):
+anova_li_taxa_h <- Anova(lm_li_taxa_h, type = 'II')
+
+
+
+
+# ~~ functional groups:
+
+# ~~~ richness:
+lm_li_func_s <-  # make model
+  # (transformation doesn't correct non-normality/heteroscedasticity)
+  lm(`S` ~ site, data = dd_lichens_func)
+
+# # diagnostic plots of model residuals:
+# par(mfrow = c(2, 3))
+# plot(lm_li_func_s); hist(residuals(lm_li_func_s))
+
+# Shapiro-Wilk normality test:
+norm_li_func_s <- shapiro.test(residuals(lm_li_func_s))
+# Levene's test for homoscedasticity:
+het_li_func_s <- leveneTest(`S` ~ site, data = dd_lichens_func)
+
+# ANOVA table (based on Type II SS):
+anova_li_func_s <- Anova(lm_li_func_s, type = 'II')
+
+
+
+
+# ~~~ diversity:
+lm_li_func_h <-  # make model
+  # (transformation doesn't correct normality)
+  lm(`H'` ~ site, data = dd_lichens_func)
+
+# # diagnostic plots of model residuals:
+# par(mfrow = c(2, 3))
+# plot(lm_li_func_h); hist(residuals(lm_li_func_h))
+
+# Shapiro-Wilk normality test:
+norm_li_func_h <- shapiro.test(residuals(lm_li_func_h))
+# Levene's test for homoscedasticity:
+het_li_func_h <- leveneTest(`H'` ~ site, data = dd_lichens_func)
+
+# ANOVA table (based on Type II SS):
+anova_li_func_h <- Anova(lm_li_func_h, type = 'II')
+
 
 
 

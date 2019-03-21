@@ -18,8 +18,11 @@ n_perm <- 9999  # specify no. permutations for multivariate analyses
 
 # load required packages:
 suppressPackageStartupMessages(library(tidyverse))
+
+library(car)  # Anova()
 library(Hmisc)  # rcorr()
 library(vegan)
+
 library(knitr)  # kable()
 
 

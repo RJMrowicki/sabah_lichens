@@ -30,7 +30,7 @@ The following functional traits were recorded for each tree: (1) girth, measured
 Numbers of observations per site:
 
 ```{r nobs_tables, echo = FALSE}
-# insert tables for numbers of observations vs. site
+# insert tables for numbers of observations vs. site:
 # ~ lichen taxonomic groups:
 kable(nobs_site_li_taxa, caption = 'Lichen taxonomic group data')
 # ~ lichen functional groups:
@@ -39,8 +39,7 @@ kable(nobs_site_li_func, caption = 'Lichen functional group data')
 kable(nobs_site_tr_func, caption = 'Tree functional trait data')
 ```
 
-
-
+Are there missing observations? (See _Queries_ below.)
 
 ## Data analysis
 
@@ -48,26 +47,39 @@ Taxonomic/functional group richness (_S_) and Shannon-Wiener diversity (_H\'_) w
 
 Tree bark type was coded numerically in relation to increasing roughness, i.e. smooth = 0, scaly = 1, ridged/rough = 2, ancient dry = 3. (See _Queries_ below.)
 
+Analysis of variance (ANOVA) was used to test for differences in lichen taxonomic and functional group richness and diversity among sites. Tests were based on Type II Sums of Squares owing to unequal numbers of observations among groups.
+
 Community dissimilarities were calculated using the zero-adjusted Bray-Curtis coefficient (Clarke _et al._, 2006, _J. Exp. Mar. Biol. Ecol._ 330:55--80).
-
-
-
 
 ## Preliminary results
 
 Mean lichen diversity (_H\'_ and _S_) per site:
 
 ```{r mean_div_tables, echo = FALSE}
-# insert tables for mean lichen diversity vs. site:
+# insert summary tables for mean lichen diversity vs. site:
 # ~ taxonomic groups:
 kable(mean_div_li_taxa, caption = 'Taxonomic group data')
 # ~ functional groups:
 kable(mean_div_li_func, caption = 'Functional group data')
 ```
 
-As expected, lichen richness and diversity (in terms of both taxonomic and functional groups) were lower at the disturbed site compared to the other two sites.
+As expected, lichen richness and diversity (in terms of both taxonomic and functional groups) appeared to be lower at the disturbed site compared to the other two sites. While ANOVAs indicated significant differences in all cases, these results must be interpreted with caution owing to the poor fit of data to models -- specifically, assumptions of normality and/or homoscedasticity were contravened. (Perhaps the data are zero-inflated?)
 
+ANOVA results:
 
+```{r anova_tables, echo = FALSE}
+# insert ANOVA tables
+# ~ taxonomic groups:
+# ~~ richness:
+kable(anova_li_taxa_s, caption = 'Lichen taxonomic group _S_ vs. site')
+# ~~ diversity:
+kable(anova_li_taxa_h, caption = 'Lichen taxonomic group _H\'_ vs. site')
+# ~ functional groups:
+# ~~ richness:
+kable(anova_li_func_s, caption = 'Lichen functional group _S_ vs. site')
+# ~~ diversity:
+kable(anova_li_func_h, caption = 'Lichen functional group _H\'_ vs. site')
+```
 
 
 

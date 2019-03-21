@@ -78,7 +78,8 @@ dd_trees_func <-  # create new data frame
   # create variable `site` based on first character of `tree` values:
   mutate(`site` = str_sub(`tree`, end = 1)) %>%
   # recode `bark` to numerical (ordinal) based on relative roughness:
-  mutate(`bark_ord` = recode(
+  # (NB -- specify 'dplyr::' as opposed to 'car::')
+  mutate(`bark_ord` = dplyr::recode(
     `bark`, 'S' = 0, 'C' = 1, 'R' = 2, 'DR' = 3)) %>%
   # change relevant 'character' variables to 'factors':
   mutate_at(c('bark', 'func_grp', 'site'), factor)
