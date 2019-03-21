@@ -138,16 +138,26 @@ env_vars <- c('girth', 'bark_ord', 'buttress')
 
 
 
-# run BIOENV analysis:
+env_cor <-  # test correlations between environmental variables
+  rcorr(as.matrix(dd_trees_func[, env_vars]), type = "spearman")
+# exclude if |\rho| > 0.7 ... currently, all values < 0.7
+# create vector of variables to use in subsequent analyses:
+env_use <- env_vars  # (currently no variables are excluded)
+
+
+
+
+# BIOENV analysis:
 
 # ~ taxonomic groups:
-bioenv_taxa <- bioenv(
-  # log10(x+1)-transformed communit data, including 'dummy' variable
-  # to enable calculation of zero-adjusted Bray-Curtis:
-  log10(dd_tree_lichens_taxa[, c(lichen_taxa, 'dummy')] + 1),
-  # vs. z-standardised environmental data:
-  z_std(dd_tree_lichens_taxa[, env_vars]),
-  method = "spearman", index = "bray", metric = "euclidean")
+bioenv_taxa <-
+  bioenv(  # run BIOENV analysis
+    # log10(x+1)-transformed communit data, including 'dummy' variable
+    # to enable calculation of zero-adjusted Bray-Curtis:
+    log10(dd_tree_lichens_taxa[, c(lichen_taxa, 'dummy')] + 1),
+    # vs. z-standardised environmental data:
+    z_std(dd_tree_lichens_taxa[, env_vars]),
+    method = "spearman", index = "bray", metric = "euclidean")
 
 bioenv_taxa_rho <-  # extract correlation coefficient
   max(summary(bioenv_taxa)$correlation)
@@ -158,10 +168,11 @@ cond_vars_taxa <-  # specify conditioning variables
   env_vars[-which(env_vars %in% bioenv_vars_taxa)]
 
 # ~ functional groups:
-bioenv_func <- bioenv(
-  log10(dd_tree_lichens_func[, c(lichen_func_grps, 'dummy')] + 1),
-  z_std(dd_tree_lichens_func[, env_vars]),
-  method = "spearman", index = "bray", metric = "euclidean")
+bioenv_func <-
+  bioenv(
+    log10(dd_tree_lichens_func[, c(lichen_func_grps, 'dummy')] + 1),
+    z_std(dd_tree_lichens_func[, env_vars]),
+    method = "spearman", index = "bray", metric = "euclidean")
 
 bioenv_func_rho <-  # extract correlation coefficient
   max(summary(bioenv_func)$correlation)

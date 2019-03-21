@@ -17,7 +17,8 @@ n_perm <- 9999  # specify no. permutations for multivariate analyses
 # Packages ----------------------------------------------------------
 
 # load required packages:
-library(tidyverse)
+suppressPackageStartupMessages(library(tidyverse))
+library(Hmisc)  # rcorr()
 library(vegan)
 
 
