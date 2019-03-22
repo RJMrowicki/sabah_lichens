@@ -95,12 +95,34 @@ anova_li_func_h <- Anova(lm_li_func_h, type = 'II')
 # (NB -- R doesn't allow for specification of more complex models or
 # post-hoc pairwise comparisons... use PRIMER instead)
 
+# output data for PERMANOVA analysis in PRIMER:
+# ~ lichen taxonomic and functional group abundances:
+# (NB -- use write.csv() instead of write_csv(), as require rownames)
+write.csv(dd_tree_lichens_taxa[, lichen_taxa], './primer/taxa.csv')
+write.csv(dd_tree_lichens_func[, lichen_func_grps], './primer/func.csv')
+# ~ corresponding factors (i.e. `site`):
+# (NB -- paste manually in PRIMER)
+write_csv(dd_tree_lichens_taxa[, 'site'], './primer/factors_taxa.csv')
+write_csv(dd_tree_lichens_func[, 'site'], './primer/factors_func.csv')
+
+# ### PERMANOVA analysis in PRIMER here ###
+
+# import results of PERMANOVA analysis in PRIMER:
+# ~ PERMANOVA table and post-hoc pairwise test results:
+perm_li_taxa <- read_csv('./primer/results/perm_li_taxa.csv')
+perm_li_taxa_ph <- read_csv('./primer/results/perm_li_taxa_ph.csv')
+perm_li_func <- read_csv('./primer/results/perm_li_func.csv')
+perm_li_func_ph <- read_csv('./primer/results/perm_li_func_ph.csv')
+
+
+
+
 # ~~ taxonomic groups:
 perm_li_taxa <-
   adonis(  # run PERMANOVA (vegan::adonis)
     # log10(x+1)-transformed data, including 'dummy' variable to enable
     # calculation of zero-adjusted Bray-Curtis dissimilarities:
-    log10(dd_lichens_taxa[, c(lichen_taxa, 'dummy')] + 1) ~ site,
+    cbind(log10(dd_lichens_taxa[, lichen_taxa] + 1), dummy_taxa) ~ site,
     data = dd_lichens_taxa,
     permutations = n_perm, method = "bray"
   )
@@ -108,7 +130,7 @@ perm_li_taxa <-
 # ~~ functional groups:
 perm_li_func <-
   adonis(
-    log10(dd_lichens_func[, c(lichen_func_grps, 'dummy')] + 1) ~ site,
+    cbind(log10(dd_lichens_func[, lichen_func_grps] + 1), dummy_func) ~ site,
     data = dd_lichens_func,
     permutations = n_perm, method = "bray"
   )
@@ -123,12 +145,12 @@ perm_li_func <-
 # mds_li_taxa <-
 #   mds(  # custom mds function
 #     # log10(x+1)-transformed data and zero-adjusted Bray-Curtis:
-#     log10(dd_lichens_taxa[, c(lichen_taxa, 'dummy')] + 1)
+#     cbind(log10(dd_lichens_taxa[, lichen_taxa] + 1), dummy_taxa)
 #   )
 # 
 # # ~~ functional groups:
 # mds_li_func <-
-#   mds(log10(dd_lichens_func[, c(lichen_func_grps, 'dummy')] + 1))
+#   mds(cbind(log10(dd_lichens_func[, lichen_func_grps] + 1), dummy_func))
 
 
 

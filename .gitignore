@@ -5,6 +5,9 @@
 *.pdf
 *.csv
 
+# PRIMER workspace files
+*.pwk
+
 # History files
 .Rhistory
 .Rapp.history
