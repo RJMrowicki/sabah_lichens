@@ -10,7 +10,7 @@
 # ~~~ richness:
 lm_li_taxa_s <-  # make model
   # (transformation corrects heteroscedasticity but not normality)
-  lm(`S`^0.5 ~ site, data = dd_lichens_taxa)
+  lm(`S`^0.5 ~ site, data = dd_tree_lichens_taxa)
 
 # # diagnostic plots of model residuals:
 # par(mfrow = c(2, 3))
@@ -19,7 +19,7 @@ lm_li_taxa_s <-  # make model
 # Shapiro-Wilk normality test:
 norm_li_taxa_s <- shapiro.test(residuals(lm_li_taxa_s))
 # Levene's test for homoscedasticity:
-het_li_taxa_s <- leveneTest(`S`^0.5 ~ site, data = dd_lichens_taxa)
+het_li_taxa_s <- leveneTest(`S`^0.5 ~ site, data = dd_tree_lichens_taxa)
 
 # ANOVA table (based on Type II SS):
 anova_li_taxa_s <- Anova(lm_li_taxa_s, type = 'II')
@@ -30,7 +30,7 @@ anova_li_taxa_s <- Anova(lm_li_taxa_s, type = 'II')
 # ~~~ diversity:
 lm_li_taxa_h <-  # make model
   # (transformation doesn't correct normality)
-  lm(`H'` ~ site, data = dd_lichens_taxa)
+  lm(`H'` ~ site, data = dd_tree_lichens_taxa)
 
 # # diagnostic plots of model residuals:
 # par(mfrow = c(2, 3))
@@ -39,7 +39,7 @@ lm_li_taxa_h <-  # make model
 # Shapiro-Wilk normality test:
 norm_li_taxa_h <- shapiro.test(residuals(lm_li_taxa_h))
 # Levene's test for homoscedasticity:
-het_li_taxa_h <- leveneTest(`H'` ~ site, data = dd_lichens_taxa)
+het_li_taxa_h <- leveneTest(`H'` ~ site, data = dd_tree_lichens_taxa)
 
 # ANOVA table (based on Type II SS):
 anova_li_taxa_h <- Anova(lm_li_taxa_h, type = 'II')
@@ -52,7 +52,7 @@ anova_li_taxa_h <- Anova(lm_li_taxa_h, type = 'II')
 # ~~~ richness:
 lm_li_func_s <-  # make model
   # (transformation doesn't correct non-normality/heteroscedasticity)
-  lm(`S` ~ site, data = dd_lichens_func)
+  lm(`S` ~ site, data = dd_tree_lichens_func)
 
 # # diagnostic plots of model residuals:
 # par(mfrow = c(2, 3))
@@ -61,7 +61,7 @@ lm_li_func_s <-  # make model
 # Shapiro-Wilk normality test:
 norm_li_func_s <- shapiro.test(residuals(lm_li_func_s))
 # Levene's test for homoscedasticity:
-het_li_func_s <- leveneTest(`S` ~ site, data = dd_lichens_func)
+het_li_func_s <- leveneTest(`S` ~ site, data = dd_tree_lichens_func)
 
 # ANOVA table (based on Type II SS):
 anova_li_func_s <- Anova(lm_li_func_s, type = 'II')
@@ -72,7 +72,7 @@ anova_li_func_s <- Anova(lm_li_func_s, type = 'II')
 # ~~~ diversity:
 lm_li_func_h <-  # make model
   # (transformation doesn't correct normality)
-  lm(`H'` ~ site, data = dd_lichens_func)
+  lm(`H'` ~ site, data = dd_tree_lichens_func)
 
 # # diagnostic plots of model residuals:
 # par(mfrow = c(2, 3))
@@ -81,7 +81,7 @@ lm_li_func_h <-  # make model
 # Shapiro-Wilk normality test:
 norm_li_func_h <- shapiro.test(residuals(lm_li_func_h))
 # Levene's test for homoscedasticity:
-het_li_func_h <- leveneTest(`H'` ~ site, data = dd_lichens_func)
+het_li_func_h <- leveneTest(`H'` ~ site, data = dd_tree_lichens_func)
 
 # ANOVA table (based on Type II SS):
 anova_li_func_h <- Anova(lm_li_func_h, type = 'II')
@@ -117,23 +117,23 @@ perm_li_func_ph <- read_csv('./primer/results/perm_li_func_ph.csv')
 
 
 
-# ~~ taxonomic groups:
-perm_li_taxa <-
-  adonis(  # run PERMANOVA (vegan::adonis)
-    # log10(x+1)-transformed data, including 'dummy' variable to enable
-    # calculation of zero-adjusted Bray-Curtis dissimilarities:
-    cbind(log10(dd_lichens_taxa[, lichen_taxa] + 1), dummy_taxa) ~ site,
-    data = dd_lichens_taxa,
-    permutations = n_perm, method = "bray"
-  )
-
-# ~~ functional groups:
-perm_li_func <-
-  adonis(
-    cbind(log10(dd_lichens_func[, lichen_func_grps] + 1), dummy_func) ~ site,
-    data = dd_lichens_func,
-    permutations = n_perm, method = "bray"
-  )
+# # ~~ taxonomic groups:
+# perm_li_taxa <-
+#   adonis(  # run PERMANOVA (vegan::adonis)
+#     # log10(x+1)-transformed data, plus 'dummy' variable to enable
+#     # calculation of zero-adjusted Bray-Curtis dissimilarities:
+#     cbind(log10(dd_tree_lichens_taxa[, lichen_taxa] + 1), dummy_taxa) ~ site,
+#     data = dd_tree_lichens_taxa,
+#     permutations = n_perm, method = "bray"
+#   )
+# 
+# # ~~ functional groups:
+# perm_li_func <-
+#   adonis(
+#     cbind(log10(dd_tree_lichens_func[, lichen_func_grps] + 1), dummy_func) ~ site,
+#     data = dd_tree_lichens_func,
+#     permutations = n_perm, method = "bray"
+#   )
 
 
 
@@ -145,12 +145,12 @@ perm_li_func <-
 # mds_li_taxa <-
 #   mds(  # custom mds function
 #     # log10(x+1)-transformed data and zero-adjusted Bray-Curtis:
-#     cbind(log10(dd_lichens_taxa[, lichen_taxa] + 1), dummy_taxa)
+#     cbind(log10(dd_tree_lichens_taxa[, lichen_taxa] + 1), dummy_taxa)
 #   )
 # 
 # # ~~ functional groups:
 # mds_li_func <-
-#   mds(cbind(log10(dd_lichens_func[, lichen_func_grps] + 1), dummy_func))
+#   mds(cbind(log10(dd_tree_lichens_func[, lichen_func_grps] + 1), dummy_func))
 
 
 
@@ -180,7 +180,7 @@ env_use <- env_vars  # (currently no variables are excluded)
 bioenv_taxa <-
   bioenv(  # run BIOENV analysis (vegan::bioenv)
     # log10(x+1)-transformed data and zero-adjusted Bray-Curtis:
-    log10(dd_tree_lichens_taxa[, c(lichen_taxa, 'dummy')] + 1),
+    cbind(log10(dd_tree_lichens_taxa[, lichen_taxa] + 1), dummy_taxa),
     # vs. z-standardised environmental data:
     z_std(dd_tree_lichens_taxa[, env_vars]),
     method = "spearman", index = "bray", metric = "euclidean"
@@ -197,7 +197,7 @@ cond_vars_taxa <-  # specify conditioning variables
 # ~~ functional groups:
 bioenv_func <-
   bioenv(
-    log10(dd_tree_lichens_func[, c(lichen_func_grps, 'dummy')] + 1),
+    cbind(log10(dd_tree_lichens_func[, lichen_func_grps] + 1), dummy_func),
     z_std(dd_tree_lichens_func[, env_vars]),
     method = "spearman", index = "bray", metric = "euclidean"
   )
@@ -221,7 +221,7 @@ cap_taxa <-
   capscale(  # run CAP analysis (vegan::capscale)
     formula(paste0(
       # log10(x+1)-transformed data and zero-adjusted Bray-Curtis:
-      "log10(dd_tree_lichens_taxa[, c(lichen_taxa, 'dummy')] + 1) ~ ",
+      "cbind(log10(dd_tree_lichens_taxa[, lichen_taxa] + 1), dummy_taxa) ~ ",
       paste0(strsplit(bioenv_vars_taxa, split = " "), collapse = " + "))),
     # vs. z-standardised environmental data:
     data = z_std(dd_tree_lichens_taxa[, bioenv_vars_taxa]),
@@ -291,7 +291,7 @@ cor_cap_taxa_env <-  # ~ environmental
 cor_cap_taxa_spp <-  # ~ species
   as.data.frame(cor(cbind(
     scores(cap_taxa)$sites, # site scores
-    # log10(x+1)-transformed abundance data (excluding 'dummy'):
+    # log10(x+1)-transformed abundance data:
     log10(dd_tree_lichens_taxa[, lichen_taxa] + 1)),
     method = "spearman")[  # rank (not product-moment) correlation
       -(1:2), 1:2])  # subset relevant correlations
@@ -320,7 +320,7 @@ cap_func <-
   capscale(  # run CAP analysis (vegan::capscale)
     formula(paste0(
       # log10(x+1)-transformed data and zero-adjusted Bray-Curtis:
-      "log10(dd_tree_lichens_func[, c(lichen_func_grps, 'dummy')] + 1) ~ ",
+      "cbind(log10(dd_tree_lichens_func[, lichen_func_grps] + 1), dummy_func) ~ ",
       paste0(strsplit(bioenv_vars_func, split = " "), collapse = " + "))),
     # vs. z-standardised environmental data:
     data = z_std(dd_tree_lichens_func[, bioenv_vars_func]),
@@ -390,7 +390,7 @@ cor_cap_func_env <-  # ~ environmental
 cor_cap_func_spp <-  # ~ species
   as.data.frame(cor(cbind(
     scores(cap_func)$sites, # site scores
-    # log10(x+1)-transformed abundance data (excluding 'dummy'):
+    # log10(x+1)-transformed abundance data:
     log10(dd_tree_lichens_func[, lichen_func_grps] + 1)),
     method = "spearman")[  # rank (not product-moment) correlation
       -(1:2), 1:2])  # subset relevant correlations

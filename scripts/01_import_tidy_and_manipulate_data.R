@@ -41,9 +41,6 @@ dd_lichens_taxa <-  # create new data frame
   # re-order columns so that `site` is at the beginning:
   select(`site`, `tree`, lichen_taxa)
 
-# create `dummy` species vector for zero-adjusted Bray-Curtis:
-dummy_taxa <- rep(1, nrow(dd_lichens_taxa))  # abundance of 1
-
 # ~ functional groups:
 
 # create vector of unique lichen functional groups:
@@ -64,9 +61,6 @@ dd_lichens_func <-  # create new data frame
   mutate(`site` = factor(str_sub(`tree`, end = 1))) %>%
   # re-order columns so that `site` is at the beginning:
   select(`site`, `tree`, lichen_func_grps)
-
-# create `dummy` species vector for zero-adjusted Bray-Curtis:
-dummy_func <- rep(1, nrow(dd_lichens_func))  # abundance of 1
 
 
 
@@ -129,3 +123,7 @@ dd_tree_lichens_func <-  # functional groups
   left_join(dd_trees_func, dd_lichens_func, by = c('tree', 'site')) %>%
   # remove rows for which there are no lichen functional group data:
   filter(is.na(rowSums(.[, lichen_func_grps])) == FALSE)
+
+# create separate `dummy` species vectors for zero-adjusted Bray-Curtis:
+dummy_taxa <- rep(1, nrow(dd_tree_lichens_taxa))  # abundance of 1
+dummy_func <- rep(1, nrow(dd_tree_lichens_func))

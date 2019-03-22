@@ -48,9 +48,11 @@ Taxonomic/functional group richness (_S_) and Shannon-Wiener diversity (_H\'_) w
 
 Tree bark type was coded numerically in relation to increasing roughness, i.e. smooth = 0, scaly = 1, ridged/rough = 2, ancient dry = 3. (See _Queries_ below.)
 
-Analysis of variance (ANOVA) was used to test for differences in lichen taxonomic and functional group richness and diversity among sites. Tests were based on Type II Sums of Squares owing to unequal numbers of observations among groups.
+Analysis of variance (ANOVA) was used to test for differences in lichen taxonomic and functional group richness and diversity among the three sites. Tests were based on Type II Sums of Squares owing to unequal numbers of observations among groups.
 
-Community dissimilarities were calculated using the zero-adjusted Bray-Curtis coefficient (Clarke _et al._, 2006, _J. Exp. Mar. Biol. Ecol._ 330:55--80).
+Differences in multivariate lichen community structure among sites were tested using permutational multivariate analysis of variance (PERMANOVA), separately for taxonomic and functional groups. Analyses involved 9,999 permutations of residuals under a reduced model. (Normally, non-metric multidimensional scaling (MDS) plots would be used to visualise overall differences in community structure... however, MDS analyses failed to converge on a result.)
+
+For all multivariate tests, community dissimilarities were calculated using the zero-adjusted Bray-Curtis coefficient (Clarke _et al._, 2006, _J. Exp. Mar. Biol. Ecol._ 330:55--80), based on $log10(x+1)$-transformed abundance data to reduce the influence of numerically dominant taxonomic/functional groups.
 
 ## Preliminary results
 
@@ -68,7 +70,7 @@ kable(mean_div_li_func, caption = 'Functional group data')
 
 ![Boxplot of lichen functional group richness and diversity versus site.](./figs/boxplots_func.pdf)
 
-As expected, lichen richness and diversity (in terms of both taxonomic and functional groups) appeared to be lower at the disturbed site compared to the other two sites. While ANOVAs indicated significant differences in all cases, these results must be interpreted with caution owing to the poor fit of data to models -- specifically, assumptions of normality and/or homoscedasticity were contravened. (Perhaps the data are zero-inflated?)
+As expected, lichen richness and diversity (in terms of both taxonomic and functional groups) appeared to be lower at the disturbed site compared to the other two sites. While ANOVAs indicated significant differences in all cases, these results must be interpreted with caution owing to the poor fit of data to models -- specifically, assumptions of normality and/or homoscedasticity were contravened. (Perhaps because the data are zero-inflated, i.e. contain an excessively large number of empty observations? In this case, permutational ANOVA (PERANOVA) may be more suitable for univariate analyses.)
 
 ANOVA results:
 
@@ -86,6 +88,25 @@ kable(anova_li_func_s, caption = 'Lichen functional group _S_ vs. site')
 kable(anova_li_func_h, caption = 'Lichen functional group _H\'_ vs. site')
 ```
 
+There were significant differences in overall lichen community structure (in terms of both taxonomic and functional groups) not only between old growth and logged sites, but also between Danum and Maliau Conservation Areas. (The particular taxonomic/functional groups making the greatest contributions to these differences may be examined in more detail via SIMPER analysis.)
+
+PERMANOVA tables and post-hoc pairwise test results:
+
+```{r permanova_tables, echo = FALSE}
+# insert PERMANOVA tables and post-hoc pairwise test results:
+# ~ taxonomic groups:
+kable(
+  perm_li_taxa,
+  caption = 'Lichen community structure (taxonomic groups) vs. site'
+)
+kable(perm_li_taxa_ph, caption = 'Post-hoc pairwise tests')
+# ~ functional groups:
+kable(
+  perm_li_func,
+  caption = 'Lichen community structure (functional groups) vs. site'
+)
+kable(perm_li_func_ph, caption = 'Post-hoc pairwise tests')
+```
 
 
 
