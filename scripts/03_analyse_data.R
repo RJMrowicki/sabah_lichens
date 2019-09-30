@@ -120,6 +120,35 @@ anova_li_func_h <- Anova(lm_li_func_h, type = 'II')
 
 
 
+# ~ PERANOVAs of lichen diversity vs. site --------------------------
+
+# output data for PERANOVA analysis in PRIMER:
+# ~ lichen taxonomic and functional group diversity:
+# (NB -- use write.csv() instead of write_csv(), as require rownames)
+write.csv(dd_tree_lichens_taxa[, c("S", "H'")], './primer/taxa_uni.csv')
+write.csv(dd_tree_lichens_func[, c("S", "H'")], './primer/func_uni.csv')
+
+# ~ corresponding factors (i.e. `site` and `plot`):
+# (NB -- paste manually in PRIMER)
+write_csv(dd_tree_lichens_taxa[, c('site', 'plot')], './primer/factors_taxa.csv')
+write_csv(dd_tree_lichens_func[, c('site', 'plot')], './primer/factors_func.csv')
+
+# ### PERMANOVA analysis in PRIMER here ###
+
+# import results of PERANOVA analysis in PRIMER:
+# ~ PERANOVA table and post-hoc pairwise test results:
+li_taxa_s <- read_csv('./primer/results/li_taxa_s.csv')
+li_taxa_s_ph <- read_csv('./primer/results/li_taxa_s_ph.csv')
+li_taxa_h <- read_csv('./primer/results/li_taxa_h.csv')
+li_taxa_h_ph <- read_csv('./primer/results/li_taxa_h_ph.csv')
+li_func_s <- read_csv('./primer/results/li_func_s.csv')
+li_func_s_ph <- read_csv('./primer/results/li_func_s_ph.csv')
+li_func_h <- read_csv('./primer/results/li_func_h.csv')
+li_func_h_ph <- read_csv('./primer/results/li_func_h_ph.csv')
+
+
+
+
 # Unconstrained multivariate analyses ===============================
 
 # ~ PERMANOVAs of lichen community structure vs. site ---------------
@@ -129,12 +158,9 @@ anova_li_func_h <- Anova(lm_li_func_h, type = 'II')
 # output data for PERMANOVA analysis in PRIMER:
 # ~ lichen taxonomic and functional group abundances:
 # (NB -- use write.csv() instead of write_csv(), as require rownames)
-write.csv(dd_tree_lichens_taxa[, lichen_taxa], './primer/taxa.csv')
-write.csv(dd_tree_lichens_func[, lichen_func_grps], './primer/func.csv')
-# ~ corresponding factors (i.e. `site`):
-# (NB -- paste manually in PRIMER)
-write_csv(dd_tree_lichens_taxa[, 'site'], './primer/factors_taxa.csv')
-write_csv(dd_tree_lichens_func[, 'site'], './primer/factors_func.csv')
+write.csv(dd_tree_lichens_taxa[, lichen_taxa], './primer/taxa_multi.csv')
+write.csv(dd_tree_lichens_func[, lichen_func_grps], './primer/func_multi.csv')
+# ~ corresponding factors (i.e. `site` and `plot`) output above.
 
 # ### PERMANOVA analysis in PRIMER here ###
 
