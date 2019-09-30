@@ -55,6 +55,50 @@ mds <- function (dat)  # accepts data frame of samples vs. species
 
 
 
+# create formatted SIMPER tables:
+simp_tab <- function (simp_obj_transf, simp_obj_untransf)  # simper objects
+{
+  tables_out <- vector(  # create empty list to store tables
+    'list', length = length(summary(simp_obj_transf)))
+  
+  for(i in 1:length(summary(simp_obj_transf))) {
+    # create table using transformed data simper output:
+    tab <- summary(simp_obj_transf)[[i]][
+      c("ava", "avb", "ratio", "cumsum")]
+    # convert cumulative % contributions into actual % contributions:
+    contrib <- c(tab$cumsum, 0) - c(0, tab$cumsum)
+    tab$cumsum <- contrib[1:nrow(tab)]*100  # change decimal to %
+    
+    tab <- tab[tab$cumsum >= 3, ]  # include only species contributing >3%
+    
+    # substitute transformed species abundances for untransformed:
+    tab[, c("ava", "avb")] <- summary(simp_obj_untransf)[[i]][
+      rownames(tab), c("ava", "avb")]
+    
+    # format columns to appropriate no. of d.p.:
+    tab$ava <- formatC(tab$ava, 2, format = "f")  # abundances 2 d.p.
+    tab$avb <- formatC(tab$avb, 2, format = "f")
+    tab$ratio <- formatC(tab$ratio, 2, format = "f")  # rest to 2 d.p.
+    tab$cumsum <- formatC(tab$cumsum, 2, format = "f")
+    
+    # substitute abundance colnames for actual group names:
+    colnames(tab)[which(colnames(tab)=="ava")] <- strsplit(
+      names(simp_obj_transf)[i], split = "_")[[1]][1]
+    colnames(tab)[which(colnames(tab)=="avb")] <- strsplit(
+      names(simp_obj_transf)[i], split = "_")[[1]][2]
+    # alter the rest of the column names:
+    colnames(tab)[which(colnames(tab)=="ratio")] <- "Contrib./SD"
+    colnames(tab)[which(colnames(tab)=="cumsum")] <- "Contrib.\\%"
+    
+    # store finished table in list:
+    tables_out[[i]] <- tab
+  }
+  return(tables_out)  # output list of tables
+}
+
+
+
+
 # z-standardise data frame:
 z_std <- function (dat)  # accepts data frame, tibble, etc.
 {

@@ -40,17 +40,19 @@ kable(nobs_site_li_func, caption = 'Lichen functional group data')
 kable(nobs_site_tr_func, caption = 'Tree functional trait data')
 ```
 
-Are there missing observations? (See _Queries_ below.)
-
 ## Data analysis
 
 Taxonomic/functional group richness (_S_) and Shannon-Wiener diversity (_H\'_) were calculated for each tree.
 
 Tree bark type was coded numerically in relation to increasing roughness, i.e. smooth = 0, scaly = 1, ridged/rough = 2, ancient dry = 3. (See _Queries_ below.)
 
-Permutational analysis of variance (PERANOVA) was used to test for differences in lichen taxonomic and functional group richness and diversity among the three sites. Differences in multivariate lichen community structure among sites were tested using permutational multivariate analysis of variance (PERMANOVA), separately for taxonomic and functional groups. Analyses involved 9,999 permutations of residuals under a reduced model, and tests were based on Type II Sums of Squares owing to unequal numbers of observations among groups. (Normally, non-metric multidimensional scaling (MDS) plots would be used to visualise overall differences in community structure... however, MDS analyses failed to converge on a result.)
+Permutational analysis of variance (PERANOVA) was used to test for differences in lichen taxonomic and functional group richness and diversity among the three sites. Differences in multivariate lichen community structure among sites were tested using permutational multivariate analysis of variance (PERMANOVA), separately for taxonomic and functional groups. Models included the factor 'site' (fixed, 3 levels: D, M and S), with a planned comparison (D, M) vs. S (i.e. undisturbed sites vs. disturbed site). 'Plot' (nested within site) was also included a random factor to account for potential non-independence of trees located within the same plot. Where a significant effect of 'site' was identified, pairwise permutational post-hoc tests were used to reveal differences between individual factor levels. Analyses involved 9,999 permutations of residuals under a reduced model, and tests were based on Type II Sums of Squares owing to unequal numbers of observations among groups.
 
-The biota--environment (BIOENV; Clarke & Ainsworth, 1993, _Mar. Ecol. Prog. Ser._ 92:205-219) routine was used to identify the optimal subset of tree functional traits (= 'environmental' variables) accounting for variability in lichen community structure, via maximisation of the rank correlation between environmental and biological distance matrices. The variables identified by the BIOENV analysis were then used in a canonical analysis of principal coordinates (CAP; Anderson & Willis, 2003, _Ecology_ 84:511--525) to enable dissimilarities in lichen communities to be visualised in relation to tree functional traits.
+(Normally, non-metric multidimensional scaling (MDS) plots would be used to visualise overall differences in community structure... however, MDS analyses failed to converge on a result.)
+
+Relative contributions of individual lichen taxa or functional groups to differences in community structure between groups of sites were determined via similarity of percentages (SIMPER; Clarke, 1993, _Aus. J. Ecol._ 18:117--143).
+
+The biota--environment (BIOENV; Clarke & Ainsworth, 1993, _Mar. Ecol. Prog. Ser._ 92:205--219) routine was used to identify the optimal subset of tree functional traits (= 'environmental' variables) accounting for variability in lichen community structure, via maximisation of the rank correlation between environmental and biological distance matrices. The variables identified by the BIOENV analysis were then used in a canonical analysis of principal coordinates (CAP; Anderson & Willis, 2003, _Ecology_ 84:511--525) to enable dissimilarities in lichen communities to be visualised in relation to tree functional traits.
 
 For all multivariate tests, community dissimilarities were calculated using the zero-adjusted Bray-Curtis coefficient (Clarke _et al._, 2006, _J. Exp. Mar. Biol. Ecol._ 330:55--80), based on $log10(x+1)$-transformed abundance data to reduce the influence of numerically dominant taxonomic/functional groups.
 

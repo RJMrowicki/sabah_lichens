@@ -5,13 +5,17 @@
 
 # ~ mixed effects models of lichen diversity vs. site ---------------
 
+# NB -- probability distributions are not really suitable for GLMMs;
+# try zero-inflated models, OR permutational ANOVA (see below).
+
 # ~~ taxonomic groups:
 
 # ~~~ richness:
 lm_li_taxa_s <-  # make model
-  # (NB -- 'plot/site' specifies both 'plot' AND 'site:plot' as random effects;
-  # as 'site' is already a fixed effect (and cannot be a random effect as well),
-  # specify 'site:plot' only; and set REML to true if data unbalanced...?)
+  # (NB -- 'plot/site' specifies both 'plot' AND 'site:plot' as
+  # random effects; as 'site' is already a fixed effect (and cannot
+  # be a random effect as well), specify 'site:plot' only;
+  # and set REML to TRUE, as data unbalanced...?)
   lmer(`S` ~ site + (1 | site:plot), data = dd_tree_lichens_taxa)
 
 
@@ -133,7 +137,9 @@ write.csv(dd_tree_lichens_func[, c("S", "H'")], './primer/func_uni.csv')
 write_csv(dd_tree_lichens_taxa[, c('site', 'plot')], './primer/factors_taxa.csv')
 write_csv(dd_tree_lichens_func[, c('site', 'plot')], './primer/factors_func.csv')
 
+
 # ### PERMANOVA analysis in PRIMER here ###
+
 
 # import results of PERANOVA analysis in PRIMER:
 # ~ PERANOVA table and post-hoc pairwise test results:
@@ -162,7 +168,9 @@ write.csv(dd_tree_lichens_taxa[, lichen_taxa], './primer/taxa_multi.csv')
 write.csv(dd_tree_lichens_func[, lichen_func_grps], './primer/func_multi.csv')
 # ~ corresponding factors (i.e. `site` and `plot`) output above.
 
+
 # ### PERMANOVA analysis in PRIMER here ###
+
 
 # import results of PERMANOVA analysis in PRIMER:
 # ~ PERMANOVA table and post-hoc pairwise test results:
@@ -199,15 +207,60 @@ perm_li_func_ph <- read_csv('./primer/results/perm_li_func_ph.csv')
 # (NB -- no convergence after multiple iterations)
 
 # # ~~ taxonomic groups:
-# mds_li_taxa <-
-#   mds(  # custom mds function
-#     # log10(x+1)-transformed data and zero-adjusted Bray-Curtis:
-#     cbind(log10(dd_tree_lichens_taxa[, lichen_taxa] + 1), dummy_taxa)
-#   )
+# mds_li_taxa <- mds(  # custom mds function
+#   # log10(x+1)-transformed data and zero-adjusted Bray-Curtis:
+#   cbind(log10(dd_tree_lichens_taxa[, lichen_taxa] + 1), dummy_taxa)
+# )
 # 
 # # ~~ functional groups:
-# mds_li_func <-
-#   mds(cbind(log10(dd_tree_lichens_func[, lichen_func_grps] + 1), dummy_func))
+# mds_li_func <- mds(
+#   # log10(x+1)-transformed data and zero-adjusted Bray-Curtis:
+#   cbind(log10(dd_tree_lichens_func[, lichen_func_grps] + 1), dummy_func)
+# )
+
+
+
+
+# ~ SIMPER tests of contributions to differences --------------------
+
+# ~~ taxonomic groups:
+
+simp_li_taxa_untransf <- simper(
+  # include dummy taxa to avoid empty row errors:
+  cbind(dd_tree_lichens_taxa[, lichen_taxa], dummy_taxa),
+  if_else(dd_tree_lichens_taxa$site == 'S', 'S', '(D,M)')  # (D,M) vs. S
+)
+# summary(simp_li_taxa_untransf)
+
+simp_li_taxa_transf <- simper(
+  # log10(x+1)-transform taxonomic group data, not dummy data:
+  cbind(log10(dd_tree_lichens_taxa[, lichen_taxa] + 1), dummy_taxa),
+  if_else(dd_tree_lichens_taxa$site == 'S', 'S', '(D,M)')  # (D,M) vs. S
+)
+# summary(simp_li_taxa_transf)
+
+# produce summary table:
+simp_li_taxa <- simp_tab(simp_li_taxa_transf, simp_li_taxa_untransf)
+
+
+
+
+# ~~ functional groups:
+
+simp_li_func_untransf <- simper(
+  cbind(dd_tree_lichens_func[, lichen_func_grps], dummy_taxa),
+  if_else(dd_tree_lichens_func$site == 'S', 'S', '(D,M)')  # D,M vs. S
+)
+# summary(simp_li_func_untransf)
+
+simp_li_func_transf <- simper(
+  cbind(log10(dd_tree_lichens_func[, lichen_func_grps] + 1), dummy_taxa),
+  if_else(dd_tree_lichens_func$site == 'S', 'S', '(D,M)')  # D,M vs. S
+)
+# summary(simp_li_func_transf)
+
+# produce summary table:
+simp_li_func <- simp_tab(simp_li_func_transf, simp_li_func_untransf)
 
 
 
