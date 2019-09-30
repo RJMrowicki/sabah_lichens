@@ -11,8 +11,9 @@ boxplot_li_taxa_s <-  # assign to object
   ggplot(dd_lichens_taxa, aes(x = `site`, y = `S`)) +
   geom_boxplot() +
   geom_jitter(  # overlay data points
-    shape = 16, position = position_jitter(0.2),
-    colour = "blue", alpha = 0.5)
+    shape = 16, position = position_jitter(0.15),
+    colour = grey(0.25), alpha = 0.5) +
+  theme_rob()
 # ~~ diversity:
 # (same plot as above, except with different y variable)
 boxplot_li_taxa_h <- boxplot_li_taxa_s + aes(y = `H'`)
@@ -22,8 +23,9 @@ boxplot_li_func_s <-
   ggplot(dd_lichens_func, aes(x = `site`, y = `S`)) +
   geom_boxplot() +
   geom_jitter(
-    shape = 16, position = position_jitter(0.1),
-    colour = "blue", alpha = 0.5)
+    shape = 16, position = position_jitter(0.15),
+    colour = grey(0.25), alpha = 0.5) +
+  theme_rob()
 # ~~ diversity:
 boxplot_li_func_h <- boxplot_li_func_s + aes(y = `H'`)
 

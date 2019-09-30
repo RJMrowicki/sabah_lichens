@@ -1,5 +1,5 @@
 ---
-title: 'How much taxonomic expertise is necessary for prioritising areas of lowland rainforest sites as habitats for lichens in northeast-Borneo?'
+title: 'How much taxonomic expertise is necessary for prioritising areas of lowland rainforest sites as habitats for lichens in northeast Borneo?'
 author: 'Rob Mrowicki'
 date: '`r format(Sys.time(), "%d %B %Y")`'
 output:
@@ -8,8 +8,8 @@ output:
     fig_crop: yes
 ---
 
-```{r setup, include = FALSE}
-source('./scripts/00_setup.R')  # run setup script
+```{r init, include = FALSE}
+source('./scripts/00_init.R')  # run initialisation script
 ```
 
 ```{r source_scripts, include = FALSE}
@@ -24,13 +24,13 @@ source('./scripts/04_plotting.R')
 
 Sampling was conducted at three sites within different areas of lowland forest in northeast Borneo, including two old growth reserve sites, (1) Danum Valley Conservation Area ('D') and (2) Maliau Conservation Area ('M'), and one selectively logged site, (3) the Stability of Altered Forest Ecosystems (SAFE) Project area ('S').
 
-At each site, ...
+At each site, ... (D and M = 96; S = 72).
 
 The following functional traits were recorded for each tree: (1) girth, measured as ...; (2) bark type (S = smooth, C = scaly, R = ridged/rough, DR = dry ancient); and (3) the presence of buttresses or flutes.
 
-Numbers of observations per site:
+(Check actual numbers of replicates per site.)
 
-```{r nobs_tables, echo = FALSE}
+```{r nobs_tables, eval = FALSE, echo = FALSE}
 # insert tables for numbers of observations vs. site:
 # ~ lichen taxonomic groups:
 kable(nobs_site_li_taxa, caption = 'Lichen taxonomic group data')
@@ -52,6 +52,8 @@ Analysis of variance (ANOVA) was used to test for differences in lichen taxonomi
 
 Differences in multivariate lichen community structure among sites were tested using permutational multivariate analysis of variance (PERMANOVA), separately for taxonomic and functional groups. Analyses involved 9,999 permutations of residuals under a reduced model. (Normally, non-metric multidimensional scaling (MDS) plots would be used to visualise overall differences in community structure... however, MDS analyses failed to converge on a result.)
 
+The biota--environment (BIOENV; Clarke & Ainsworth, 1993, _Mar. Ecol. Prog. Ser._ 92:205-219) routine was used to identify the optimal subset of tree functional traits (= 'environmental' variables) accounting for variability in lichen community structure, via maximisation of the rank correlation between environmental and biological distance matrices. The variables identified by the BIOENV analysis were then used in a canonical analysis of principal coordinates (CAP; Anderson & Willis, 2003, _Ecology_ 84:511--525) to enable dissimilarities in lichen communities to be visualised in relation to tree functional traits.
+
 For all multivariate tests, community dissimilarities were calculated using the zero-adjusted Bray-Curtis coefficient (Clarke _et al._, 2006, _J. Exp. Mar. Biol. Ecol._ 330:55--80), based on $log10(x+1)$-transformed abundance data to reduce the influence of numerically dominant taxonomic/functional groups.
 
 ## Preliminary results
@@ -70,7 +72,7 @@ kable(mean_div_li_func, caption = 'Functional group data')
 
 ![Boxplot of lichen functional group richness and diversity versus site.](./figs/boxplots_func.pdf)
 
-As expected, lichen richness and diversity (in terms of both taxonomic and functional groups) appeared to be lower at the disturbed site compared to the other two sites. While ANOVAs indicated significant differences in all cases, these results must be interpreted with caution owing to the poor fit of data to models -- specifically, assumptions of normality and/or homoscedasticity were contravened. (Perhaps because the data are zero-inflated, i.e. contain an excessively large number of empty observations? In this case, permutational ANOVA (PERANOVA) may be more suitable for univariate analyses.)
+As expected, lichen richness and diversity (in terms of both taxonomic and functional groups) appeared to be lower at the logged site compared to the other two sites. While ANOVAs indicated significant differences in all cases, these results must be interpreted with caution owing to the poor fit of data to models -- specifically, assumptions of normality and/or homoscedasticity were contravened. (Perhaps because the data are zero-inflated, i.e. contain an excessively large number of empty observations? In this case, permutational ANOVA (PERANOVA) may be more suitable for univariate analyses.)
 
 ANOVA results:
 
@@ -108,14 +110,14 @@ kable(
 kable(perm_li_func_ph, caption = 'Post-hoc pairwise tests')
 ```
 
+Tree girth and presence of buttresses/flutes were identified by BIOENV as key tree traits influencing lichen community structure, in terms of both taxonomic and functional groups. CAP axis 1 correlated positively with tree girth, while axis 2 correlated negatively with buttress presence; however, only tree girth appeared to have a statistically significant effect on lichen communities.
 
+(Relationships between lichen community structure and tree functional traits are to be visualised with a CAP ordination plot. Subsequent analysis will allow more detailed examination of which lichen taxonomic/functional groups correlate with particular tree traits.)
 
 ## Queries
 
 1. In both lichen abundance datasets, there are two _D810_ columns -- is this a mistake (should these be combined into a single column in each case)? OR should one of these be labelled _D710_, as this tree is not present in either dataset?
 
-1. The _crsco_ taxfree code is duplicated in the lichen functional group abundance dataset -- should the abundance variables be summed for these two rows?
+1. I'm assuming that 'tree no.' is coded as follows: site-plot-tree (i.e. _D111_ = tree 11 in plot 1 in site Danum). Is this correct?
 
-1. There are no data for tree _SA4_ in the lichen functional group abundance dataset (in addition to tree _D710_ -- see above).
-
-1. Can 'bark type' be coded numerically (i.e. an ordinal categorical variable), e.g. smooth = 1, scaly = 2, ridged/rough = 3, dry ancient = 4? In this way, it could be used as an environmental variable in the CAP analysis.
+1. Can 'bark type' be coded numerically (i.e. an ordinal categorical variable), e.g. smooth = 1, scaly = 2, ridged/rough = 3, dry ancient = 4? In this way, it can be used as an environmental variable in the CAP analysis.

@@ -21,6 +21,8 @@ suppressPackageStartupMessages(library(tidyverse))
 
 library(car)  # Anova()
 library(Hmisc)  # rcorr()
+library(lme4)  # lmer()
+library(plotrix)  # std.error()
 library(vegan)
 
 library(gridExtra)  # grid.arrange()
