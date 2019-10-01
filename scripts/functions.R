@@ -55,6 +55,26 @@ mds <- function (dat)  # accepts data frame of samples vs. species
 
 
 
+# report numeric value (e.g. MS, F) with 2 d.p.:
+rep_2dp <- function (num_val)
+{
+  formatC(num_val, 2, format = "f")
+}
+
+
+
+
+# report P value with 3 d.p.:
+rep_p <- function (p_val)
+{
+  if(p_val < 0.001) {"< 0.001"} else {  # display < 0.001 if necessary
+    paste("= ", formatC(p_val, 3, format = "f"))  # display P value
+  }
+}
+
+
+
+
 # create formatted SIMPER tables:
 simp_tab <- function (simp_obj_transf, simp_obj_untransf)  # simper objects
 {
