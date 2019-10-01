@@ -95,7 +95,7 @@ dd_trees_func <-  # create new data frame
   # recode `bark` to numerical (ordinal) based on relative roughness:
   # (NB -- specify 'dplyr::' as opposed to 'car::')
   mutate(`bark_ord` = dplyr::recode(
-    `bark`, 'S' = 0, 'C' = 1, 'R' = 2, 'DR' = 3)) %>%
+    `bark`, 'DR' = 1, 'S' = 2, 'C' = 3, 'R' = 4)) %>%
   # change relevant 'character' variables to 'factors':
   mutate_at(vars(`bark`, `func_grp`, `site`), factor) %>%
   # re-arrange rows by site, plot and tree:

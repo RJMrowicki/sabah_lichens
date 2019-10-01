@@ -27,7 +27,7 @@ Sampling was conducted at three sites within different areas of lowland forest i
 
 At each site, ... (D and M = 96; S = 72).
 
-The following functional traits were recorded for each tree: (1) girth, measured as ...; (2) bark type (S = smooth, C = scaly, R = ridged/rough, DR = dry ancient); and (3) the presence of buttresses or flutes.
+The following functional traits were recorded for each tree: (1) girth, measured as ...; (2) bark type (DR = dry ancient, S = smooth, C = scaly, R = ridged/rough); and (3) the presence of buttresses or flutes.
 
 ```{r nobs_tables, eval = FALSE, echo = FALSE}
 # check actual numbers of replicates per site
@@ -45,7 +45,7 @@ kable(nobs_site_tr_func, caption = 'Tree functional trait data')
 
 Lichen taxonomic and functional group richness (_S_) and Shannon-Wiener diversity (_H\'_) were calculated for each tree.
 
-Tree bark type was coded numerically in relation to increasing roughness, i.e. smooth = 0, scaly = 1, ridged/rough = 2, ancient dry = 3. (See _Queries_ below.)
+Tree bark type was coded numerically in relation to increasing perceived water holding capacity, i.e. ancient dry = 1, smooth = 2, scaly = 3, ridged/rough = 4. (See _Queries_ below.)
 
 
 ### Differences in lichen diversity among sites
@@ -167,8 +167,8 @@ Taxonomic groups (R-Es, R-Py and ArH) and functional groups (crapo, crbya, crbys
 
 ## Queries
 
-1. In both lichen abundance datasets, there are two _D810_ columns -- perhaps one of these (the first one) should be labelled _D710_, as this tree is not present in either dataset? This is what I've done. (Otherwise, should these be combined into a single column _D810_ in each case)?
+1. In both lichen abundance datasets, there are two _D810_ columns -- perhaps one of these (the first one) should be labelled _D710_, as this tree is not present in either dataset? This is what I've done. (Otherwise, should these be combined into a single column _D810_ in each case?)
 
 1. I'm assuming that 'tree no.' is coded as follows: site-plot-tree (i.e. _D111_ = tree 11 in plot 1 in site Danum). Is this correct?
 
-1. Can 'bark type' be coded numerically (i.e. an ordinal categorical variable), e.g. smooth = 1, scaly = 2, ridged/rough = 3, dry ancient = 4? In this way, it can be used as an environmental variable in the CAP analysis.
+1. Again, coding 'bark type' numerically (i.e. an ordinal categorical variable) -- so that it can be used as an environmental variable in the CAP analysis -- is questionable; as Holger suggests, water holding capacity is probably more relevant than roughness if we are to do this. (As it happens, bark type is not identified as an 'important' environmental variable anyway, at least not when treated this way; results may differ if it is included as a non-ordinal categorical variable.)
