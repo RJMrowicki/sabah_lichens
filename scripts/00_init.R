@@ -23,9 +23,11 @@ library(car)  # Anova()
 library(Hmisc)  # rcorr()
 library(lme4)  # lmer()
 library(plotrix)  # std.error()
-library(vegan)
+library(vegan)  # specnumber(), bioenv(), capscale(),
+library(wordcloud)
 
 library(gridExtra)  # grid.arrange()
+library(knitr)  # kable()
 
 
 

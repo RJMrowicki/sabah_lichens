@@ -73,9 +73,9 @@ plot_cap_env <- function(
   use_x <- scores(cap_obj)$sites[, "CAP1"]
   use_y <- scores(cap_obj)$sites[, "CAP2"]
   # determine x and y limits (based on lowest integer value):
-  x0 <- floor(min(use_x)); x1 <- ceiling(max(use_x))
-  y0 <- floor(min(use_y)); y1 <- ceiling(max(use_y))
-  
+  x0 <- 2 * floor(min(use_x)/2); x1 <- 2 * ceiling(max(use_x)/2)
+  y0 <- 2 * floor(min(use_y)/2); y1 <- 2 * ceiling(max(use_y)/2)
+  # (NB -- `2 * round(x/2)` rounds to nearest even integer)
   
   plot(  # create blank plot area
     use_x, use_y, type = "n", bty = "l",
@@ -86,13 +86,13 @@ plot_cap_env <- function(
   
   abline(h = 0, col = grey(0.75))  # horizontal line at x = 0
   abline(v = 0, col = grey(0.75))  # vertical line at y = 0
-  sf <- 0.375  # scaling factor for circle perimeter and arrow length
+  sf <- 1.1  # scaling factor for circle perimeter and arrow length
   # draw.circle(  # add circle (perimeter represents correlation = 1)
   #   0, 0, radius = (x1-x0)*sf, border = grey(0.75))
   
   axis(  # add x axis
     side = 1, cex.axis = fig_cex,
-    at = seq(x0, x1, 1), labels = seq(x0, x1, 1)
+    at = seq(x0, x1, 2), labels = seq(x0, x1, 2)
   )
   title(  # axis label including proportion explained
     line = 2.5, cex.lab = fig_cex,
@@ -225,30 +225,33 @@ plot_cap_spp <- function (
   
   par(xpd = TRUE)  # allow plotting throughout figure region
   
-  # text(  # add species labels
-  #   spp_cor_obj$CAP1, spp_cor_obj$CAP2,
-  #   parse(text = spp_labs),
-  #   pos = c(apply(  #
-  #     spp_cor_obj, MARGIN = 1, FUN = function(x) {
-  #       if(x["CAP2"] < 0) {1} else {3}
-  #     })),
-  #   # if (abs(x["CAP1"]) > abs(x["CAP2"])) {  # if |x| > |y|
-  #   #   # if x < 0, label left of point:
-  #   #   if (x["CAP1"] < 0) {2} else {4}  
-  #   #   } else { # if |x| < |y|
-  #   #     # if y < 0, label below point:
-  #   #     if (x["CAP2"] < 0) {1} else {3}  
-  #   # }})),
-  #   offset = 0.15, col = "black", cex = fig_cex
+  # textplot(  # add non-overlapping species labels
+  #   # expand x and y from origin:
+  #   (abs(spp_cor_obj_lab$CAP1) + 0.01) * sign(spp_cor_obj_lab$CAP1),
+  #   (abs(spp_cor_obj_lab$CAP2) + 0.01) * sign(spp_cor_obj_lab$CAP2),
+  #   # spp_cor_obj_lab$CAP1, spp_cor_obj_lab$CAP2,  # original coordinates
+  #   words = parse(text = spp_labs),
+  #   xlim = c(-1, 1), ylim = c(-1, 1),
+  #   new = FALSE, cex = fig_cex, show.lines = FALSE
   # )
-  textplot(  # add non-overlapping species labels
-    # expand x and y from origin:
-    (abs(spp_cor_obj_lab$CAP1) + 0.075) * sign(spp_cor_obj_lab$CAP1),
-    (abs(spp_cor_obj_lab$CAP2) + 0.075) * sign(spp_cor_obj_lab$CAP2),
-    # spp_cor_obj_lab$CAP1, spp_cor_obj_lab$CAP2,  # original coordinates
-    words = parse(text = spp_labs),
-    xlim = c(-1, 1), ylim = c(-1, 1),
-    new = FALSE, cex = fig_cex, show.lines = FALSE
+  lay <- wordlayout(  # generate coords for non-overlapping text:
+    spp_cor_obj_lab$CAP1, spp_cor_obj_lab$CAP2,
+    words = spp_labs, cex = fig_cex
+  )
+  text(  # add non-overlapping species labels
+    lay[, 1], lay[, 2], rownames(lay),
+    # pos = pmap_dbl(  # position relative to coordinates,
+    #   # based on generated non-overlapping coordinates:
+    #   as.data.frame(lay[, c('x', 'y')]),
+    #   function (x, y) {
+    #     if (abs(x) > abs(y)) {  # if |x| > |y|,
+    #       # if x < 0, label left of point:
+    #       if (x < 0) { 2 } else { 4 }
+    #     } else {  # if |x| < |y|,
+    #       # if y < 0, label below point:
+    #       if (y < 0) { 1 } else { 3 }
+    #     }}),
+    offset = 0, col = "black", cex = fig_cex
   )
   
   par(xpd = FALSE)  # re-clip plotting to plot region
@@ -273,7 +276,7 @@ rep_2dp <- function (num_val)
 # report P value with 3 d.p.:
 rep_p <- function (p_val)
 {
-  if(p_val < 0.001) {"< 0.001"} else {  # display < 0.001 if necessary
+  if (p_val < 0.001) {"< 0.001"} else {  # display < 0.001 if necessary
     paste("= ", formatC(p_val, 3, format = "f"))  # display P value
   }
 }
