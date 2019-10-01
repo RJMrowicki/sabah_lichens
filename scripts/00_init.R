@@ -26,7 +26,6 @@ library(plotrix)  # std.error()
 library(vegan)
 
 library(gridExtra)  # grid.arrange()
-library(knitr)  # kable()
 
 
 

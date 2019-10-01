@@ -29,11 +29,10 @@ lm_li_taxa_s <-  # make model
 
 
 
-# diagnostic plots of model residuals:
-# par(mfrow = c(2, 3))
-plot(lm_li_taxa_s); # hist(residuals(lm_li_taxa_s))
-par(mfrow = c(1, 2))
-qqnorm(residuals(lm_li_taxa_s)); hist(residuals(lm_li_taxa_s))
+# # diagnostic plots of model residuals:
+# plot(lm_li_taxa_s)
+# par(mfrow = c(1, 2))
+# qqnorm(residuals(lm_li_taxa_s)); hist(residuals(lm_li_taxa_s))
 
 # Shapiro-Wilk normality test:
 norm_li_taxa_s <- shapiro.test(residuals(lm_li_taxa_s))
@@ -55,10 +54,9 @@ lm_li_taxa_h <-  # make model
 #   glmer(`H'`+1 ~ site + (1 | site:plot), data = dd_tree_lichens_taxa, family = Gamma)
 
 # # diagnostic plots of model residuals:
-# par(mfrow = c(2, 3))
-plot(lm_li_taxa_h); # hist(residuals(lm_li_taxa_h))
-par(mfrow = c(1, 2))
-qqnorm(residuals(lm_li_taxa_h)); hist(residuals(lm_li_taxa_h))
+# plot(lm_li_taxa_h)
+# par(mfrow = c(1, 2))
+# qqnorm(residuals(lm_li_taxa_h)); hist(residuals(lm_li_taxa_h))
 
 # Shapiro-Wilk normality test:
 norm_li_taxa_h <- shapiro.test(residuals(lm_li_taxa_h))
@@ -81,11 +79,10 @@ lm_li_func_s <-  # make model
 # glm_li_func_s <-  # make model
 #   glmer(`S`+1 ~ site + (1 | site:plot), data = dd_tree_lichens_func, family = Gamma)
 
-# diagnostic plots of model residuals:
-# par(mfrow = c(2, 3))
-plot(lm_li_func_s); # hist(residuals(lm_li_taxa_s))
-par(mfrow = c(1, 2))
-qqnorm(residuals(lm_li_func_s)); hist(residuals(lm_li_func_s))
+# # diagnostic plots of model residuals:
+# plot(lm_li_func_s)
+# par(mfrow = c(1, 2))
+# qqnorm(residuals(lm_li_func_s)); hist(residuals(lm_li_func_s))
 
 # Shapiro-Wilk normality test:
 norm_li_func_s <- shapiro.test(residuals(lm_li_func_s))
@@ -107,11 +104,10 @@ lm_li_func_h <-  # make model
 # glm_li_func_h <-  # make model
 #   glmer(`H'`+1 ~ site + (1 | site:plot), data = dd_tree_lichens_func, family = Gamma)
 
-# diagnostic plots of model residuals:
-# par(mfrow = c(2, 3))
-plot(lm_li_func_h); # hist(residuals(lm_li_func_h))
-par(mfrow = c(1, 2))
-qqnorm(residuals(lm_li_func_h)); hist(residuals(lm_li_func_h))
+# # diagnostic plots of model residuals:
+# plot(lm_li_func_h)
+# par(mfrow = c(1, 2))
+# qqnorm(residuals(lm_li_func_h)); hist(residuals(lm_li_func_h))
 
 # Shapiro-Wilk normality test:
 norm_li_func_h <- shapiro.test(residuals(lm_li_func_h))
@@ -129,8 +125,10 @@ anova_li_func_h <- Anova(lm_li_func_h, type = 'II')
 # output data for PERANOVA analysis in PRIMER:
 # ~ lichen taxonomic and functional group diversity:
 # (NB -- use write.csv() instead of write_csv(), as require rownames)
-write.csv(dd_tree_lichens_taxa[, c("S", "H'")], './primer/taxa_uni.csv')
-write.csv(dd_tree_lichens_func[, c("S", "H'")], './primer/func_uni.csv')
+write.csv(dd_tree_lichens_taxa[, "S"], './primer/li_taxa_s.csv')
+write.csv(dd_tree_lichens_taxa[, "H'"], './primer/li_taxa_h.csv')
+write.csv(dd_tree_lichens_func[, "S"], './primer/li_func_s.csv')
+write.csv(dd_tree_lichens_func[, "H'"], './primer/li_func_h.csv')
 
 # ~ corresponding factors (i.e. `site` and `plot`):
 # (NB -- paste manually in PRIMER)
@@ -164,8 +162,8 @@ li_func_h_ph <- read_csv('./primer/results/li_func_h_ph.csv')
 # output data for PERMANOVA analysis in PRIMER:
 # ~ lichen taxonomic and functional group abundances:
 # (NB -- use write.csv() instead of write_csv(), as require rownames)
-write.csv(dd_tree_lichens_taxa[, lichen_taxa], './primer/taxa_multi.csv')
-write.csv(dd_tree_lichens_func[, lichen_func_grps], './primer/func_multi.csv')
+write.csv(dd_tree_lichens_taxa[, lichen_taxa], './primer/li_taxa.csv')
+write.csv(dd_tree_lichens_func[, lichen_func_grps], './primer/li_func.csv')
 # ~ corresponding factors (i.e. `site` and `plot`) output above.
 
 
