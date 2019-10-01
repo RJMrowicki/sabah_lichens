@@ -45,7 +45,8 @@ boxplot_li_func_h <- boxplot_li_func_s + aes(y = `H'`) +
 pdf(  # open .pdf graphics device
   './figs/boxplots_taxa.pdf',
   # set width/height in cm (convert from inches):
-  width = 18/2.54, height = 8/2.54)
+  width = 18/2.54, height = 8/2.54
+)
 
 # arrange richness and diversity plots side by side:
 grid.arrange(boxplot_li_taxa_s, boxplot_li_taxa_h, ncol = 2)
@@ -56,7 +57,8 @@ dev.off()  # close .pdf graphics device
 # ~ functional groups:
 pdf(  # open .pdf graphics device
   './figs/boxplots_func.pdf',
-  width = 18/2.54, height = 8/2.54)
+  width = 18/2.54, height = 8/2.54
+)
 
 grid.arrange(boxplot_li_func_s, boxplot_li_func_h, ncol = 2)
 
@@ -65,10 +67,9 @@ dev.off()  # close .pdf graphics device
 
 
 
-# CAP ordination plot ===============================================
+# CAP ordination plots ==============================================
 
 cap_mar <- c(3.5, 3.5, 0.5, 0.5)  # specify plot margins for CAP
-fig_cex <- 0.8  # specify plot text size
 
 # lookup tables for point styles:
 pt_sty_site <- data.frame(  # by site
@@ -81,178 +82,61 @@ pt_sty_site <- data.frame(  # by site
 
 
 
-# vector of CAP site labels:
-site_labs <- as.vector(rownames(scores(cap_taxa)$sites))
-
-# vector of CAP environmental vector labels:
-env_labs <-  rownames(summary(cap_taxa)$biplot)
-
-# vector of CAP species vector labels:
-# (NB -- species with correlation coefficient >=x only)
-spp_labs <- as.vector(rownames(cor_taxa_spp))
-# spp_labs <- as.vector(rownames(cor_cap_taxa_spp))
-
-
-
+# ~ taxonomic groups:
 
 pdf(  # open .pdf graphics device
   './figs/cap_taxa.pdf',
-  width = 18/2.54, height = 9/2.54)
+  width = 18/2.54, height = 9/2.54
+)
 
 
 par( # set plotting parameters
   las = 1, mar = cap_mar)
 
-
-# ~~ (A) CAP ordination plot:
-
 par(fig = c(0, 0.5, 0, 1))
-
-# extract point coordinates (for sites):
-use_x <- scores(cap_taxa)$sites[, "CAP1"]
-use_y <- scores(cap_taxa)$sites[, "CAP2"]
-# determine x and y limits (based on lowest integer value):
-x0 <- floor(min(use_x)); x1 <- ceiling(max(use_x))
-y0 <- floor(min(use_y)); y1 <- ceiling(max(use_y))
-
-plot( # create plot area
-  use_x, use_y, type = "n", bty = "l",
-  xaxt = "n", xaxs = "i", yaxt = "n", yaxs = "i",
-  xlab = "", ylab = "",
-  xlim = c(x0, x1), ylim = c(y0, y1), cex.lab = fig_cex)
-
-abline(h = 0, col = grey(0.75))  # horizontal line at x = 0
-abline(v = 0, col = grey(0.75))  # vertical line at y = 0
-sf <- 0.375  # scaling factor for circle perimeter and arrow length
-# draw.circle(  # add circle (perimeter represents correlation = 1)
-#   0, 0, radius = (x1-x0)*sf, border = grey(0.75))
-axis(  # add x axis
-  side = 1, at = seq(x0, x1, 1), labels = seq(x0, x1, 1), cex.axis = fig_cex)
-title(  # axis label including proportion explained
-  line = 2.5, cex.lab = fig_cex, xlab = parse(text = paste(
-    "paste(\"CAP1 (\", delta^2, \" = \",",
-    rep_2dp(delta_sq_taxa[1]), ",\")\", sep = \"\")")))
-axis( # add y axis
-  side = 2, at = seq(y0, y1, 2), labels = seq(y0, y1, 2), cex.axis = fig_cex)
-title(  # axis label including proportion explained
-  line = 2.25, cex.lab = fig_cex, ylab = parse(text = paste(
-    "paste(\"CAP2 (\", delta^2, \" = \",",
-    rep_2dp(delta_sq_taxa[2]), ",\")\", sep = \"\")")))
-
-points(  # add points
-  use_x, use_y,
-  pch = as.numeric(pt_sty_site[  # lookup symbol from table
-    match(as_vector(dd_tree_lichens_taxa[,"site"]), pt_sty_site[,"site"]
-    ), "pch"]),
-  cex = as.numeric(pt_sty_site[  # lookup size from table
-    match(as_vector(dd_tree_lichens_taxa[,"site"]), pt_sty_site[,"site"]
-    ), "cex"]),
-  col = as.character(pt_sty_site[  # lookup colour from table
-    match(as_vector(dd_tree_lichens_taxa[,"site"]), pt_sty_site[,"site"]
-    ), "col"]))
-
-par(xpd = NA)  # allow plotting throughout device region
-
-# text(  # add transect labels
-#   use_x-0.02*(x1-x0), use_y,
-#   labels = site_labs,
-#   adj = c(1, 0), pos = 1,  # pos overrides adj
-#   offset = 0.25, cex = 0.7, col = grey(0.5))
-# wordcloud::textplot(  # add non-overlapping transect labels
-#   use_x, use_y,
-#   words = site_labs,# rownames(scores(cap_spp_subst)$sites),
-#   xlim = c(x0, x1), ylim = c(y0, y1),
-#   new = FALSE, cex = 0.5, col = grey(0.5),
-#   show.lines = FALSE)
-
-# text( # add vector overlay of environmental variables
-#   # (NB - uses product-moment, not rank, correlation coefficients)
-#   cap_taxa, display = "bp", col = grey(0.5), axis.bp = FALSE,
-#   arrow.mul = (x1-x0)*sf, # length multiplier matches circle radius
-#   head.arrow = 0.05, cex = 0.7,
-#   labels = env_labs)
-arrows(  # add arrows for environmental correlations, from origin
-  x0 = 0, y0 = 0,
-  x1 = cor_cap_taxa_env$CAP1*((x1-x0)*sf),  # use scaling factor
-  y1 = cor_cap_taxa_env$CAP2*((x1-x0)*sf),  # (correspond with circle perimeter)
-  code = 2, length = 0.05, lwd = 1.5, col = "blue")
-text(  # add environmental labels
-  cor_cap_taxa_env$CAP1*((x1-x0)*sf), cor_cap_taxa_env$CAP2*((x1-x0)*sf),
-  env_labs, pos = c(apply( #
-    cor_cap_taxa_env, MARGIN = 1, FUN = function (x) {
-      if (abs(x["CAP1"]) > abs(x["CAP2"])) { # if |x| > |y|
-        if (x["CAP1"] < 0) {2} else {4}  # if x < 0, label left of point
-      } else { # if |x| < |y|
-        if (x["CAP2"] < 0) {1} else {3}  # if y < 0, label below point
-      }})),
-  offset = 0.15, col = "blue", cex = fig_cex)
-
-par(xpd = FALSE) # re-clip plotting to plot region
-
-# legend(  # add legend for sites
-#   "topright", bty = "n", title = "Site",
-#   legend = pt_sty_site$site,
-#   pch = pt_sty_site$pch, col = pt_sty_site$col,
-#   pt.cex = 0.8*pt_sty_site$cex, y.intersp = 0.8, cex = 0.8)
-legend(  # add plot label
-  "topleft", bty = "n", legend = "", title = expression(bold("A")))
-
-
-
-
-# ~~ (B) species correlations with CAP axes
+plot_cap_env(  # plot CAP ordination with environmental correlations
+  cap_obj = cap_taxa, cap_dat = dd_tree_lichens_taxa,
+  spp_cor_obj = cor_taxa_spp, env_cor_obj = cor_cap_taxa_env,
+  delta_sq_obj = delta_sq_taxa,
+  pt_sty_dat = pt_sty_site, fig_cex = 0.8, plot_lab = "(a)"
+)
 
 par(fig = c(0.5, 1, 0, 1), new = TRUE)
+plot_cap_spp(  # plot species correlations with CAP axes
+  spp_cor_obj = cor_cap_taxa_spp, spp_cor_obj_lab = cor_taxa_spp,
+  fig_cex = 0.8, plot_lab = "(b)"
+)
 
-plot(  # create plot
-  cor_cap_taxa_spp$CAP1, cor_cap_taxa_spp$CAP2, type = "n", bty = "l",
-  xaxt = "n", xaxs = "i", xlab = "",
-  yaxt = "n", yaxs = "i", ylab = "",
-  xlim = c(-1, 1), ylim = c(-1, 1), cex.lab = fig_cex)
-abline(h = 0, col = grey(0.75))  # horizontal line at x = 0
-abline(v = 0, col = grey(0.75))  # vertical line at y = 0
-draw.circle(  # draw circle (perimeter represents correlation = 1)
-  0, 0, radius = 1, border = grey(0.75))
-axis(  # add x-axis
-  side = 1, at = seq(-1, 1, 0.5), labels = seq(-1, 1, 0.5), cex.axis = fig_cex)
-title(  # add x-axis label
-  line = 2.5, xlab = "Correlation with CAP Axis 1", cex.lab = fig_cex)
-axis(  # add y-axis
-  side = 2, at = seq(-1, 1, 0.5), labels = seq(-1, 1, 0.5), cex.axis = fig_cex)
-title( # add y-axis label
-  line = 2.25, ylab = "Correlation with CAP Axis 2", cex.lab = fig_cex)
 
-arrows(  # add arrows for species correlations, from origin
-  x0 = 0, y0 = 0, x1 = cor_cap_taxa_spp$CAP1, y1 = cor_cap_taxa_spp$CAP2,
-  code = 2, length = 0.05, col = grey(0.5))
+dev.off()  # close .pdf graphics device
 
-par(xpd = TRUE)  # allow plotting throughout figure region
-# text(  # add species labels
-#   cor_cap_taxa_spp$CAP1, cor_cap_taxa_spp$CAP2,
-#   parse(text = spp_labs),
-#   pos = c(apply(  #
-#     cor_cap_taxa_spp, MARGIN = 1, FUN = function(x) {
-#       if(x["CAP2"] < 0) {1} else {3}
-#     })),
-#   # if(abs(x["CAP1"]) > abs(x["CAP2"])) { # if |x| > |y|
-#   #   if(x["CAP1"] < 0) {2} else {4}  # if x < 0, label left of point
-#   #   } else { # if |x| < |y|
-#   #     if(x["CAP2"] < 0) {1} else {3}  # if y < 0, label below point
-#   # }})),
-#   offset = 0.15, col = "black", cex = fig_cex)
-textplot(  # add non-overlapping species labels
-  # (NB -- species with correlation coefficient >=x only)
-  # expand x and y from origin:
-  (abs(cor_taxa_spp$CAP1) + 0.075) * sign(cor_taxa_spp$CAP1),
-  (abs(cor_taxa_spp$CAP2) + 0.075) * sign(cor_taxa_spp$CAP2),
-  # cor_taxa_spp$CAP1, cor_taxa_spp$CAP2,  # original coordinates
-  words = parse(text = spp_labs),
-  xlim = c(-1, 1), ylim = c(-1, 1),
-  new = FALSE, cex = fig_cex, show.lines = FALSE)
-par(xpd = FALSE)  # re-clip plotting to plot region
 
-legend( # add plot label
-  "topleft", bty = "n", legend = "", title = expression(bold("B")))
+
+
+# ~ functional groups:
+
+pdf(  # open .pdf graphics device
+  './figs/cap_func.pdf',
+  width = 18/2.54, height = 9/2.54
+)
+
+
+par( # set plotting parameters
+  las = 1, mar = cap_mar)
+
+par(fig = c(0, 0.5, 0, 1))
+plot_cap_env(  # plot CAP ordination with environmental correlations
+  cap_obj = cap_func, cap_dat = dd_tree_lichens_func,
+  spp_cor_obj = cor_func_spp, env_cor_obj = cor_cap_func_env,
+  delta_sq_obj = delta_sq_func,
+  pt_sty_dat = pt_sty_site, fig_cex = 0.8, plot_lab = "(a)"
+)
+
+par(fig = c(0.5, 1, 0, 1), new = TRUE)
+plot_cap_spp(  # plot species correlations with CAP axes
+  spp_cor_obj = cor_cap_func_spp, spp_cor_obj_lab = cor_func_spp,
+  fig_cex = 0.8, plot_lab = "(b)"
+)
 
 
 dev.off()  # close .pdf graphics device

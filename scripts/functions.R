@@ -55,6 +55,212 @@ mds <- function (dat)  # accepts data frame of samples vs. species
 
 
 
+# plot CAP ordination with environmental correlations:
+plot_cap_env <- function(
+  cap_obj, spp_cor_obj, env_cor_obj, delta_sq_obj,
+  cap_dat, pt_sty_dat, fig_cex = 0.8, plot_lab = ""
+)
+{
+  # vector of CAP site labels:
+  site_labs <- as.vector(rownames(scores(cap_obj)$sites))
+  # vector of CAP environmental vector labels:
+  env_labs <-  rownames(summary(cap_obj)$biplot)
+  # vector of CAP species vector labels:
+  spp_labs <- as.vector(rownames(spp_cor_obj))
+  
+  
+  # extract point coordinates (for sites):
+  use_x <- scores(cap_obj)$sites[, "CAP1"]
+  use_y <- scores(cap_obj)$sites[, "CAP2"]
+  # determine x and y limits (based on lowest integer value):
+  x0 <- floor(min(use_x)); x1 <- ceiling(max(use_x))
+  y0 <- floor(min(use_y)); y1 <- ceiling(max(use_y))
+  
+  
+  plot(  # create blank plot area
+    use_x, use_y, type = "n", bty = "l",
+    xaxt = "n", xaxs = "i", yaxt = "n", yaxs = "i",
+    xlab = "", ylab = "",
+    xlim = c(x0, x1), ylim = c(y0, y1), cex.lab = fig_cex
+  )
+  
+  abline(h = 0, col = grey(0.75))  # horizontal line at x = 0
+  abline(v = 0, col = grey(0.75))  # vertical line at y = 0
+  sf <- 0.375  # scaling factor for circle perimeter and arrow length
+  # draw.circle(  # add circle (perimeter represents correlation = 1)
+  #   0, 0, radius = (x1-x0)*sf, border = grey(0.75))
+  
+  axis(  # add x axis
+    side = 1, cex.axis = fig_cex,
+    at = seq(x0, x1, 1), labels = seq(x0, x1, 1)
+  )
+  title(  # axis label including proportion explained
+    line = 2.5, cex.lab = fig_cex,
+    xlab = parse(text = paste(
+      "paste(\"CAP1 (\", delta^2, \" = \",",
+      rep_2dp(delta_sq_obj[1]), ",\")\", sep = \"\")"))
+  )
+  axis( # add y axis
+    side = 2, cex.axis = fig_cex,
+    at = seq(y0, y1, 2), labels = seq(y0, y1, 2)
+  )
+  title(  # axis label including proportion explained
+    line = 2.25, cex.lab = fig_cex,
+    ylab = parse(text = paste(
+      "paste(\"CAP2 (\", delta^2, \" = \",",
+      rep_2dp(delta_sq_obj[2]), ",\")\", sep = \"\")"))
+  )
+  
+  points(  # add points
+    use_x, use_y,
+    pch = as.numeric(pt_sty_dat[  # lookup symbol from table
+      match(as_vector(cap_dat[,"site"]), pt_sty_dat[,"site"]
+      ), "pch"]),
+    cex = as.numeric(pt_sty_dat[  # lookup size from table
+      match(as_vector(cap_dat[,"site"]), pt_sty_dat[,"site"]
+      ), "cex"]),
+    col = as.character(pt_sty_dat[  # lookup colour from table
+      match(as_vector(cap_dat[,"site"]), pt_sty_dat[,"site"]
+      ), "col"]))
+  
+  par(xpd = NA)  # allow plotting throughout device region
+  
+  # text(  # add replicate labels
+  #   use_x-0.02*(x1-x0), use_y,
+  #   labels = site_labs,
+  #   adj = c(1, 0), pos = 1,  # pos overrides adj
+  #   offset = 0.25, cex = 0.7, col = grey(0.5)
+  # )
+  # wordcloud::textplot(  # add non-overlapping replicate labels
+  #   use_x, use_y,
+  #   words = site_labs,
+  #   xlim = c(x0, x1), ylim = c(y0, y1),
+  #   new = FALSE, cex = 0.5, col = grey(0.5),
+  #   show.lines = FALSE
+  # )
+  
+  # text( # add vector overlay of environmental variables
+  #   # (NB - uses product-moment, not rank, correlation coefficients)
+  #   cap_obj, display = "bp", col = grey(0.5), axis.bp = FALSE,
+  #   arrow.mul = (x1-x0)*sf,  # length multiplier matches circle radius
+  #   head.arrow = 0.05, cex = 0.7,
+  #   labels = env_labs
+  # )
+  arrows(  # add arrows for environmental correlations, from origin
+    x0 = 0, y0 = 0,
+    x1 = env_cor_obj$CAP1*((x1-x0)*sf),  # use scaling factor
+    y1 = env_cor_obj$CAP2*((x1-x0)*sf),  # (correspond with circle perimeter)
+    code = 2, length = 0.05, lwd = 1.5, col = "blue"
+  )
+  text(  # add environmental labels
+    env_cor_obj$CAP1*((x1-x0)*sf), env_cor_obj$CAP2*((x1-x0)*sf),
+    env_labs, pos = c(apply( #
+      env_cor_obj, MARGIN = 1, FUN = function (x) {
+        if (abs(x["CAP1"]) > abs(x["CAP2"])) {  # if |x| > |y|
+          if (x["CAP1"] < 0) {2} else {4}  # if x < 0, label left of point
+        } else { # if |x| < |y|
+          if (x["CAP2"] < 0) {1} else {3}  # if y < 0, label below point
+        }})),
+    offset = 0.15, col = "blue", cex = fig_cex
+  )
+  
+  par(xpd = FALSE)  # re-clip plotting to plot region
+  
+  # legend(  # add legend for sites
+  #   "topright", bty = "n", title = "Site",
+  #   legend = pt_sty_dat$site,
+  #   pch = pt_sty_dat$pch, col = pt_sty_dat$col,
+  #   pt.cex = 0.8*pt_sty_dat$cex, y.intersp = 0.8, cex = 0.8
+  # )
+  legend(  # add plot label
+    "topleft", bty = "n", legend = "", title = plot_lab
+  )
+}
+
+
+
+
+# plot CAP species correlations:
+plot_cap_spp <- function (
+  spp_cor_obj, spp_cor_obj_lab, fig_cex = 0.8, plot_lab = ""
+)
+{
+  # vector of CAP species vector labels:
+  spp_labs <- as.vector(rownames(spp_cor_obj_lab))
+  
+  plot(  # create blank plot
+    spp_cor_obj$CAP1, spp_cor_obj$CAP2,
+    type = "n", bty = "l",
+    xaxt = "n", xaxs = "i", xlab = "",
+    yaxt = "n", yaxs = "i", ylab = "",
+    xlim = c(-1, 1), ylim = c(-1, 1), cex.lab = fig_cex
+  )
+  
+  abline(h = 0, col = grey(0.75))  # horizontal line at x = 0
+  abline(v = 0, col = grey(0.75))  # vertical line at y = 0
+  # draw circle (perimeter represents correlation = 1):
+  draw.circle(0, 0, radius = 1, border = grey(0.75))
+  
+  axis(  # add x-axis
+    side = 1, cex.axis = fig_cex,
+    at = seq(-1, 1, 0.5), labels = seq(-1, 1, 0.5) 
+  )
+  title(  # add x-axis label
+    line = 2.5, cex.lab = fig_cex,
+    xlab = "Correlation with CAP Axis 1"
+  )
+  axis(  # add y-axis
+    side = 2, cex.axis = fig_cex,
+    at = seq(-1, 1, 0.5), labels = seq(-1, 1, 0.5)
+  )
+  title( # add y-axis label
+    line = 2.25, cex.lab = fig_cex,
+    ylab = "Correlation with CAP Axis 2"
+  )
+  
+  arrows(  # add arrows for species correlations, from origin
+    x0 = 0, y0 = 0, x1 = spp_cor_obj$CAP1, y1 = spp_cor_obj$CAP2,
+    code = 2, length = 0.05, col = grey(0.5)
+  )
+  
+  par(xpd = TRUE)  # allow plotting throughout figure region
+  
+  # text(  # add species labels
+  #   spp_cor_obj$CAP1, spp_cor_obj$CAP2,
+  #   parse(text = spp_labs),
+  #   pos = c(apply(  #
+  #     spp_cor_obj, MARGIN = 1, FUN = function(x) {
+  #       if(x["CAP2"] < 0) {1} else {3}
+  #     })),
+  #   # if (abs(x["CAP1"]) > abs(x["CAP2"])) {  # if |x| > |y|
+  #   #   # if x < 0, label left of point:
+  #   #   if (x["CAP1"] < 0) {2} else {4}  
+  #   #   } else { # if |x| < |y|
+  #   #     # if y < 0, label below point:
+  #   #     if (x["CAP2"] < 0) {1} else {3}  
+  #   # }})),
+  #   offset = 0.15, col = "black", cex = fig_cex
+  # )
+  textplot(  # add non-overlapping species labels
+    # expand x and y from origin:
+    (abs(spp_cor_obj_lab$CAP1) + 0.075) * sign(spp_cor_obj_lab$CAP1),
+    (abs(spp_cor_obj_lab$CAP2) + 0.075) * sign(spp_cor_obj_lab$CAP2),
+    # spp_cor_obj_lab$CAP1, spp_cor_obj_lab$CAP2,  # original coordinates
+    words = parse(text = spp_labs),
+    xlim = c(-1, 1), ylim = c(-1, 1),
+    new = FALSE, cex = fig_cex, show.lines = FALSE
+  )
+  
+  par(xpd = FALSE)  # re-clip plotting to plot region
+  
+  legend( # add plot label
+    "topleft", bty = "n", legend = "", title = plot_lab
+  )
+}
+
+
+
+
 # report numeric value (e.g. MS, F) with 2 d.p.:
 rep_2dp <- function (num_val)
 {
