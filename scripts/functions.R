@@ -140,7 +140,7 @@ plot_cap_env <- function(
   # )
   
   # text( # add vector overlay of environmental variables
-  #   # (NB - uses product-moment, not rank, correlation coefficients)
+  #   # (NB -- uses product-moment, not rank, correlation coefficients)
   #   cap_obj, display = "bp", col = grey(0.5), axis.bp = FALSE,
   #   arrow.mul = (x1-x0)*sf,  # length multiplier matches circle radius
   #   head.arrow = 0.05, cex = 0.7,
@@ -166,12 +166,12 @@ plot_cap_env <- function(
   
   par(xpd = FALSE)  # re-clip plotting to plot region
   
-  # legend(  # add legend for sites
-  #   "topright", bty = "n", title = "Site",
-  #   legend = pt_sty_dat$site,
-  #   pch = pt_sty_dat$pch, col = pt_sty_dat$col,
-  #   pt.cex = 0.8*pt_sty_dat$cex, y.intersp = 0.8, cex = 0.8
-  # )
+  legend(  # add legend for sites
+    "topright", bty = "n", title = "Site",
+    legend = pt_sty_dat$site,
+    pch = pt_sty_dat$pch, col = pt_sty_dat$col,
+    pt.cex = 0.8*pt_sty_dat$cex, y.intersp = 0.8, cex = 0.8
+  )
   legend(  # add plot label
     "topleft", bty = "n", legend = "", title = plot_lab
   )
@@ -234,9 +234,13 @@ plot_cap_spp <- function (
   #   xlim = c(-1, 1), ylim = c(-1, 1),
   #   new = FALSE, cex = fig_cex, show.lines = FALSE
   # )
-  lay <- wordlayout(  # generate coords for non-overlapping text:
-    spp_cor_obj_lab$CAP1, spp_cor_obj_lab$CAP2,
-    words = spp_labs, cex = fig_cex
+  lay <- wordlayout(  # generate coords for non-overlapping text
+    # expand x and y from origin:
+    (abs(spp_cor_obj_lab$CAP1) + 0.02) * sign(spp_cor_obj_lab$CAP1),
+    (abs(spp_cor_obj_lab$CAP2) + 0.02) * sign(spp_cor_obj_lab$CAP2),
+    # spp_cor_obj_lab$CAP1, spp_cor_obj_lab$CAP2,  # original coordinates
+    words = spp_labs, cex = fig_cex,
+    xlim = c(-1, 1), ylim = c(-1, 1)
   )
   text(  # add non-overlapping species labels
     lay[, 1], lay[, 2], rownames(lay),

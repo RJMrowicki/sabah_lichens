@@ -408,9 +408,9 @@ cor_cap_taxa_spp <-  # ~ species
 cor_taxa_spp <-
   cor_cap_taxa_spp[which(  # correlation coefficient >= x
     if (length(bioenv_vars_taxa) > 1) {
-      abs(cor_cap_taxa_spp$CAP1) >= 0.5 | abs(cor_cap_taxa_spp$CAP2) >= 0.5
+      abs(cor_cap_taxa_spp$CAP1) >= 0.35 | abs(cor_cap_taxa_spp$CAP2) >= 0.35
     } else {
-      abs(cor_cap_taxa_spp$CAP1) >= 0.5
+      abs(cor_cap_taxa_spp$CAP1) >= 0.35
     }
   ), ]
 
@@ -507,9 +507,9 @@ cor_cap_func_spp <-  # ~ species
 cor_func_spp <-
   cor_cap_func_spp[which(  # correlation coefficient >= x
     if (length(bioenv_vars_func) > 1) {
-      abs(cor_cap_func_spp$CAP1) >= 0.5 | abs(cor_cap_func_spp$CAP2) >= 0.5
+      abs(cor_cap_func_spp$CAP1) >= 0.35 | abs(cor_cap_func_spp$CAP2) >= 0.35
     } else {
-      abs(cor_cap_func_spp$CAP1) >= 0.5
+      abs(cor_cap_func_spp$CAP1) >= 0.35
     }
   ), ]
 

@@ -1,5 +1,6 @@
 ---
-title: 'How much taxonomic expertise is necessary for prioritising areas of lowland rainforest sites as habitats for lichens in northeast Borneo?'
+title: 'How much taxonomic expertise is necessary for prioritising areas of lowland
+  rainforest sites as habitats for lichens in northeast Borneo?'
 author: 'Rob Mrowicki'
 date: '`r format(Sys.time(), "%d %B %Y")`'
 output:
@@ -62,13 +63,13 @@ Pairwise Spearman rank correlations were used to assess the extent of collineari
 
 The biota--environment (BIOENV; Clarke & Ainsworth, 1993, _Mar. Ecol. Prog. Ser._ 92:205--219) routine was used to identify the optimal subset of environmental variables accounting for variability in lichen community structure, via maximisation of the rank correlation between environmental and biological distance matrices.
 
-The variables identified by the BIOENV analysis were then used in a canonical analysis of principal coordinates (CAP; Anderson & Willis, 2003, _Ecology_ 84:511--525) to enable dissimilarities in lichen communities to be visualised in relation to tree functional traits. The resulting ordination plot incorporated vectors representing Spearman rank correlations between environmental variables and the first two CAP axes. The significance of the overall model (based on the sum of all eigenvalues) and of constraining variables (marginal terms) were assessed via ANOVA-like permutation tests involving `r format(n_perm, big.mark = ",")` permutations. Spearman rank correlation coefficients between individual taxonomic or functional group abundances and CAP axes were calculated to identify the most important groups (i.e. $|\rho| \geq 0.5$) contributing to variability in lichen assemblage structure.
+The variables identified by the BIOENV analysis were then used in a canonical analysis of principal coordinates (CAP; Anderson & Willis, 2003, _Ecology_ 84:511--525) to enable dissimilarities in lichen communities to be visualised in relation to tree functional traits. The resulting ordination plot incorporated vectors representing Spearman rank correlations between environmental variables and the first two CAP axes. The significance of the overall model (based on the sum of all eigenvalues) and of constraining variables (marginal terms) were assessed via ANOVA-like permutation tests involving `r format(n_perm, big.mark = ",")` permutations. Spearman rank correlation coefficients between individual taxonomic or functional group abundances and CAP axes were calculated to identify the most important groups (i.e. $|\rho| \geq 0.35$) contributing to variability in lichen assemblage structure.
 
 (I'm not sure if it is possible to account for the effects of plot or site, e.g. plot nested within site, when determining the significance of the CAP model, to be consistent with the PERANOVAs and PERMANOVAs.)
 
 For all multivariate tests, community dissimilarities were calculated using the zero-adjusted Bray-Curtis coefficient (Clarke _et al._, 2006, _J. Exp. Mar. Biol. Ecol._ 330:55--80), based on $log10(x+1)$-transformed abundance data to reduce the influence of numerically dominant taxonomic/functional groups. Euclidean distances were calculated from environmental data, which were _z_-standardised to account for scaling differences between variables.
 
-(Check whether exclusion of rare taxonomic/functional groups (e.g. overall mean abundance $\leq$ 0.01) alters results substantially.)
+(Check whether exclusion of rare taxonomic/functional groups (e.g. overall mean abundance $\leq$ 0.1) alters results substantially.)
 
 
 ## Preliminary results
@@ -140,26 +141,28 @@ SIMPER tables:
 # insert SIMPER tables:
 # ~ taxonomic groups:
 kable(
-  simp_li_taxa,
-  caption = 'Lichen taxonomic group contributions to differences in community structure'
+  rownames_to_column(simp_li_taxa[[1]], "Tax. group"),
+  caption = 'Lichen taxonomic group contributions to differences in community structure',
+  longtable = FALSE
 )
 
 # ~ functional groups:
 kable(
-  simp_li_func,
-  caption = 'Lichen functional group contributions to differences in community structure'
+  rownames_to_column(simp_li_func[[1]], "Func. group"),
+  caption = 'Lichen functional group contributions to differences in community structure',
+  longtable = FALSE
 )
 ```
 
-Tree girth and presence of buttresses/flutes were identified by BIOENV as key tree traits influencing lichen community structure, in terms of both taxonomic and functional groups (BIOENV; $\rho = `r rep_2dp(bioenv_taxa_rho)` and $\rho = `r rep_2dp(bioenv_func_rho)`, respectively).
+Tree girth and presence of buttresses/flutes were identified by BIOENV as key tree traits influencing lichen community structure, in terms of both taxonomic and functional groups (BIOENV; $\rho$ = `r rep_2dp(bioenv_taxa_rho)` and $\rho$ = `r rep_2dp(bioenv_func_rho)`, respectively).
 
 CAP axis 1 correlated positively with tree girth, while axis 2 correlated negatively with presence of buttresses/flutes; however, only tree girth was significant as a constraining variable (taxonomic groups: pseudo-_F_~1,261~ = `r rep_2dp(cap_taxa_margin_f["girth"])`, P `r rep_p(cap_taxa_margin_p["girth"])`; functional groups: pseudo-_F_~1,261~ = `r rep_2dp(cap_func_margin_f["girth"])`, P `r rep_p(cap_func_margin_p["girth"])`), suggesting that it was more important than buttress/flute presence in terms of structuring lichen communities.
 
-![(a) CAP ordination plot of lichen community structure (taxonomic groups) according to environmental variables (vectors represent Spearman rank correlation coefficients with axes). (b) Spearman rank correlation coefficients between CAP axes and individual taxa for which $|\rho| \geq 0.5$.](./figs/cap_taxa.pdf)
+![(a) CAP ordination plot of lichen community structure (taxonomic groups) according to environmental variables (vectors represent Spearman rank correlation coefficients with axes). (b) Spearman rank correlation coefficients between CAP axes and individual taxa for which $|\rho| \geq 0.35$.](./figs/cap_taxa.pdf)
 
-![(a) CAP ordination plot of lichen community structure (functional groups) according to environmental variables (vectors represent Spearman rank correlation coefficients with axes). (b) Spearman rank correlation coefficients between CAP axes and individual functional groups for which $|\rho| \geq 0.5$.](./figs/cap_func.pdf)
+![(a) CAP ordination plot of lichen community structure (functional groups) according to environmental variables (vectors represent Spearman rank correlation coefficients with axes). (b) Spearman rank correlation coefficients between CAP axes and individual functional groups for which $|\rho| \geq 0.35$.](./figs/cap_func.pdf)
 
-(Describe correlations of taxonomic/functional groups with CAP axes and environmental variables.)
+Taxonomic groups (R-Es, R-Py and ArH) and functional groups (crapo, crbya, crbysp, sqhya and sqhyp) appeared to be associated with the presence of buttresses/flutes and smaller girth; (PoR and Gr-th) and (crpen and crthe) with smaller girth; and (ArC) and (crstd) with the absence of buttresses/flutes.
 
 
 ## Queries
