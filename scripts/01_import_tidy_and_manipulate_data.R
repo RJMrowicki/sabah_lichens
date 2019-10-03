@@ -15,7 +15,6 @@ ddR_trees_func <- read_csv('./data/trees_func.csv')
 
 
 
-
 # Tidy data =========================================================
 
 # lichen abundance data:

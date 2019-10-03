@@ -79,6 +79,13 @@ pt_sty_site <- data.frame(  # by site
   col = rep(grey(0.5), 3)  # colour
 )
 
+pt_sty_bark <- data.frame(  # by bark type
+  bark = levels(dd_tree_lichens_taxa$bark),
+  pch = c(4, 3, 2, 1),  # symbol
+  cex = rep(0.8, 4),  # size
+  col = rep(grey(0.5), 4)  # colour
+)
+
 
 
 
@@ -97,8 +104,8 @@ par(fig = c(0, 0.5, 0, 1))
 plot_cap_env(  # plot CAP ordination with environmental correlations
   cap_obj = cap_taxa, cap_dat = dd_tree_lichens_taxa,
   spp_cor_obj = cor_taxa_spp, env_cor_obj = cor_cap_taxa_env,
-  delta_sq_obj = delta_sq_taxa,
-  pt_sty_dat = pt_sty_site, fig_cex = 0.8, plot_lab = "(a)"
+  delta_sq_obj = delta_sq_taxa, fig_cex = 0.8,
+  pt_sty_dat = pt_sty_bark, plot_lab = "(a)", leg_title = "Bark type"
 )
 
 par(fig = c(0.5, 1, 0, 1), new = TRUE)
@@ -128,8 +135,8 @@ par(fig = c(0, 0.5, 0, 1))
 plot_cap_env(  # plot CAP ordination with environmental correlations
   cap_obj = cap_func, cap_dat = dd_tree_lichens_func,
   spp_cor_obj = cor_func_spp, env_cor_obj = cor_cap_func_env,
-  delta_sq_obj = delta_sq_func,
-  pt_sty_dat = pt_sty_site, fig_cex = 0.8, plot_lab = "(a)"
+  delta_sq_obj = delta_sq_func, fig_cex = 0.8,
+  pt_sty_dat = pt_sty_bark, plot_lab = "(a)", leg_title = "Bark type"
 )
 
 par(fig = c(0.5, 1, 0, 1), new = TRUE)

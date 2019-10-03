@@ -58,7 +58,7 @@ mds <- function (dat)  # accepts data frame of samples vs. species
 # plot CAP ordination with environmental correlations:
 plot_cap_env <- function(
   cap_obj, spp_cor_obj, env_cor_obj, delta_sq_obj,
-  cap_dat, pt_sty_dat, fig_cex = 0.8, plot_lab = ""
+  cap_dat, pt_sty_dat, fig_cex = 0.8, plot_lab = "", leg_title = ""
 )
 {
   # vector of CAP site labels:
@@ -87,8 +87,8 @@ plot_cap_env <- function(
   abline(h = 0, col = grey(0.75))  # horizontal line at x = 0
   abline(v = 0, col = grey(0.75))  # vertical line at y = 0
   sf <- 1.1  # scaling factor for circle perimeter and arrow length
-  # draw.circle(  # add circle (perimeter represents correlation = 1)
-  #   0, 0, radius = (x1-x0)*sf, border = grey(0.75))
+  # # add circle (perimeter represents correlation = 1):
+  # draw.circle(0, 0, radius = (x1-x0)*sf, border = grey(0.75))
   
   axis(  # add x axis
     side = 1, cex.axis = fig_cex,
@@ -111,16 +111,18 @@ plot_cap_env <- function(
       rep_2dp(delta_sq_obj[2]), ",\")\", sep = \"\")"))
   )
   
+  # extract point style variable name:
+  pt_sty_var <- names(pt_sty_dat)[1]
   points(  # add points
     use_x, use_y,
     pch = as.numeric(pt_sty_dat[  # lookup symbol from table
-      match(as_vector(cap_dat[,"site"]), pt_sty_dat[,"site"]
+      match(as_vector(cap_dat[, pt_sty_var]), pt_sty_dat[, pt_sty_var]
       ), "pch"]),
     cex = as.numeric(pt_sty_dat[  # lookup size from table
-      match(as_vector(cap_dat[,"site"]), pt_sty_dat[,"site"]
+      match(as_vector(cap_dat[, pt_sty_var]), pt_sty_dat[, pt_sty_var]
       ), "cex"]),
     col = as.character(pt_sty_dat[  # lookup colour from table
-      match(as_vector(cap_dat[,"site"]), pt_sty_dat[,"site"]
+      match(as_vector(cap_dat[, pt_sty_var]), pt_sty_dat[, pt_sty_var]
       ), "col"]))
   
   par(xpd = NA)  # allow plotting throughout device region
@@ -167,8 +169,8 @@ plot_cap_env <- function(
   par(xpd = FALSE)  # re-clip plotting to plot region
   
   legend(  # add legend for sites
-    "topright", bty = "n", title = "Site",
-    legend = pt_sty_dat$site,
+    "topright", bty = "n", title = leg_title,
+    legend = pt_sty_dat[, pt_sty_var],
     pch = pt_sty_dat$pch, col = pt_sty_dat$col,
     pt.cex = 0.8*pt_sty_dat$cex, y.intersp = 0.8, cex = 0.8
   )
@@ -235,27 +237,28 @@ plot_cap_spp <- function (
   #   new = FALSE, cex = fig_cex, show.lines = FALSE
   # )
   lay <- wordlayout(  # generate coords for non-overlapping text
-    # expand x and y from origin:
-    (abs(spp_cor_obj_lab$CAP1) + 0.02) * sign(spp_cor_obj_lab$CAP1),
-    (abs(spp_cor_obj_lab$CAP2) + 0.02) * sign(spp_cor_obj_lab$CAP2),
-    # spp_cor_obj_lab$CAP1, spp_cor_obj_lab$CAP2,  # original coordinates
+    # # expand x and y from origin:
+    # (abs(spp_cor_obj_lab$CAP1) + 0.01) * sign(spp_cor_obj_lab$CAP1),
+    # (abs(spp_cor_obj_lab$CAP2) + 0.01) * sign(spp_cor_obj_lab$CAP2),
+    spp_cor_obj_lab$CAP1, spp_cor_obj_lab$CAP2,  # original coordinates
     words = spp_labs, cex = fig_cex,
     xlim = c(-1, 1), ylim = c(-1, 1)
   )
   text(  # add non-overlapping species labels
-    lay[, 1], lay[, 2], rownames(lay),
-    # pos = pmap_dbl(  # position relative to coordinates,
-    #   # based on generated non-overlapping coordinates:
-    #   as.data.frame(lay[, c('x', 'y')]),
-    #   function (x, y) {
-    #     if (abs(x) > abs(y)) {  # if |x| > |y|,
-    #       # if x < 0, label left of point:
-    #       if (x < 0) { 2 } else { 4 }
-    #     } else {  # if |x| < |y|,
-    #       # if y < 0, label below point:
-    #       if (y < 0) { 1 } else { 3 }
-    #     }}),
-    offset = 0, col = "black", cex = fig_cex
+    # lay[, 1], lay[, 2], rownames(lay),  # generated coordinates
+    spp_cor_obj_lab, labels = rownames(spp_cor_obj_lab), # original coordinates
+    pos = pmap_dbl(  # position relative to coordinates,
+      # based on generated non-overlapping coordinates:
+      as.data.frame(lay[, c('x', 'y')]),
+      function (x, y) {
+        if (abs(x) > abs(y)) {  # if |x| > |y|,
+          # if x < 0, label left of point:
+          if (x < 0) { 2 } else { 4 }
+        } else {  # if |x| < |y|,
+          # if y < 0, label below point:
+          if (y < 0) { 1 } else { 3 }
+        }}),
+    offset = 0.1, col = "black", cex = fig_cex
   )
   
   par(xpd = FALSE)  # re-clip plotting to plot region
