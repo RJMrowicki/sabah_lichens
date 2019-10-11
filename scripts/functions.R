@@ -57,14 +57,14 @@ mds <- function (dat)  # accepts data frame of samples vs. species
 
 # plot CAP ordination with environmental correlations:
 plot_cap_env <- function(
-  cap_obj, spp_cor_obj, env_cor_obj, delta_sq_obj,
+  cap_obj, spp_cor_obj, env_cor_obj = NULL, delta_sq_obj,
   cap_dat, pt_sty_dat, fig_cex = 0.8, plot_lab = "", leg_title = ""
 )
 {
   # vector of CAP site labels:
   site_labs <- as.vector(rownames(scores(cap_obj)$sites))
   # vector of CAP environmental vector labels:
-  env_labs <-  rownames(summary(cap_obj)$biplot)
+  env_labs <-  rownames(env_cor_obj)
   # vector of CAP species vector labels:
   spp_labs <- as.vector(rownames(spp_cor_obj))
   
@@ -141,30 +141,32 @@ plot_cap_env <- function(
   #   show.lines = FALSE
   # )
   
-  # text( # add vector overlay of environmental variables
-  #   # (NB -- uses product-moment, not rank, correlation coefficients)
-  #   cap_obj, display = "bp", col = grey(0.5), axis.bp = FALSE,
-  #   arrow.mul = (x1-x0)*sf,  # length multiplier matches circle radius
-  #   head.arrow = 0.05, cex = 0.7,
-  #   labels = env_labs
-  # )
-  arrows(  # add arrows for environmental correlations, from origin
-    x0 = 0, y0 = 0,
-    x1 = env_cor_obj$CAP1*((x1-x0)*sf),  # use scaling factor
-    y1 = env_cor_obj$CAP2*((x1-x0)*sf),  # (correspond with circle perimeter)
-    code = 2, length = 0.05, lwd = 1.5, col = "blue"
-  )
-  text(  # add environmental labels
-    env_cor_obj$CAP1*((x1-x0)*sf), env_cor_obj$CAP2*((x1-x0)*sf),
-    env_labs, pos = c(apply( #
-      env_cor_obj, MARGIN = 1, FUN = function (x) {
-        if (abs(x["CAP1"]) > abs(x["CAP2"])) {  # if |x| > |y|
-          if (x["CAP1"] < 0) {2} else {4}  # if x < 0, label left of point
-        } else { # if |x| < |y|
-          if (x["CAP2"] < 0) {1} else {3}  # if y < 0, label below point
-        }})),
-    offset = 0.15, col = "blue", cex = fig_cex
-  )
+  if (!is.null(env_cor_obj)) {
+    # text(  # add vector overlay of environmental variables
+    #   # (NB -- uses product-moment, not rank, correlation coefficients)
+    #   cap_obj, display = "bp", col = grey(0.5), axis.bp = FALSE,
+    #   arrow.mul = (x1-x0)*sf,  # length multiplier matches circle radius
+    #   head.arrow = 0.05, cex = 0.7,
+    #   labels = rownames(summary(cap_obj)$biplot)
+    # )
+    arrows(  # add arrows for environmental correlations, from origin
+      x0 = 0, y0 = 0,
+      x1 = env_cor_obj$CAP1*((x1-x0)*sf),  # use scaling factor
+      y1 = env_cor_obj$CAP2*((x1-x0)*sf),  # (correspond with circle perimeter)
+      code = 2, length = 0.05, lwd = 1.5, col = "blue"
+    )
+    text(  # add environmental labels
+      env_cor_obj$CAP1*((x1-x0)*sf), env_cor_obj$CAP2*((x1-x0)*sf),
+      env_labs, pos = c(apply( #
+        env_cor_obj, MARGIN = 1, FUN = function (x) {
+          if (abs(x["CAP1"]) > abs(x["CAP2"])) {  # if |x| > |y|
+            if (x["CAP1"] < 0) {2} else {4}  # if x < 0, label left of point
+          } else { # if |x| < |y|
+            if (x["CAP2"] < 0) {1} else {3}  # if y < 0, label below point
+          }})),
+      offset = 0.15, col = "blue", cex = fig_cex
+    )
+  }
   
   par(xpd = FALSE)  # re-clip plotting to plot region
   

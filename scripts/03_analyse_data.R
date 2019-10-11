@@ -405,13 +405,14 @@ names(cap_taxa_margin_p) <- names(cap_taxa_margin_f) <- env_vars
 
 # test environmental and species correlations with axes:
 
-# cor_cap_taxa_env <-  # ~ environmental (if continuous variables)
-#   as.data.frame(cor(cbind(
-#     scores(cap_taxa)$sites,  # site scores
-#     # z-standardised, subsetted environmental data:
-#     z_std(dd_tree_lichens_taxa[, env_vars])),
-#     method = "spearman")[  # rank (not product-moment) correlation
-#       -(1:2), 1:2])  # subset relevant correlations
+cor_cap_taxa_env <-  # ~ environmental
+  #  (NB -- for ordinal/continuous variables)
+  as.data.frame(cor(cbind(
+    scores(cap_taxa)$sites,  # site scores
+    # z-standardised, subsetted environmental data:
+    z_std(dd_tree_lichens_taxa[, env_vars_ord])),
+    method = "spearman")[  # rank (not product-moment) correlation
+      -(1:2), 1:2])  # subset relevant correlations
 
 cor_cap_taxa_spp <-  # ~ species
   as.data.frame(cor(cbind(
@@ -522,13 +523,14 @@ names(cap_func_margin_p) <- names(cap_func_margin_f) <- env_vars
 
 # test environmental and species correlations with axes:
 
-# cor_cap_func_env <-  # ~ environmental (if continuous variables)
-#   as.data.frame(cor(cbind(
-#     scores(cap_func)$sites,  # site scores
-#     # z-standardised, subsetted environmental data:
-#     z_std(dd_tree_lichens_func[, env_vars])),
-#     method = "spearman")[  # rank (not product-moment) correlation
-#       -(1:2), 1:2])  # subset relevant correlations
+cor_cap_func_env <-  # ~ environmental
+  #  (NB -- for ordinal/continuous variables)
+  as.data.frame(cor(cbind(
+    scores(cap_func)$sites,  # site scores
+    # z-standardised, subsetted environmental data:
+    z_std(dd_tree_lichens_func[, env_vars_ord])),
+    method = "spearman")[  # rank (not product-moment) correlation
+      -(1:2), 1:2])  # subset relevant correlations
 
 cor_cap_func_spp <-  # ~ species
   as.data.frame(cor(cbind(

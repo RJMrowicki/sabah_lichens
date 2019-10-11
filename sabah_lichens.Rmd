@@ -60,11 +60,13 @@ Relative contributions of individual lichen taxa or functional groups to differe
 
 ### Relationships between lichen community structure and tree functional traits
 
-Pairwise Spearman rank correlations were used to assess the extent of collinearity among tree functional traits (= 'environmental' variables). There were no strong correlations between tree girth, bark type and presence of buttresses/flutes ($|\rho| \leq\ 0.50$), therefore all three variables were included in subsequent analyses.
+<!-- Pairwise Spearman rank correlations were used to assess the extent of collinearity among tree functional traits (= 'environmental' variables). There were no strong correlations between tree girth, bark type and presence of buttresses/flutes ($|\rho| \leq\ 0.50$), therefore all three variables were included in subsequent analyses. -->
 
-The biota--environment (BIOENV; Clarke & Ainsworth, 1993, _Mar. Ecol. Prog. Ser._ 92:205--219) routine was used to identify the optimal subset of environmental variables accounting for variability in lichen community structure, via maximisation of the rank correlation between environmental and biological distance matrices.
+<!-- The biota--environment (BIOENV; Clarke & Ainsworth, 1993, _Mar. Ecol. Prog. Ser._ 92:205--219) routine was used to identify the optimal subset of environmental variables accounting for variability in lichen community structure, via maximisation of the rank correlation between environmental and biological distance matrices. -->
 
-The variables identified by the BIOENV analysis were then used in a canonical analysis of principal coordinates (CAP; Anderson & Willis, 2003, _Ecology_ 84:511--525) to enable dissimilarities in lichen communities to be visualised in relation to tree functional traits. The resulting ordination plot incorporated vectors representing Spearman rank correlations between environmental variables and the first two CAP axes. The significance of the overall model (based on the sum of all eigenvalues) and of constraining variables (marginal terms) were assessed via ANOVA-like permutation tests involving `r format(n_perm, big.mark = ",")` permutations. Spearman rank correlation coefficients between individual taxonomic or functional group abundances and CAP axes were calculated to identify the most important groups (i.e. $|\rho| \geq 0.35$) contributing to variability in lichen assemblage structure.
+<!-- The variables identified by the BIOENV analysis were then used -->
+
+The three tree functional traits (= 'environmental' variables) were used in a canonical analysis of principal coordinates (CAP; Anderson & Willis, 2003, _Ecology_ 84:511--525) to enable dissimilarities in lichen communities to be visualised in relation to tree traits. The resulting ordination plot incorporated vectors representing Spearman rank correlations between environmental variables (expressed as continuous/ordinal numerical) and the first two CAP axes. The significance of the overall model (based on the sum of all eigenvalues) and of constraining variables (marginal terms) were assessed via ANOVA-like permutation tests involving `r format(n_perm, big.mark = ",")` permutations. Spearman rank correlation coefficients between individual taxonomic or functional group abundances and CAP axes were calculated to identify the most important groups (i.e. $|\rho| \geq 0.35$) contributing to variability in lichen assemblage structure.
 
 (I'm not sure if it is possible to account for the effects of plot or site, e.g. plot nested within site, when determining the significance of the CAP model, to be consistent with the PERANOVAs and PERMANOVAs.)
 
@@ -133,7 +135,7 @@ kable(
 kable(perm_li_func_ph, caption = 'Post-hoc pairwise tests')
 ```
 
-Of the lichen taxonomic/functional groups making the greatest contributions to differences in community structure, (_R-Es_, _ArH_, _R-Py_, _Gr-th_, _Gr-li_ and _PyP_) and (_sqhya_, _crbysp_, _crbys_, _crthe_, _crbya_, _crlir_ and _sqhyp_) exhibited higher mean abundances in old growth sites compared to the logged site, whereas (_PoR_ and _ArC_) and (_crpen_, _crstd_, _crstlf_ and _crapo_) showed the opposite trend.
+Of the lichen taxonomic/functional groups making the greatest contributions to differences in community structure, [_R-Es_, _ArH_, _R-Py_, _Gr-th_, _Gr-li_ and _PyP_] and [_sqhya_, _crbysp_, _crbys_, _crthe_, _crbya_, _crlir_ and _sqhyp_] exhibited higher mean abundances in old growth sites compared to the logged site, whereas [_PoR_ and _ArC_] and [_crpen_, _crstd_, _crstlf_ and _crapo_] showed the opposite trend.
 
 SIMPER tables:
 ((D,M), S: overall mean abundance in old growth and logged sites, respectively; Contrib./SD: average species contribution to group dissimilarity divided by standard deviation of contributions; Contrib.%: percent contribution of species to overall between-group dissimilarity. Only the most important species (Contrib. $\geq$ 3%) are shown.)
@@ -155,15 +157,15 @@ kable(
 )
 ```
 
-Tree girth and presence of buttresses/flutes were identified by BIOENV as key tree traits influencing lichen community structure, in terms of both taxonomic and functional groups (BIOENV; $\rho$ = `r rep_2dp(bioenv_taxa_rho)` and $\rho$ = `r rep_2dp(bioenv_func_rho)`, respectively).
+<!-- Tree girth and presence of buttresses/flutes were identified by BIOENV as key tree traits influencing lichen community structure, in terms of both taxonomic and functional groups (BIOENV; $\rho$ = `r rep_2dp(bioenv_taxa_rho)` and $\rho$ = `r rep_2dp(bioenv_func_rho)`, respectively). -->
 
-CAP axis 1 correlated positively with tree girth, while axis 2 correlated negatively with presence of buttresses/flutes; however, only tree girth was significant as a constraining variable (taxonomic groups: pseudo-_F_~1,261~ = `r rep_2dp(cap_taxa_margin_f["girth"])`, P `r rep_p(cap_taxa_margin_p["girth"])`; functional groups: pseudo-_F_~1,261~ = `r rep_2dp(cap_func_margin_f["girth"])`, P `r rep_p(cap_func_margin_p["girth"])`), suggesting that it was more important than buttress/flute presence in terms of structuring lichen communities.
+CAP axis 1 correlated positively with tree girth, while axis 2 appeared to be related to presence of buttresses/flutes and bark type; however, only tree girth was significant as a constraining variable (taxonomic groups: pseudo-_F_~2,257~ = `r rep_2dp(cap_taxa_margin_f["girth"])`, P `r rep_p(cap_taxa_margin_p["girth"])`; functional groups: pseudo-_F_~2,257~ = `r rep_2dp(cap_func_margin_f["girth"])`, P `r rep_p(cap_func_margin_p["girth"])`), suggesting that it was more important than buttress/flute presence and bark type in structuring lichen communities.
 
-![(a) CAP ordination plot of lichen community structure (taxonomic groups) according to environmental variables (vectors represent Spearman rank correlation coefficients with axes). (b) Spearman rank correlation coefficients between CAP axes and individual taxa for which $|\rho| \geq 0.35$.](./figs/cap_taxa.pdf)
+![(a) CAP ordination plot of lichen community structure (taxonomic groups) according to categorical environmental variables. (b) Spearman rank correlation coefficients between CAP axes and individual taxa for which $|\rho| \geq$ `r cor_spp_x`.](./figs/cap_taxa.pdf)
 
-![(a) CAP ordination plot of lichen community structure (functional groups) according to environmental variables (vectors represent Spearman rank correlation coefficients with axes). (b) Spearman rank correlation coefficients between CAP axes and individual functional groups for which $|\rho| \geq 0.35$.](./figs/cap_func.pdf)
+![(a) CAP ordination plot of lichen community structure (functional groups) according to categorical environmental variables. (b) Spearman rank correlation coefficients between CAP axes and individual functional groups for which $|\rho| \geq$ `r cor_spp_x`.](./figs/cap_func.pdf)
 
-Taxonomic groups (R-Es, R-Py and ArH) and functional groups (crapo, crbya, crbysp, sqhya and sqhyp) appeared to be associated with the presence of buttresses/flutes and smaller girth; (PoR and Gr-th) and (crpen and crthe) with smaller girth; and (ArC) and (crstd) with the absence of buttresses/flutes.
+Taxonomic groups [_R-Es_, _R-Py_, _ArH_, _PoR_, _Gr-th_, _Gr-li_ and _CaT_] and functional groups [_sqhya_, _crbysp_, _crbya_, _crpen_, _crthe_, _sqhyp_ and _crlir_] appeared to be associated strongly with smaller tree girth. Groups [_Uicr_] and [_crstd_] showed some association with larger girth.
 
 
 ## Queries
@@ -171,5 +173,3 @@ Taxonomic groups (R-Es, R-Py and ArH) and functional groups (crapo, crbya, crbys
 1. In both lichen abundance datasets, there are two _D810_ columns -- perhaps one of these (the first one) should be labelled _D710_, as this tree is not present in either dataset? This is what I've done. (Otherwise, should these be combined into a single column _D810_ in each case?)
 
 1. I'm assuming that 'tree no.' is coded as follows: site-plot-tree (i.e. _D111_ = tree 11 in plot 1 in site Danum). Is this correct?
-
-1. Again, coding 'bark type' numerically (i.e. an ordinal categorical variable) -- so that it can be used as an environmental variable in the CAP analysis -- is questionable; as Holger suggests, water holding capacity is probably more relevant than roughness if we are to do this. (As it happens, bark type is not identified as an 'important' environmental variable anyway, at least not when treated this way; results may differ if it is included as a non-ordinal categorical variable.)
