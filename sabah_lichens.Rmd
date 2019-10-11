@@ -44,7 +44,9 @@ kable(nobs_site_tr_func, caption = 'Tree functional trait data')
 
 Lichen taxonomic and functional group richness (_S_) and Shannon-Wiener diversity (_H\'_) were calculated for each tree.
 
-Tree bark type was coded numerically in relation to increasing perceived water holding capacity, i.e. ancient dry = 1, smooth = 2, scaly = 3, ridged/rough = 4. (See _Queries_ below.)
+<!-- Tree bark type was coded numerically in relation to increasing perceived water holding capacity, i.e. ancient dry = 1, smooth = 2, scaly = 3, ridged/rough = 4. (See _Queries_ below.) -->
+
+Tree girth was converted into a categorical variable (s < 100 cm; m = 100--199 cm; l $\geq$ 200 cm)
 
 
 ### Differences in lichen diversity among sites

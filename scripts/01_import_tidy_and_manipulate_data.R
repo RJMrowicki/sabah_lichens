@@ -84,23 +84,37 @@ dd_lichens_func <-  # create new data frame
 
 dd_trees_func <-  # create new data frame
   ddR_trees_func %>%
-  # rename all variables (except `girth`):
-  rename(`tree` = 1, `bark` = 3, `buttress` = 4, `func_grp` = 5) %>%
-  # create factors `site`, `plot` and `tree` based on characters of `tree`:
+  # rename all variables:
+  rename(
+    `tree` = 1,
+    `girth_m` = 2, `bark` = 3, `buttress_ord` = 4,
+    `func_grp` = 5) %>%
+  # create factors `site` and `plot` based on characters of `tree`:
   mutate(
     `site` = factor(str_sub(`tree`, end = 1)),
-    `plot` = factor(str_sub(`tree`, end = 2))
-  ) %>%
-  # recode `bark` to numerical (ordinal) based on relative roughness:
+    `plot` = factor(str_sub(`tree`, end = 2))) %>%
+  # create `girth` categorical variable, based on
+  # `girth_m` cutoff values of 100 and 200 (a >= x < b):
+  mutate(
+    `girth` = cut(
+      `girth_m`, breaks = c(-Inf, 100, 200, Inf),
+      labels = c("s", "m", "l"), right = FALSE)) %>%
+  # recode `bark` to numerical (ordinal) based on relative water holding:
   # (NB -- specify 'dplyr::' as opposed to 'car::')
   mutate(`bark_ord` = dplyr::recode(
     `bark`, 'DR' = 1, 'S' = 2, 'C' = 3, 'R' = 4)) %>%
+  # create factor `buttress`, in addition to 'ordinal' variable:
+  mutate(`buttress` = factor(buttress_ord)) %>%
   # change relevant 'character' variables to 'factors':
-  mutate_at(vars(`bark`, `func_grp`, `site`), factor) %>%
+  mutate_at(vars(`bark`, `girth`, `func_grp`, `site`), factor) %>%
   # re-arrange rows by site, plot and tree:
   arrange(`site`, `plot`, `tree`) %>%
   # re-order columns so that `site`, `plot` and `tree` are at the beginning:
-  select(`site`, `plot`, `tree`, everything())
+  select(
+    `site`, `plot`, `tree`,
+    `girth_m`, `bark_ord`, `buttress_ord`,  # continuous variables
+    `girth`, `bark`, `buttress`,  # categorical variables
+    everything())  # everything else, i.e. `func_grp`
 
 # create vector of unique tree numbers:
 tree_nos <- unique(dd_trees_func$tree)
