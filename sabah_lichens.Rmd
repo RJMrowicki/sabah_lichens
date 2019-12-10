@@ -28,7 +28,7 @@ Sampling was conducted at three sites within different areas of lowland forest i
 
 At each site, ... (D and M = 96; S = 72).
 
-The following functional traits were recorded for each tree: (1) girth, measured as ...; (2) bark type (DR = dry ancient, S = smooth, C = scaly, R = ridged/rough); and (3) the presence of buttresses or flutes.
+The following functional traits were recorded for each tree: (1) girth, measured as ...; (2) bark type (DR = dry ancient, S = smooth, C = scaly, R = ridged/rough); (3) the presence of buttresses or flutes; and (4) dipterocarp vs. non-dipterocarp species.
 
 ```{r nobs_tables, eval = FALSE, echo = FALSE}
 # check actual numbers of replicates per site
@@ -44,11 +44,13 @@ kable(nobs_site_tr_func, caption = 'Tree functional trait data')
 
 ## Data analysis
 
-Lichen taxonomic and functional group richness (_S_) and Shannon-Wiener diversity (_H\'_) were calculated for each tree.
+Lichen taxonomic and functional group richness (_S_) and Shannon-Wiener diversity (_H\'_) were calculated for each tree. Additionally, lichen abundance data were summed for each plot, and plot-level richness and diversity were calculated for both taxonomic and functional groups.
 
 <!-- Tree bark type was coded numerically in relation to increasing perceived water holding capacity, i.e. ancient dry = 1, smooth = 2, scaly = 3, ridged/rough = 4. (See _Queries_ below.) -->
 
-Tree girth was converted into a categorical variable (s < 100 cm; m = 100--199 cm; l $\geq$ 200 cm)
+Tree girth was converted into a categorical variable (s < 100 cm; m = 100--199 cm; l $\geq$ 200 cm).
+
+To enable plot-level characterisation of tree traits, we calculated the Shannon-Wiener diversity of (1) girth category and (2) bark type, and the proportion of (3) trees with buttresses or flutes and (4) dipterocarp trees within each plot.
 
 
 ### Differences in lichen diversity among sites
