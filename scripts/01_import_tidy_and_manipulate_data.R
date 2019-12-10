@@ -87,7 +87,7 @@ dd_trees_func <-  # create new data frame
   # rename all variables:
   rename(
     `tree` = 1,
-    `girth_m` = 2, `bark` = 3, `buttress_ord` = 4,
+    `girth_m` = 2, `bark` = 3, `buttress_ord` = 4, `dipterocarp` = 6,
     `func_grp` = 5) %>%
   # create factors `site` and `plot` based on characters of `tree`:
   mutate(
@@ -105,15 +105,15 @@ dd_trees_func <-  # create new data frame
     `bark`, 'DR' = 1, 'S' = 2, 'C' = 3, 'R' = 4)) %>%
   # create factor `buttress`, in addition to 'ordinal' variable:
   mutate(`buttress` = factor(buttress_ord)) %>%
-  # change relevant 'character' variables to 'factors':
-  mutate_at(vars(`bark`, `girth`, `func_grp`, `site`), factor) %>%
+  # change relevant 'character'/'double' variables to 'factors':
+  mutate_at(vars(`bark`, `girth`, `dipterocarp`, `func_grp`, `site`), factor) %>%
   # re-arrange rows by site, plot and tree:
   arrange(`site`, `plot`, `tree`) %>%
   # re-order columns so that `site`, `plot` and `tree` are at the beginning:
   select(
     `site`, `plot`, `tree`,
     `girth_m`, `bark_ord`, `buttress_ord`,  # continuous variables
-    `girth`, `bark`, `buttress`,  # categorical variables
+    `girth`, `bark`, `buttress`, `dipterocarp`,  # categorical variables
     everything())  # everything else, i.e. `func_grp`
 
 # create vector of unique tree numbers:

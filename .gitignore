@@ -20,6 +20,8 @@
 
 *.zip
 
+notes.txt
+
 # Saved R objects
 objects/
 
