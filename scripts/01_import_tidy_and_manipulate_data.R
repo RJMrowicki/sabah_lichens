@@ -130,16 +130,18 @@ missing_trees <- tree_nos[
 
 # Manipulate data ===================================================
 
-# ~ Calculate lichen diversity indices ------------------------------
+# ~ Tree-level ------------------------------------------------------
 
-# taxonomic groups:
+# calculate lichen diversity indices:
+
+# ~ taxonomic groups:
 dd_lichens_taxa <- dd_lichens_taxa %>%
   mutate(  # vegan:specnumber(), vegan::diversity()
     `S` = specnumber(.[, lichen_taxa]),  # taxonomic richness (S)
     `H'` = diversity(.[, lichen_taxa], "shannon")  # Shannon-Wiener (H')
   )
 
-# functional groups:
+# ~ functional groups:
 dd_lichens_func <- dd_lichens_func %>%
   mutate(
     `S` = specnumber(.[, lichen_func_grps]),  # func. group richness
@@ -149,7 +151,7 @@ dd_lichens_func <- dd_lichens_func %>%
 
 
 
-# ~ Combine lichen and tree datasets --------------------------------
+# combine lichen and tree datasets:
 
 dd_tree_lichens_taxa <-  # taxonomic groups
   # perform 'left join' with tree dataset as 'x':
@@ -166,3 +168,88 @@ dd_tree_lichens_func <-  # functional groups
 # create separate `dummy` species vectors for zero-adjusted Bray-Curtis:
 dummy_taxa <- rep(1, nrow(dd_tree_lichens_taxa))  # abundance of 1
 dummy_func <- rep(1, nrow(dd_tree_lichens_func))
+
+
+
+
+# ~ Plot-level ------------------------------------------------------
+
+# lichen abundance data:
+
+lichens_taxa_plot <- dd_lichens_taxa %>%
+  # calculate summed abundances of lichen taxonomic groups per plot:
+  group_by(`plot`) %>% summarise_at(lichen_taxa, sum) %>%
+  # calculate per-plot taxonomic diversity indices:
+  mutate(
+    `S` = specnumber(.[, lichen_taxa]),  # taxonomic richness (S)
+    `H'` = diversity(.[, lichen_taxa], "shannon")  # Shannon-Wiener (H')
+  )
+
+lichens_func_plot <- dd_lichens_func %>%
+  # calculate summed abundances of lichen functional groups per plot:
+  group_by(`plot`) %>% summarise_at(lichen_func_grps, sum) %>%
+  # calculate per-plot functional diversity indices:
+  mutate(
+    `S` = specnumber(.[, lichen_func_grps]),
+    `H'` = diversity(.[, lichen_func_grps], "shannon")
+  )
+
+
+
+
+# tree functional trait data:
+
+# calculate 'diversity' of tree trait categories per plot:
+# ~ girth:
+trees_func_plot_girth_div <- dd_trees_func %>%
+  # obtain number of trees per girth category per plot:
+  group_by(`plot`, `girth`) %>% tally %>%
+  # re-group by `plot` only:
+  group_by(`plot`) %>%
+  # calculate Shannon diversity of girth categories:
+  summarise_at(vars(`n`), list(`girth_H'` = ~diversity(., "shannon")))
+
+# ~ bark:
+trees_func_plot_bark_div <- dd_trees_func %>%
+  # obtain number of trees per bark category per plot:
+  group_by(`plot`, `bark`) %>% tally %>%
+  # re-group by `plot` only:
+  group_by(`plot`) %>%
+  # calculate Shannon diversity of bark categories:
+  summarise_at(vars(`n`), list(`bark_H'` = ~diversity(., "shannon")))
+
+
+# calculate proportions of buttresses & dipterocarp trees:
+trees_func_plot_props <- dd_trees_func %>%
+  group_by(`plot`) %>% summarise_at(
+    vars(`buttress`, `dipterocarp`),
+    list(`prop` = ~length(which(. == "1")) / length(.))
+  )
+
+
+trees_func_plot <-  # combine into single data frame
+  # girth and bark 'diversity':
+  left_join(trees_func_plot_girth_div, trees_func_plot_bark_div) %>%
+  # add buttress and dipterocarp proportions:
+  left_join(trees_func_plot_props) %>%
+  # add column for `site` (distinct rows from main dataframe only):
+  left_join(distinct(select(dd_trees_func, `plot`, `site`))) %>%
+  # re-order columns so that `site` and `plot` are at the beginning:
+  select(`site`, `plot`, everything())
+
+
+
+
+# combine lichen and tree datasets:
+
+tree_lichens_taxa_plot <-  # taxonomic groups
+  # perform 'left join' with tree dataset as 'x':
+  left_join(trees_func_plot, lichens_taxa_plot)
+  
+tree_lichens_func_plot <-  # functional groups
+  # perform 'left join' with tree dataset as 'x':
+  left_join(trees_func_plot, lichens_func_plot)
+
+# create separate `dummy` species vectors for zero-adjusted Bray-Curtis:
+dummy_taxa_plot <- rep(1, nrow(tree_lichens_taxa_plot))
+dummy_func_plot <- rep(1, nrow(tree_lichens_func_plot))
