@@ -204,7 +204,8 @@ perm_li_func_ph <- read_csv('./primer/results/perm_li_func_ph.csv')
 # ~ MDS ordinations of lichen community structure -------------------
 
 # ~~ Tree-level -----------------------------------------------------
-# (NB -- no convergence after multiple iterations)
+# (NB -- no convergence after multiple iterations;
+# unless no. of dimensions [k] is set to 3...)
 
 # # ~~ taxonomic groups:
 # mds_li_taxa <- mds(  # custom mds function
@@ -344,10 +345,16 @@ cond_vars_func <-  # specify conditioning variables
 
 # ~~ CAP of lichen communities vs. tree functional traits -----------
 
+# (NB -- use vegan::capscale, as it allows multiple factors as constraints;
+# 'traditional' CAP [PRIMER or FORTRAN program] only allows a single factor
+# [i.e. grouping variable for Discriminant Analysis].
+
+
 # ~~~ taxonomic groups:
 
 env_vars <- env_vars_cat  # specify variables used in CAP
 # env_vars <- bioenv_vars_taxa
+
 
 # ~~~~ continuous/ordinal environmental variables:
 # cap_taxa <-
@@ -466,6 +473,7 @@ top_taxa <- rownames(cor_cap_taxa_spp[order(
 
 env_vars <- env_vars_cat  # specify variables used in CAP
 # env_vars <- bioenv_vars_func
+
 
 # ~~~~ continuous/ordinal environmental variables:
 # cap_func <-
@@ -745,3 +753,76 @@ cor_taxa_plot_spp <-
 top_taxa_plot <- rownames(cor_cap_taxa_plot_spp[order(
   apply(cor_cap_taxa_plot_spp, MARGIN = 1, function(x) {max(abs(x))}),
   decreasing = TRUE), ])
+
+
+
+
+# ~ Plot-level ------------------------------------------------------
+
+# ~~ CAP of lichen taxonomic groups vs. site ------------------------
+
+# output data for CAP analysis in FORTRAN program:
+# (NB -- for testing classification success/goodness of fit, which is
+# not possible using vegan::capscale)
+
+# ~ lichen taxonomic and functional group diversity:
+# (NB -- without rownames [hence write_csv()] or column names)
+write_csv(  # (include dummy species)
+  cbind(tree_lichens_taxa_plot[, lichen_taxa], dummy_taxa_plot),
+  './cap/li_taxa_plot.txt', col_names = FALSE)
+write_csv(
+  cbind(tree_lichens_func_plot[, lichen_func_grps], dummy_func_plot),
+  './cap/li_func_plot.txt', col_names = FALSE)
+
+# (NB -- no need to output factor(s), as specify no. of groups/observations per group:)
+tree_lichens_taxa_plot %>% group_by(site) %>% summarise(n = n())
+
+
+# ### CAP analysis via FORTRAN program here ###
+
+
+# (NB -- log10(x+1) transform data, zero-adjusted Bray-Curtis [i.e. include dummy];
+# Discriminant Analysis [groups] rather than Canonical Correlation Analysis [variables];
+# allow program to choose m automatically; run tests with 9,999 permutations)
+
+
+
+
+# ~~~ taxonomic groups:
+
+# (testing use of BiodiversityR::CAPdiscrim. But produces warnings.)
+
+dist_taxa <-  # pre-calculate dissimilarity matrix for CAPdiscrim()
+  vegdist(
+    # log10(x+1)-transformed data and zero-adjusted Bray-Curtis:
+    log10(cbind(tree_lichens_taxa_plot[, lichen_taxa], dummy_taxa_plot) + 1),
+    method = "bray"
+  )
+
+cap_taxa_plot_site <- 
+  CAPdiscrim(  # run CAP analysis (BiodiversityR::CAPdiscrim)
+    dist_taxa ~ site,  # vs. site (categorical) only
+    # NB -- environmental data as data frame, not tibble:
+    data = as.data.frame(tree_lichens_taxa_plot),
+    add = TRUE, m = 4  # number of axes resulting in highest classification success
+  )
+
+
+
+
+m_max <- 15  # specify max no. of axes
+
+plot(  # create blank plot
+  1:m_max, rep(-1000, m_max), type = "n",
+  xlim = c(0, m_max), ylim = c(0, 100),
+  xlab = "m", ylab = "Classification success (%)"
+)
+
+# plot classification success for sequential values of m:
+for (i in 1:m_max) {
+  cap_result <- CAPdiscrim(
+    dist_taxa ~ site,
+    data = as.data.frame(tree_lichens_taxa_plot),
+    axes = 2, m = i)
+  points(i, cap_result$percent)
+}

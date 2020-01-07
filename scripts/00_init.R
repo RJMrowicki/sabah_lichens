@@ -25,6 +25,7 @@ library(Hmisc)  # rcorr()
 library(lme4)  # lmer()
 library(plotrix)  # std.error()
 library(vegan)  # specnumber(), bioenv(), capscale(),
+library(BiodiversityR)  # CAPdiscrim()
 library(wordcloud)
 
 library(gridExtra)  # grid.arrange()
