@@ -96,7 +96,9 @@ pt_sty_bark <- data.frame(  # by bark type
 
 
 
-# ~ taxonomic groups:
+# ~ Tree-level ------------------------------------------------------
+
+# ~~ taxonomic groups:
 
 pdf(  # open .pdf graphics device
   './figs/cap_taxa.pdf',
@@ -127,7 +129,7 @@ dev.off()  # close .pdf graphics device
 
 
 
-# ~ functional groups:
+# ~~ functional groups:
 
 pdf(  # open .pdf graphics device
   './figs/cap_func.pdf',
@@ -149,6 +151,39 @@ plot_cap_env(  # plot CAP ordination (with environmental correlations)
 par(fig = c(0.5, 1, 0, 1), new = TRUE)
 plot_cap_spp(  # plot species correlations with CAP axes
   spp_cor_obj = cor_cap_func_spp, spp_cor_obj_lab = cor_func_spp,
+  fig_cex = 0.8, plot_lab = "(b)"
+)
+
+
+dev.off()  # close .pdf graphics device
+
+
+
+
+# ~ Plot-level ------------------------------------------------------
+
+# ~~ taxonomic groups:
+
+pdf(  # open .pdf graphics device
+  './figs/cap_taxa_plot.pdf',
+  width = 18/2.54, height = 9/2.54
+)
+
+
+par( # set plotting parameters
+  las = 1, mar = cap_mar)
+
+par(fig = c(0, 0.5, 0, 1))
+plot_cap_env(  # plot CAP ordination (with environmental correlations)
+  cap_obj = cap_taxa_plot, cap_dat = tree_lichens_taxa_plot,
+  spp_cor_obj = cor_taxa_plot_spp, # env_cor_obj = cor_cap_taxa_env,
+  delta_sq_obj = delta_sq_taxa_plot, fig_cex = 0.8,
+  pt_sty_dat = pt_sty_site, plot_lab = "(a)", leg_title = "Site"
+)
+
+par(fig = c(0.5, 1, 0, 1), new = TRUE)
+plot_cap_spp(  # plot species correlations with CAP axes
+  spp_cor_obj = cor_cap_taxa_plot_spp, spp_cor_obj_lab = cor_taxa_plot_spp,
   fig_cex = 0.8, plot_lab = "(b)"
 )
 

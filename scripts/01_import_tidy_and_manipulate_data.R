@@ -206,8 +206,8 @@ trees_func_plot_girth_div <- dd_trees_func %>%
   group_by(`plot`, `girth`) %>% tally %>%
   # re-group by `plot` only:
   group_by(`plot`) %>%
-  # calculate Shannon diversity of girth categories:
-  summarise_at(vars(`n`), list(`girth_H'` = ~diversity(., "shannon")))
+  # calculate Shannon-Wiener diversity of girth categories:
+  summarise_at(vars(`n`), list(`girth_div` = ~diversity(., "shannon")))
 
 # ~ bark:
 trees_func_plot_bark_div <- dd_trees_func %>%
@@ -215,8 +215,8 @@ trees_func_plot_bark_div <- dd_trees_func %>%
   group_by(`plot`, `bark`) %>% tally %>%
   # re-group by `plot` only:
   group_by(`plot`) %>%
-  # calculate Shannon diversity of bark categories:
-  summarise_at(vars(`n`), list(`bark_H'` = ~diversity(., "shannon")))
+  # calculate Shannon-Wiener diversity of bark categories:
+  summarise_at(vars(`n`), list(`bark_div` = ~diversity(., "shannon")))
 
 
 # calculate proportions of buttresses & dipterocarp trees:
