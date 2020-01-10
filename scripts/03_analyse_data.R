@@ -312,33 +312,37 @@ bioenv_taxa <-
     # log10(x+1)-transformed data and zero-adjusted Bray-Curtis:
     cbind(log10(dd_tree_lichens_taxa[, lichen_taxa] + 1), dummy_taxa),
     # vs. z-standardised environmental data:
-    z_std(dd_tree_lichens_taxa[, env_vars_ord]),
+    z_std(dd_tree_lichens_taxa[, env_use]),
     method = "spearman", index = "bray", metric = "euclidean"
   )
 
 bioenv_taxa_rho <-  # extract correlation coefficient
   max(summary(bioenv_taxa)$correlation)
+
 bioenv_vars_taxa <-  # extract variables to use in CAP
   summary(bioenv_taxa)$variables[bioenv_taxa$whichbest]
 bioenv_vars_taxa <- strsplit(bioenv_vars_taxa, " ")[[1]]
+
 cond_vars_taxa <-  # specify conditioning variables
-  env_vars_ord[-which(env_vars_ord %in% bioenv_vars_taxa)]
+  env_use[-which(env_use %in% bioenv_vars_taxa)]
 
 # ~~~ functional groups:
 bioenv_func <-
   bioenv(
     cbind(log10(dd_tree_lichens_func[, lichen_func_grps] + 1), dummy_func),
-    z_std(dd_tree_lichens_func[, env_vars_ord]),
+    z_std(dd_tree_lichens_func[, env_use]),
     method = "spearman", index = "bray", metric = "euclidean"
   )
 
 bioenv_func_rho <-  # extract correlation coefficient
   max(summary(bioenv_func)$correlation)
+
 bioenv_vars_func <-  # extract variables to use in CAP
   summary(bioenv_func)$variables[bioenv_func$whichbest]
 bioenv_vars_func <- strsplit(bioenv_vars_func, " ")[[1]]
+
 cond_vars_func <-  # specify conditioning variables
-  env_vars_ord[-which(env_vars_ord %in% bioenv_vars_func)]
+  env_use[-which(env_use %in% bioenv_vars_func)]
 
 
 
@@ -433,14 +437,14 @@ names(cap_taxa_margin_p) <- names(cap_taxa_margin_f) <- env_vars
 
 # test environmental and species correlations with axes:
 
-cor_cap_taxa_env <-  # ~ environmental
-  #  (NB -- for ordinal/continuous variables)
-  as.data.frame(cor(cbind(
-    scores(cap_taxa)$sites,  # site scores
-    # z-standardised, subsetted environmental data:
-    z_std(dd_tree_lichens_taxa[, env_vars_ord])),
-    method = "spearman")[  # rank (not product-moment) correlation
-      -(1:2), 1:2])  # subset relevant correlations
+# cor_cap_taxa_env <-  # ~ environmental
+#   #  (NB -- for ordinal/continuous variables only)
+#   as.data.frame(cor(cbind(
+#     scores(cap_taxa)$sites,  # site scores
+#     # z-standardised, subsetted environmental data:
+#     z_std(dd_tree_lichens_taxa[, env_vars_ord])),
+#     method = "spearman")[  # rank (not product-moment) correlation
+#       -(1:2), 1:2])  # subset relevant correlations
 
 cor_cap_taxa_spp <-  # ~ species
   as.data.frame(cor(cbind(
@@ -552,14 +556,14 @@ names(cap_func_margin_p) <- names(cap_func_margin_f) <- env_vars
 
 # test environmental and species correlations with axes:
 
-cor_cap_func_env <-  # ~ environmental
-  #  (NB -- for ordinal/continuous variables)
-  as.data.frame(cor(cbind(
-    scores(cap_func)$sites,  # site scores
-    # z-standardised, subsetted environmental data:
-    z_std(dd_tree_lichens_func[, env_vars_ord])),
-    method = "spearman")[  # rank (not product-moment) correlation
-      -(1:2), 1:2])  # subset relevant correlations
+# cor_cap_func_env <-  # ~ environmental
+#   #  (NB -- for ordinal/continuous variables only)
+#   as.data.frame(cor(cbind(
+#     scores(cap_func)$sites,  # site scores
+#     # z-standardised, subsetted environmental data:
+#     z_std(dd_tree_lichens_func[, env_vars_ord])),
+#     method = "spearman")[  # rank (not product-moment) correlation
+#       -(1:2), 1:2])  # subset relevant correlations
 
 cor_cap_func_spp <-  # ~ species
   as.data.frame(cor(cbind(
@@ -587,12 +591,12 @@ top_func <- rownames(cor_cap_func_spp[order(
 
 
 
-# ~ Plot-level
+# ~ Plot-level ------------------------------------------------------
 
 # ~~ Environmental variables ----------------------------------------
 
 # create vectors of continuous/ordinal and categorical tree trait variables:
-env_vars_plot <- c("girth_div", "bark_div", "buttress_prop", "dipterocarp_prop")
+env_vars_plot <- c("bark_div", "girth_l_prop", "buttress_prop", "dipterocarp_prop")
 
 
 
@@ -654,17 +658,17 @@ cond_vars_func_plot <-  # specify conditioning variables
 
 # ~~~ taxonomic groups:
 
-env_vars <- bioenv_vars_taxa_plot  # specify variables used in CAP
+env_vars_plot <- bioenv_vars_taxa_plot  # specify variables used in CAP
 
 cap_taxa_plot <-
   capscale(  # run CAP analysis (vegan::capscale)
     formula(paste0(
       # log10(x+1)-transformed data and zero-adjusted Bray-Curtis:
       "cbind(log10(tree_lichens_taxa_plot[, lichen_taxa] + 1), dummy_taxa_plot) ~ ",
-      paste0(strsplit(env_vars, split = " "), collapse = " + ")
+      paste0(strsplit(env_vars_plot, split = " "), collapse = " + ")
     )),
     # vs. z-standardised environmental data:
-    data = z_std(tree_lichens_taxa_plot[, env_vars]),
+    data = z_std(tree_lichens_taxa_plot[, env_vars_plot]),
     distance = "bray"  # specify Bray-Curtis dissimilarity
   )
 
@@ -684,9 +688,9 @@ if (length(env_vars) > 1) {
 
 # calculate squared canonical correlation(s):
 delta_sq_taxa_plot <-  # create empty vector
-  vector(length = length(env_vars))
+  vector(length = length(env_vars_plot))
 
-for(i in 1:length(env_vars)) {
+for(i in 1:length(env_vars_plot)) {
   delta_sq_taxa_plot[i] <-  # assign to relevant item
     cor(  # calculate Pearson correlation coefficient
       summary(cap_taxa_plot)$sites[, i],  # site scores
@@ -712,10 +716,10 @@ anova_cap_taxa_plot_margin <-  # assess marginal effects of terms
   anova(cap_taxa_plot, by = "margin", permutations = n_perm, model = "reduced")
 
 # extract F and P values:
-cap_taxa_plot_margin_f <- anova_cap_taxa_plot_margin$F[1:length(env_vars)]
-cap_taxa_plot_margin_p <- anova_cap_taxa_plot_margin$`Pr(>F)`[1:length(env_vars)]
+cap_taxa_plot_margin_f <- anova_cap_taxa_plot_margin$F[1:length(env_vars_plot)]
+cap_taxa_plot_margin_p <- anova_cap_taxa_plot_margin$`Pr(>F)`[1:length(env_vars_plot)]
 # rename vector elements according to environmental variables used:
-names(cap_taxa_plot_margin_p) <- names(cap_taxa_plot_margin_f) <- env_vars
+names(cap_taxa_plot_margin_p) <- names(cap_taxa_plot_margin_f) <- env_vars_plot
 
 
 
@@ -757,8 +761,6 @@ top_taxa_plot <- rownames(cor_cap_taxa_plot_spp[order(
 
 
 
-# ~ Plot-level ------------------------------------------------------
-
 # ~~ CAP of lichen taxonomic groups vs. site ------------------------
 
 # output data for CAP analysis in FORTRAN program:
@@ -775,7 +777,7 @@ write_csv(
   './cap/li_func_plot.txt', col_names = FALSE)
 
 # (NB -- no need to output factor(s), as specify no. of groups/observations per group:)
-tree_lichens_taxa_plot %>% group_by(site) %>% summarise(n = n())
+# tree_lichens_taxa_plot %>% group_by(site) %>% summarise(n = n())
 
 
 # ### CAP analysis via FORTRAN program here ###
@@ -783,10 +785,81 @@ tree_lichens_taxa_plot %>% group_by(site) %>% summarise(n = n())
 
 # (NB -- log10(x+1) transform data, zero-adjusted Bray-Curtis [i.e. include dummy];
 # Discriminant Analysis [groups] rather than Canonical Correlation Analysis [variables];
-# allow program to choose m automatically; run tests with 9,999 permutations)
+# allow program to choose m automatically;
+# run tests with 9,999 permutations, specify random seed as 123)
+
+
+# import results:
+
+cap_taxa_site_plot_raw <- read_lines('./cap/li_taxa_plot_results.txt')
+
+
+# extract canonical axes (i.e. point coordinates):
+
+# determine line number for start of axes table:
+axes_start <- grep(
+  "Canonical Axes (constrained)",
+  cap_taxa_site_plot_raw, fixed = TRUE) + 3
+# determine line number for end of table (i.e. start + no. of sites):
+axes_end <- axes_start + nrow(tree_lichens_taxa_plot)-1
+
+axes_cap_taxa_site_plot <-
+  # extract raw lines containing axes table:
+  cap_taxa_site_plot_raw[axes_start:axes_end] %>%
+  # split, remove empty elements, remove first element per line:
+  strsplit(" ") %>% map(~.[. != ""]) %>% map(~.[-1]) %>%
+  # convert into matrix:
+  unlist %>% matrix(
+    nrow = nrow(tree_lichens_taxa_plot), ncol = 2, byrow = TRUE,
+    dimnames = list(NULL, c("CAP1", "CAP2"))
+  ) %>% as.data.frame  # convert into data frame
+
+
+# extract squared canonical correlation(s):
+delta_sq_taxa_site_plot <-
+  # extract raw line containing delta^2 values:
+  cap_taxa_site_plot_raw[grep(
+    "Squared Correlations", cap_taxa_site_plot_raw, fixed = TRUE
+  ) + 1] %>%
+  # extract actual values (using presence of decimal point):
+  strsplit(" ") %>% unlist %>% grep(".", ., value = TRUE)
+
+
+# extract species correlations with axes:
+
+# determine line number for start of correlation table:
+cor_spp_start <- grep(
+  "Correlations of Canonical Axes (Q*) with Original Variables (Y)",
+  cap_taxa_site_plot_raw, fixed = TRUE) + 3
+# determine line number for end of table (i.e. start + no. of species):
+cor_spp_end <- cor_spp_start + length(lichen_taxa)-1
+
+cor_cap_taxa_plot_spp <-
+  # extract raw lines containing species correlation table:
+  cap_taxa_site_plot_raw[cor_spp_start:cor_spp_end] %>%
+  # split, remove empty elements, remove first element per line:
+  strsplit(" ") %>% map(~.[. != ""]) %>% map(~.[-1]) %>%
+  # convert into matrix:
+  unlist %>% matrix(
+    nrow = length(lichen_taxa), ncol = 2, byrow = TRUE,
+    dimnames = list(lichen_taxa, c("CAP1", "CAP2"))
+  ) %>% as.data.frame  # convert into data frame
+  
+
+# extract group classification success:
+succ_cap_taxa_site_plot <-
+  # extract raw line containing classification success:
+  cap_taxa_site_plot_raw %>%
+  grep("Total correct", ., fixed = TRUE, value = TRUE) %>%
+  # remove %, split and extract last element:
+  gsub("%", "", .) %>% strsplit(" ") %>% map(~.[length(.)]) %>%
+  # convert to numeric vector:
+  unlist %>% as.numeric
 
 
 
+
+#####################################################################
 
 # ~~~ taxonomic groups:
 
@@ -804,7 +877,8 @@ cap_taxa_plot_site <-
     dist_taxa ~ site,  # vs. site (categorical) only
     # NB -- environmental data as data frame, not tibble:
     data = as.data.frame(tree_lichens_taxa_plot),
-    add = TRUE, m = 4  # number of axes resulting in highest classification success
+    # specify no. of axes resulting in highest classification success:
+    m = 4, add = TRUE, permutations = n_perm  
   )
 
 
