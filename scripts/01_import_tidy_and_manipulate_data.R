@@ -200,15 +200,6 @@ lichens_func_plot <- dd_lichens_func %>%
 # tree functional trait data:
 
 # calculate 'diversity' of tree trait categories per plot:
-# ~ girth:
-trees_func_plot_girth_div <- dd_trees_func %>%
-  # obtain number of trees per girth category per plot:
-  group_by(`plot`, `girth`) %>% tally %>%
-  # re-group by `plot` only:
-  group_by(`plot`) %>%
-  # calculate Shannon-Wiener diversity of girth categories:
-  summarise_at(vars(`n`), list(`girth_div` = ~diversity(., "shannon")))
-
 # ~ bark:
 trees_func_plot_bark_div <- dd_trees_func %>%
   # obtain number of trees per bark category per plot:
@@ -218,19 +209,23 @@ trees_func_plot_bark_div <- dd_trees_func %>%
   # calculate Shannon-Wiener diversity of bark categories:
   summarise_at(vars(`n`), list(`bark_div` = ~diversity(., "shannon")))
 
+# ~ girth?
 
-# calculate proportions of buttresses & dipterocarp trees:
+
+# calculate proportions of girth >200cm, buttresses & dipterocarp trees:
 trees_func_plot_props <- dd_trees_func %>%
+  # first create factor for 'large' girth (i.e. >= 200 cm):
+  mutate(`girth_l` = ifelse(`girth_m` >= 200, "1", "0")) %>%
   group_by(`plot`) %>% summarise_at(
-    vars(`buttress`, `dipterocarp`),
+    vars(`girth_l`, `buttress`, `dipterocarp`),
     list(`prop` = ~length(which(. == "1")) / length(.))
   )
 
 
 trees_func_plot <-  # combine into single data frame
-  # girth and bark 'diversity':
-  left_join(trees_func_plot_girth_div, trees_func_plot_bark_div) %>%
-  # add buttress and dipterocarp proportions:
+  # bark 'diversity':
+  trees_func_plot_bark_div %>%
+  # add girth, buttress and dipterocarp proportions:
   left_join(trees_func_plot_props) %>%
   # add column for `site` (distinct rows from main dataframe only):
   left_join(distinct(select(dd_trees_func, `plot`, `site`))) %>%
