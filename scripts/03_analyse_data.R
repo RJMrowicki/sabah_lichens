@@ -894,7 +894,11 @@ write_csv(
 # run tests with 9,999 permutations, specify random seed as 123)
 
 
-# import results:
+
+
+# import results
+
+# ~~ taxonomic groups:
 
 cap_taxa_site_plot_raw <- read_lines('./cap/li_taxa_plot_results.txt')
 
@@ -955,6 +959,76 @@ cor_cap_taxa_plot_spp <-
 succ_cap_taxa_site_plot <-
   # extract raw line containing classification success:
   cap_taxa_site_plot_raw %>%
+  grep("Total correct", ., fixed = TRUE, value = TRUE) %>%
+  # remove %, split and extract last element:
+  gsub("%", "", .) %>% strsplit(" ") %>% map(~.[length(.)]) %>%
+  # convert to numeric vector:
+  unlist %>% as.numeric
+
+
+
+
+# ~~ functional groups:
+
+cap_func_site_plot_raw <- read_lines('./cap/li_func_plot_results.txt')
+
+
+# extract canonical axes (i.e. point coordinates):
+
+# determine line number for start of axes table:
+axes_start <- grep(
+  "Canonical Axes (constrained)",
+  cap_func_site_plot_raw, fixed = TRUE) + 3
+# determine line number for end of table (i.e. start + no. of sites):
+axes_end <- axes_start + nrow(tree_lichens_func_plot)-1
+
+axes_cap_func_site_plot <-
+  # extract raw lines containing axes table:
+  cap_func_site_plot_raw[axes_start:axes_end] %>%
+  # split, remove empty elements, remove first element per line:
+  strsplit(" ") %>% map(~.[. != ""]) %>% map(~.[-1]) %>%
+  # convert into matrix:
+  unlist %>% matrix(
+    nrow = nrow(tree_lichens_func_plot), ncol = 2, byrow = TRUE,
+    dimnames = list(NULL, c("CAP1", "CAP2"))
+  ) %>% as.data.frame  # convert into data frame
+
+
+# extract squared canonical correlation(s):
+delta_sq_func_site_plot <-
+  # extract raw line containing delta^2 values:
+  cap_func_site_plot_raw[grep(
+    "Squared Correlations", cap_func_site_plot_raw, fixed = TRUE
+  ) + 1] %>%
+  # extract actual values (using presence of decimal point):
+  strsplit(" ") %>% unlist %>% grep(".", ., value = TRUE)
+
+
+# extract species correlations with axes:
+
+# determine line number for start of correlation table:
+cor_spp_start <- grep(
+  "Correlations of Canonical Axes (Q*) with Original Variables (Y)",
+  cap_func_site_plot_raw, fixed = TRUE) + 3
+# determine line number for end of table (i.e. start + no. of species):
+cor_spp_end <- cor_spp_start + length(lichen_func_grps)-1
+
+cor_cap_func_plot_spp <-
+  # extract raw lines containing species correlation table:
+  cap_func_site_plot_raw[cor_spp_start:cor_spp_end] %>%
+  # split, remove empty elements, remove first element per line:
+  strsplit(" ") %>% map(~.[. != ""]) %>% map(~.[-1]) %>%
+  # convert into matrix:
+  unlist %>% matrix(
+    nrow = length(lichen_func_grps), ncol = 2, byrow = TRUE,
+    dimnames = list(lichen_func_grps, c("CAP1", "CAP2"))
+  ) %>% as.data.frame  # convert into data frame
+
+
+# extract group classification success:
+succ_cap_func_site_plot <-
+  # extract raw line containing classification success:
+  cap_func_site_plot_raw %>%
   grep("Total correct", ., fixed = TRUE, value = TRUE) %>%
   # remove %, split and extract last element:
   gsub("%", "", .) %>% strsplit(" ") %>% map(~.[length(.)]) %>%
