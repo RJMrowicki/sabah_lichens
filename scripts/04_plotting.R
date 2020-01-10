@@ -1,6 +1,35 @@
 # sabah_lichens
 # Plotting
 
+# specify plot margins for MDS and CAP ordinations:
+mds_mar <- c(0.4, 0.4, 0.4, 0.4)
+cap_mar <- c(3.5, 3.5, 0.5, 0.5)
+
+# lookup tables for point styles:
+pt_sty_site <- data.frame(  # by site
+  site = levels(dd_lichens_taxa$site),
+  pch = c(0, 1, 17),  # symbol
+  cex = rep(0.8, 3),  # size
+  col = rep(grey(0.5), 3)  # colour
+)
+
+pt_sty_girth <- data.frame(  # by girth
+  girth = levels(dd_tree_lichens_taxa$girth),
+  pch = c(3, 1, 17),  # symbol
+  cex = rep(0.8, 3),  # size
+  col = rep(grey(0.5), 3)  # colour
+)
+
+pt_sty_bark <- data.frame(  # by bark type
+  bark = levels(dd_tree_lichens_taxa$bark),
+  pch = c(4, 3, 2, 1),  # symbol
+  cex = rep(0.8, 4),  # size
+  col = rep(grey(0.5), 4)  # colour
+)
+
+
+
+
 # Boxplots of lichen diversity vs. site =============================
 
 # create boxplots:
@@ -67,34 +96,49 @@ dev.off()  # close .pdf graphics device
 
 
 
+# MDS ordination plots ==============================================
+
+# ~ Tree-level ------------------------------------------------------
+
+# (NA -- MDS not converged)
+
+
+
+
+# ~ Plot-level ------------------------------------------------------
+
+pdf(  # open .pdf graphics device
+  './figs/mds_plot.pdf',
+  width = 18/2.54, height = 9/2.54
+)
+
+
+par( # set plotting parameters
+  las = 1, mar = mds_mar)
+
+par(fig = c(0, 0.5, 0, 1))
+plot_mds(  # plot MDS for taxonomic groups
+  mds_obj = mds_li_taxa_plot,
+  pt_sty_dat = pt_sty_site, pt_sty_var = "site",
+  pt_ref_dat = tree_lichens_taxa_plot,
+  legend = TRUE, leg_title = "Site", plot_lab = "(a)"
+)
+
+par(fig = c(0.5, 1, 0, 1), new = TRUE)
+plot_mds(  # plot MDS for functional groups
+  mds_obj = mds_li_func_plot,
+  pt_sty_dat = pt_sty_site, pt_sty_var = "site",
+  pt_ref_dat = tree_lichens_func_plot,
+  plot_lab = "(b)"
+)
+
+
+dev.off()  # close .pdf graphics device
+
+
+
+
 # CAP ordination plots ==============================================
-
-cap_mar <- c(3.5, 3.5, 0.5, 0.5)  # specify plot margins for CAP
-
-# lookup tables for point styles:
-pt_sty_site <- data.frame(  # by site
-  site = levels(dd_lichens_taxa$site),
-  pch = c(0, 1, 17),  # symbol
-  cex = rep(0.8, 3),  # size
-  col = rep(grey(0.5), 3)  # colour
-)
-
-pt_sty_girth <- data.frame(  # by girth
-  girth = levels(dd_tree_lichens_taxa$girth),
-  pch = c(3, 1, 17),  # symbol
-  cex = rep(0.8, 3),  # size
-  col = rep(grey(0.5), 3)  # colour
-)
-
-pt_sty_bark <- data.frame(  # by bark type
-  bark = levels(dd_tree_lichens_taxa$bark),
-  pch = c(4, 3, 2, 1),  # symbol
-  cex = rep(0.8, 4),  # size
-  col = rep(grey(0.5), 4)  # colour
-)
-
-
-
 
 # ~ Tree-level ------------------------------------------------------
 

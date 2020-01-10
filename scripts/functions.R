@@ -171,7 +171,7 @@ plot_cap_env <- function(
   
   par(xpd = FALSE)  # re-clip plotting to plot region
   
-  legend(  # add legend for sites
+  legend(  # add legend for points
     "topright", bty = "n", title = leg_title,
     legend = pt_sty_dat[, pt_sty_var],
     pch = pt_sty_dat$pch, col = pt_sty_dat$col,
@@ -269,6 +269,62 @@ plot_cap_spp <- function (
   legend( # add plot label
     "topleft", bty = "n", legend = "", title = plot_lab
   )
+}
+
+
+
+
+# plot MDS ordination:
+plot_mds <- function(
+  mds_obj, pt_sty_dat, pt_ref_dat, pt_sty_var,
+  stress = TRUE, legend = FALSE, leg_title = "", plot_lab = "",
+  output = FALSE
+)
+{
+  # extract lowest and highest x and y values:
+  x0 <- min(scores(mds_obj)[,1]); x1 <- max(scores(mds_obj)[,1])
+  y0 <- min(scores(mds_obj)[,2]); y1 <- max(scores(mds_obj)[,2])
+  xdist <- abs(x1-x0); ydist <- abs(y1-y0)  # x and y distances
+  
+  plot(  # create plot area
+    mds_obj, disp = "sites",
+    type = "n", xaxt = "n", yaxt = "n", xlab = "", ylab = "",
+    xlim = c(x0-xdist*0.1, x1+xdist*0.1),  # set x and y limits,
+    ylim = c(y0-ydist*0.1, y1+ydist*0.1)  # extend each by 10%
+  )
+  
+  points(  # add points
+    mds_obj, cex = 1,
+    pch = as.numeric(pt_sty_dat[  # lookup style from data frame
+      match(as_vector(pt_ref_dat[, pt_sty_var]), pt_sty_dat[, pt_sty_var]), "pch"]),
+    col = as.character(pt_sty_dat[
+      match(as_vector(pt_ref_dat[, pt_sty_var]), pt_sty_dat[, pt_sty_var]), "col"])
+  )
+  
+  usr <-  par("usr")  # extract plot area coordinates
+  if(stress == TRUE) {  # plot stress value
+    text(
+      usr[2]-((usr[2]-usr[1])/100), usr[4]-((usr[4]-usr[3])/100),
+      adj = c(1, 1), cex = 0.8,
+      labels = paste("2D stress =", formatC(mds_obj$stress, 2, format = "f"))
+    )
+  }
+  
+  if(legend == TRUE) {
+    legend(  # add legend for points
+      "topright", inset = c(0, 0.05), bty = "n",
+      title = leg_title, legend = pt_sty_dat[, pt_sty_var],
+      pch = pt_sty_dat$pch, col = pt_sty_dat$col,
+      pt.cex = 0.8*pt_sty_dat$cex, y.intersp = 0.8, cex = 0.8
+    )
+  }
+  legend(  # add plot label
+    "topleft", bty = "n", legend = "", title = plot_lab
+  )
+  
+  if(output == TRUE) {  # output plot data
+    return(list(xdist = xdist, ydist = ydist, usr = usr))
+  }
 }
 
 
