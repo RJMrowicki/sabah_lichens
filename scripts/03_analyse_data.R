@@ -761,6 +761,111 @@ top_taxa_plot <- rownames(cor_cap_taxa_plot_spp[order(
 
 
 
+# ~~~ functional groups:
+
+env_vars_plot <- bioenv_vars_func_plot  # specify variables used in CAP
+
+cap_func_plot <-
+  capscale(  # run CAP analysis (vegan::capscale)
+    formula(paste0(
+      # log10(x+1)-transformed data and zero-adjusted Bray-Curtis:
+      "cbind(log10(tree_lichens_func_plot[, lichen_func_grps] + 1), dummy_func_plot) ~ ",
+      paste0(strsplit(env_vars_plot, split = " "), collapse = " + ")
+    )),
+    # vs. z-standardised environmental data:
+    data = z_std(tree_lichens_func_plot[, env_vars_plot]),
+    distance = "bray"  # specify Bray-Curtis dissimilarity
+  )
+
+
+# extract proportions explained, for total and constrained:
+# ~ axis 1:
+prop_cap1_func_plot <- summary(cap_func_plot)$cont[[1]][2, "CAP1"]*100
+prop_cap1_con_func_plot <- summary(cap_func_plot)$concont[[1]][2, "CAP1"]*100
+# ~ axis 2:
+# (NB -- if only one environmental variable used, CAP2 is irrelevant)
+if (length(env_vars) > 1) {
+  prop_cap2_func_plot <- summary(cap_func_plot)$cont[[1]][2, "CAP2"]*100
+  prop_cap2_con_func_plot <- summary(cap_func_plot)$concont[[1]][2, "CAP2"]*100
+} else {
+  prop_cap2_func_plot <- prop_cap2_con_func_plot <- NULL
+}
+
+# calculate squared canonical correlation(s):
+delta_sq_func_plot <-  # create empty vector
+  vector(length = length(env_vars_plot))
+
+for(i in 1:length(env_vars_plot)) {
+  delta_sq_func_plot[i] <-  # assign to relevant item
+    cor(  # calculate Pearson correlation coefficient
+      summary(cap_func_plot)$sites[, i],  # site scores
+      summary(cap_func_plot)$constraints[, i],  # site constraints
+      method = "pearson"
+    )^2
+}
+
+
+
+
+# test significance of overall analysis and of individual terms:
+anova_cap_func_plot <-  # overall analysis
+  anova(cap_func_plot, permutations = n_perm, model = "reduced")
+
+# extract F and P values:
+cap_func_plot_f <- anova_cap_func_plot$F[1]
+cap_func_plot_p <- anova_cap_func_plot$`Pr(>F)`[1]
+
+anova_cap_func_plot_term <-  # terms assessed sequentially
+  anova(cap_func_plot, by = "term", permutations = n_perm, model = "reduced")
+anova_cap_func_plot_margin <-  # assess marginal effects of terms
+  anova(cap_func_plot, by = "margin", permutations = n_perm, model = "reduced")
+
+# extract F and P values:
+cap_func_plot_margin_f <- anova_cap_func_plot_margin$F[1:length(env_vars_plot)]
+cap_func_plot_margin_p <- anova_cap_func_plot_margin$`Pr(>F)`[1:length(env_vars_plot)]
+# rename vector elements according to environmental variables used:
+names(cap_func_plot_margin_p) <- names(cap_func_plot_margin_f) <- env_vars_plot
+
+
+
+
+# test environmental and species correlations with axes:
+
+cor_cap_func_plot_env <-  # ~ environmental
+  as.data.frame(cor(cbind(
+    scores(cap_func_plot)$sites,  # site scores
+    # z-standardised, subsetted environmental data:
+    z_std(tree_lichens_func_plot[, env_vars_plot])),
+    method = "spearman")[  # rank (not product-moment) correlation
+      -(1:2), 1:2])  # subset relevant correlations
+
+cor_cap_func_plot_spp <-  # ~ species
+  as.data.frame(cor(cbind(
+    scores(cap_func_plot)$sites, # site scores
+    # log10(x+1)-transformed abundance data:
+    log10(tree_lichens_func_plot[, lichen_func_grps] + 1)),
+    method = "spearman")[  # rank (not product-moment) correlation
+      -(1:2), 1:2])  # subset relevant correlations
+
+# extract relevant species:
+cor_func_plot_spp <-
+  cor_cap_func_plot_spp[which(  # correlation coefficient >= x
+    if (length(env_vars) > 1) {
+      abs(cor_cap_func_plot_spp$CAP1) >= cor_spp_x |
+        abs(cor_cap_func_plot_spp$CAP2) >= cor_spp_x
+    } else {
+      abs(cor_cap_func_plot_spp$CAP1) >= cor_spp_x
+    }
+  ), ]
+
+# ordered vector of names of species with strongest correlations:
+top_func_plot <- rownames(cor_cap_func_plot_spp[order(
+  apply(cor_cap_func_plot_spp, MARGIN = 1, function(x) {max(abs(x))}),
+  decreasing = TRUE), ])
+
+
+
+
 # ~~ CAP of lichen taxonomic groups vs. site ------------------------
 
 # output data for CAP analysis in FORTRAN program:

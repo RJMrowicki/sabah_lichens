@@ -114,7 +114,7 @@ plot_cap_env(  # plot CAP ordination (with environmental correlations)
   cap_obj = cap_taxa, cap_dat = dd_tree_lichens_taxa,
   spp_cor_obj = cor_taxa_spp, # env_cor_obj = cor_cap_taxa_env,
   delta_sq_obj = delta_sq_taxa, fig_cex = 0.8,
-  pt_sty_dat = pt_sty_girth, plot_lab = "(a)", leg_title = "Tree girth"
+  pt_sty_dat = pt_sty_site, plot_lab = "(a)", leg_title = "Site"
 )
 
 par(fig = c(0.5, 1, 0, 1), new = TRUE)
@@ -145,7 +145,7 @@ plot_cap_env(  # plot CAP ordination (with environmental correlations)
   cap_obj = cap_func, cap_dat = dd_tree_lichens_func,
   spp_cor_obj = cor_func_spp, # env_cor_obj = cor_cap_func_env,
   delta_sq_obj = delta_sq_func, fig_cex = 0.8,
-  pt_sty_dat = pt_sty_girth, plot_lab = "(a)", leg_title = "Tree girth"
+  pt_sty_dat = pt_sty_site, plot_lab = "(a)", leg_title = "Site"
 )
 
 par(fig = c(0.5, 1, 0, 1), new = TRUE)
@@ -176,8 +176,39 @@ par( # set plotting parameters
 par(fig = c(0, 0.5, 0, 1))
 plot_cap_env(  # plot CAP ordination (with environmental correlations)
   cap_obj = cap_taxa_plot, cap_dat = tree_lichens_taxa_plot,
-  spp_cor_obj = cor_taxa_plot_spp, # env_cor_obj = cor_cap_taxa_env,
+  spp_cor_obj = cor_taxa_plot_spp, env_cor_obj = cor_cap_taxa_plot_env,
   delta_sq_obj = delta_sq_taxa_plot, fig_cex = 0.8,
+  pt_sty_dat = pt_sty_site, plot_lab = "(a)", leg_title = "Site"
+)
+
+par(fig = c(0.5, 1, 0, 1), new = TRUE)
+plot_cap_spp(  # plot species correlations with CAP axes
+  spp_cor_obj = cor_cap_taxa_plot_spp, spp_cor_obj_lab = cor_taxa_plot_spp,
+  fig_cex = 0.8, plot_lab = "(b)"
+)
+
+
+dev.off()  # close .pdf graphics device
+
+
+
+
+# ~~ taxonomic groups:
+
+pdf(  # open .pdf graphics device
+  './figs/cap_func_plot.pdf',
+  width = 18/2.54, height = 9/2.54
+)
+
+
+par( # set plotting parameters
+  las = 1, mar = cap_mar)
+
+par(fig = c(0, 0.5, 0, 1))
+plot_cap_env(  # plot CAP ordination (with environmental correlations)
+  cap_obj = cap_func_plot, cap_dat = tree_lichens_func_plot,
+  spp_cor_obj = cor_func_plot_spp, env_cor_obj = cor_cap_func_plot_env,
+  delta_sq_obj = delta_sq_func_plot, fig_cex = 0.8,
   pt_sty_dat = pt_sty_site, plot_lab = "(a)", leg_title = "Site"
 )
 

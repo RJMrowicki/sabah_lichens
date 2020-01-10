@@ -76,6 +76,7 @@ plot_cap_env <- function(
   x0 <- 2 * floor(min(use_x)/2); x1 <- 2 * ceiling(max(use_x)/2)
   y0 <- 2 * floor(min(use_y)/2); y1 <- 2 * ceiling(max(use_y)/2)
   # (NB -- `2 * round(x/2)` rounds to nearest even integer)
+  xdist = x1-x0; ydist = y1-y0  # calculate x and y distances
   
   plot(  # create blank plot area
     use_x, use_y, type = "n", bty = "l",
@@ -145,18 +146,18 @@ plot_cap_env <- function(
     # text(  # add vector overlay of environmental variables
     #   # (NB -- uses product-moment, not rank, correlation coefficients)
     #   cap_obj, display = "bp", col = grey(0.5), axis.bp = FALSE,
-    #   arrow.mul = (x1-x0)*sf,  # length multiplier matches circle radius
+    #   arrow.mul = (xdist)*sf,  # length multiplier matches circle radius
     #   head.arrow = 0.05, cex = 0.7,
     #   labels = rownames(summary(cap_obj)$biplot)
     # )
     arrows(  # add arrows for environmental correlations, from origin
       x0 = 0, y0 = 0,
-      x1 = env_cor_obj$CAP1*((x1-x0)*sf),  # use scaling factor
-      y1 = env_cor_obj$CAP2*((x1-x0)*sf),  # (correspond with circle perimeter)
+      x1 = env_cor_obj$CAP1*((xdist/2)*sf),  # use scaling factor
+      y1 = env_cor_obj$CAP2*((xdist/2)*sf),  # (correspond with circle perimeter)
       code = 2, length = 0.05, lwd = 1.5, col = "blue"
     )
     text(  # add environmental labels
-      env_cor_obj$CAP1*((x1-x0)*sf), env_cor_obj$CAP2*((x1-x0)*sf),
+      env_cor_obj$CAP1*((xdist/2)*sf), env_cor_obj$CAP2*((xdist/2)*sf),
       env_labs, pos = c(apply( #
         env_cor_obj, MARGIN = 1, FUN = function (x) {
           if (abs(x["CAP1"]) > abs(x["CAP2"])) {  # if |x| > |y|
