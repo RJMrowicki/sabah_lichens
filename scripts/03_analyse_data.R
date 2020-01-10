@@ -360,15 +360,17 @@ env_vars <- env_vars_cat  # specify variables used in CAP
 # env_vars <- bioenv_vars_taxa
 
 
-# ~~~~ continuous/ordinal environmental variables:
+# # ~~~~ continuous/ordinal environmental variables:
 # cap_taxa <-
 #   capscale(  # run CAP analysis (vegan::capscale)
 #     formula(paste0(
 #       # log10(x+1)-transformed data and zero-adjusted Bray-Curtis:
 #       "cbind(log10(dd_tree_lichens_taxa[, lichen_taxa] + 1), dummy_taxa) ~ ",
-#       paste0(strsplit(env_vars, split = " "), collapse = " + "))),
+#       paste0(strsplit(env_vars, split = " "), collapse = " + "),
+#       "+ Condition(plot)"  # (NB -- `plot` as a conditioning variable)
+#     )),
 #     # vs. z-standardised environmental data:
-#     data = z_std(dd_tree_lichens_taxa[, env_vars]),
+#     data = z_std(dd_tree_lichens_taxa[, c(env_vars, "plot")]),
 #     distance = "bray")
 
 
@@ -378,9 +380,11 @@ cap_taxa <-
     formula(paste0(
       # log10(x+1)-transformed data and zero-adjusted Bray-Curtis:
       "cbind(log10(dd_tree_lichens_taxa[, lichen_taxa] + 1), dummy_taxa) ~ ",
-      paste0(strsplit(env_vars, split = " "), collapse = " + "))),
+      paste0(strsplit(env_vars, split = " "), collapse = " + "),
+      "+ Condition(plot)"  # (NB -- `plot` as a conditioning variable)
+    )),
     # vs. z-standardised environmental data:
-    data = dd_tree_lichens_taxa[, env_vars],
+    data = dd_tree_lichens_taxa[, c(env_vars, "plot")],
     distance = "bray")
 
 
@@ -479,15 +483,17 @@ env_vars <- env_vars_cat  # specify variables used in CAP
 # env_vars <- bioenv_vars_func
 
 
-# ~~~~ continuous/ordinal environmental variables:
+# # ~~~~ continuous/ordinal environmental variables:
 # cap_func <-
 #   capscale(  # run CAP analysis (vegan::capscale)
 #     formula(paste0(
 #       # log10(x+1)-transformed data and zero-adjusted Bray-Curtis:
 #       "cbind(log10(dd_tree_lichens_func[, lichen_func_grps] + 1), dummy_func) ~ ",
-#       paste0(strsplit(env_vars, split = " "), collapse = " + "))),
+#       paste0(strsplit(env_vars, split = " "), collapse = " + "),
+#       "+ Condition(plot)"  # (NB -- `plot` as a conditioning variable)
+#     )),
 #     # vs. z-standardised environmental data:
-#     data = z_std(dd_tree_lichens_func[, env_vars]),
+#     data = z_std(dd_tree_lichens_func[, c(env_vars, "plot")]),
 #     distance = "bray")
 
 
@@ -497,9 +503,11 @@ cap_func <-
     formula(paste0(
       # log10(x+1)-transformed data and zero-adjusted Bray-Curtis:
       "cbind(log10(dd_tree_lichens_func[, lichen_func_grps] + 1), dummy_func) ~ ",
-      paste0(strsplit(env_vars, split = " "), collapse = " + "))),
+      paste0(strsplit(env_vars, split = " "), collapse = " + "),
+      "+ Condition(plot)"  # (NB -- `plot` as a conditioning variable)
+    )),
     # vs. z-standardised environmental data:
-    data = dd_tree_lichens_func[, env_vars],
+    data = dd_tree_lichens_func[, c(env_vars, "plot")],
     distance = "bray")
 
 
