@@ -10,7 +10,8 @@ pt_sty_site <- data.frame(  # by site
   site = levels(dd_lichens_taxa$site),
   pch = c(0, 1, 17),  # symbol
   cex = rep(0.8, 3),  # size
-  col = rep(grey(0.5), 3)  # colour
+  # col = rep(grey(0.5), 3)  # colour
+  col = c(grey(0.5), "salmon", "royalblue")  # colour
 )
 
 pt_sty_girth <- data.frame(  # by girth
@@ -30,7 +31,7 @@ pt_sty_bark <- data.frame(  # by bark type
 
 
 
-# Boxplots of lichen diversity vs. site =============================
+# 1. Boxplots of lichen diversity vs. site ==========================
 
 # create boxplots:
 
@@ -96,11 +97,48 @@ dev.off()  # close .pdf graphics device
 
 
 
-# MDS ordination plots ==============================================
+# 2. MDS ordination plots ===========================================
 
 # ~ Tree-level ------------------------------------------------------
+# (NB -- MDS not converged)
 
-# (NA -- MDS not converged)
+pdf(  # open .pdf graphics device
+  './figs/mds.pdf',
+  width = 18/2.54, height = 9/2.54
+)
+
+
+par( # set plotting parameters
+  las = 1, mar = mds_mar)
+
+par(fig = c(0, 0.5, 0, 1))
+plot_mds(  # plot MDS for taxonomic groups
+  mds_obj = mds_li_taxa,
+  pt_sty_dat = pt_sty_site, pt_sty_var = "site",
+  pt_ref_dat = dd_tree_lichens_taxa,
+  legend = TRUE, leg_title = "Site", plot_lab = "(a)"
+)
+
+ordiellipse(  # add ellipses for site groups
+  mds_li_taxa, dd_tree_lichens_taxa$site,
+  draw = "line", col = as.character(pt_sty_site$col)
+)
+
+par(fig = c(0.5, 1, 0, 1), new = TRUE)
+plot_mds(  # plot MDS for functional groups
+  mds_obj = mds_li_func,
+  pt_sty_dat = pt_sty_site, pt_sty_var = "site",
+  pt_ref_dat = dd_tree_lichens_func,
+  plot_lab = "(b)"
+)
+
+ordiellipse(  # add ellipses for site groups
+  mds_li_func, dd_tree_lichens_func$site,
+  draw = "line", col = as.character(pt_sty_site$col)
+)
+
+
+dev.off()  # close .pdf graphics device
 
 
 
@@ -124,12 +162,22 @@ plot_mds(  # plot MDS for taxonomic groups
   legend = TRUE, leg_title = "Site", plot_lab = "(a)"
 )
 
+ordiellipse(  # add ellipses for site groups
+  mds_li_taxa_plot, tree_lichens_taxa_plot$site,
+  draw = "line", col = as.character(pt_sty_site$col)
+)
+
 par(fig = c(0.5, 1, 0, 1), new = TRUE)
 plot_mds(  # plot MDS for functional groups
   mds_obj = mds_li_func_plot,
   pt_sty_dat = pt_sty_site, pt_sty_var = "site",
   pt_ref_dat = tree_lichens_func_plot,
   plot_lab = "(b)"
+)
+
+ordiellipse(  # add ellipses for site groups
+  mds_li_func_plot, tree_lichens_func_plot$site,
+  draw = "line", col = as.character(pt_sty_site$col)
 )
 
 

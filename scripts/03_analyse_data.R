@@ -1,9 +1,9 @@
 # sabah_lichens
 # Analyse data
 
-# Univariate analyses ===============================================
+# 1. Univariate analyses ============================================
 
-# ~ mixed effects models of lichen diversity vs. site ---------------
+# ~ 1.1 mixed effects models of lichen diversity vs. site -----------
 
 # NB -- probability distributions are not really suitable for GLMMs;
 # try zero-inflated models, OR permutational ANOVA (see below).
@@ -120,7 +120,7 @@ anova_li_func_h <- Anova(lm_li_func_h, type = 'II')
 
 
 
-# ~ PERANOVAs of lichen diversity vs. site --------------------------
+# ~ 1.2 PERANOVAs of lichen diversity vs. site ----------------------
 
 # output data for PERANOVA analysis in PRIMER:
 # ~ lichen taxonomic and functional group diversity:
@@ -153,9 +153,9 @@ li_func_h_ph <- read_csv('./primer/results/li_func_h_ph.csv')
 
 
 
-# Unconstrained multivariate analyses ===============================
+# 2. Unconstrained multivariate analyses ============================
 
-# ~ PERMANOVAs of lichen community structure vs. site ---------------
+# ~ 2.1 PERMANOVAs of lichen community structure vs. site -----------
 # (NB -- R doesn't allow for specification of more complex models or
 # post-hoc pairwise comparisons... use PRIMER instead)
 
@@ -201,23 +201,23 @@ perm_li_func_ph <- read_csv('./primer/results/perm_li_func_ph.csv')
 
 
 
-# ~ MDS ordinations of lichen community structure -------------------
+# ~ 2.2 MDS ordinations of lichen community structure ---------------
 
 # ~~ Tree-level -----------------------------------------------------
 # (NB -- no convergence after multiple iterations;
 # unless no. of dimensions [k] is set to 3...)
 
-# # ~~ taxonomic groups:
-# mds_li_taxa <- mds(  # custom mds function
-#   # log10(x+1)-transformed data and zero-adjusted Bray-Curtis:
-#   cbind(log10(dd_tree_lichens_taxa[, lichen_taxa] + 1), dummy_taxa)
-# )
-# 
-# # ~~ functional groups:
-# mds_li_func <- mds(
-#   # log10(x+1)-transformed data and zero-adjusted Bray-Curtis:
-#   cbind(log10(dd_tree_lichens_func[, lichen_func_grps] + 1), dummy_func)
-# )
+# ~~ taxonomic groups:
+mds_li_taxa <- mds(  # custom mds function
+  # log10(x+1)-transformed data and zero-adjusted Bray-Curtis:
+  cbind(log10(dd_tree_lichens_taxa[, lichen_taxa] + 1), dummy_taxa)
+)
+
+# ~~ functional groups:
+mds_li_func <- mds(
+  # log10(x+1)-transformed data and zero-adjusted Bray-Curtis:
+  cbind(log10(dd_tree_lichens_func[, lichen_func_grps] + 1), dummy_func)
+)
 
 
 
@@ -239,7 +239,7 @@ mds_li_func_plot <- mds(
 
 
 
-# ~ SIMPER tests of contributions to differences --------------------
+# ~ 2.3 SIMPER tests of contributions to differences ----------------
 
 # ~~ taxonomic groups:
 
@@ -283,9 +283,9 @@ simp_li_func <- simp_tab(simp_li_func_transf, simp_li_func_untransf)
 
 
 
-# Constrained multivariate analyses =================================
+# 3. Constrained multivariate analyses ==============================
 
-# ~ Tree-level ------------------------------------------------------
+# ~ 3.1 Tree-level --------------------------------------------------
 
 # ~~ Environmental variables ----------------------------------------
 
@@ -599,7 +599,7 @@ top_func <- rownames(cor_cap_func_spp[order(
 
 
 
-# ~ Plot-level ------------------------------------------------------
+# ~ 3.2 Plot-level --------------------------------------------------
 
 # ~~ Environmental variables ----------------------------------------
 

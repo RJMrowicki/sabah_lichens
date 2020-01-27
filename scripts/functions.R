@@ -42,13 +42,13 @@ distr_plots <- function (dat)  # accepts a response vector
 # perform MDS analysis:
 mds <- function (dat)  # accepts data frame of samples vs. species
 {  
-  repeat {
+  # repeat {
     mds.out <- metaMDS(
       dat, autotransform = FALSE,  # avoid standardisation
       distance = "bray", zerodist = "add", trymax = 100)
-    # ensure procedure runs until solution reached:
-    if(mds.out$converged == TRUE) break
-  }
+  #   # ensure procedure runs until solution reached:
+  #   if(mds.out$converged == TRUE) break
+  # }
   return(mds.out)  # output result
 }
 
@@ -314,7 +314,7 @@ plot_mds <- function(
     legend(  # add legend for points
       "topright", inset = c(0, 0.05), bty = "n",
       title = leg_title, legend = pt_sty_dat[, pt_sty_var],
-      pch = pt_sty_dat$pch, col = pt_sty_dat$col,
+      pch = pt_sty_dat$pch, col = as.character(pt_sty_dat$col),
       pt.cex = 0.8*pt_sty_dat$cex, y.intersp = 0.8, cex = 0.8
     )
   }
