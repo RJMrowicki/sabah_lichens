@@ -45,7 +45,7 @@ mds <- function (dat)  # accepts data frame of samples vs. species
   # repeat {
     mds.out <- metaMDS(
       dat, autotransform = FALSE,  # avoid standardisation
-      distance = "bray", zerodist = "add", trymax = 100)
+      distance = "bray", zerodist = "add", trymax = 250)
   #   # ensure procedure runs until solution reached:
   #   if(mds.out$converged == TRUE) break
   # }
@@ -174,7 +174,7 @@ plot_cap_env <- function(
   legend(  # add legend for points
     "topright", bty = "n", title = leg_title,
     legend = pt_sty_dat[, pt_sty_var],
-    pch = pt_sty_dat$pch, col = pt_sty_dat$col,
+    pch = pt_sty_dat$pch, col = as.character(pt_sty_dat$col),
     pt.cex = 0.8*pt_sty_dat$cex, y.intersp = 0.8, cex = 0.8
   )
   legend(  # add plot label

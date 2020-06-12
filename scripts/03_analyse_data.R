@@ -383,7 +383,6 @@ cap_taxa <-
       paste0(strsplit(env_vars, split = " "), collapse = " + "),
       "+ Condition(plot)"  # (NB -- `plot` as a conditioning variable)
     )),
-    # vs. z-standardised environmental data:
     data = dd_tree_lichens_taxa[, c(env_vars, "plot")],
     distance = "bray")
 
@@ -506,7 +505,6 @@ cap_func <-
       paste0(strsplit(env_vars, split = " "), collapse = " + "),
       "+ Condition(plot)"  # (NB -- `plot` as a conditioning variable)
     )),
-    # vs. z-standardised environmental data:
     data = dd_tree_lichens_func[, c(env_vars, "plot")],
     distance = "bray")
 
@@ -662,7 +660,7 @@ cond_vars_func_plot <-  # specify conditioning variables
 
 
 
-# ~~ CAP of lichen communities vs. tree functional traits -----------
+# ~~ 3.2.1 CAP of lichen communities vs. tree functional traits -----------
 
 # ~~~ taxonomic groups:
 
@@ -874,7 +872,7 @@ top_func_plot <- rownames(cor_cap_func_plot_spp[order(
 
 
 
-# ~~ CAP of lichen taxonomic groups vs. site ------------------------
+# ~~ 3.2.2 CAP of lichen communities vs. site ------------------------
 
 # output data for CAP analysis in FORTRAN program:
 # (NB -- for testing classification success/goodness of fit, which is

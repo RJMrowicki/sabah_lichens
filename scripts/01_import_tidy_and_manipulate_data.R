@@ -44,7 +44,7 @@ dd_lichens_taxa <-  # create new data frame
   # re-arrange rows by site, plot and tree:
   arrange(`site`, `plot`, `tree`) %>%
   # re-order columns so that `site`, `plot` and `tree` are at the beginning:
-  select(`site`, `plot`, `tree`, lichen_taxa)
+  select(`site`, `plot`, `tree`, all_of(lichen_taxa))
 
 # ~ functional groups:
 
