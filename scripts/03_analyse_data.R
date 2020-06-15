@@ -1,9 +1,9 @@
 # sabah_lichens
 # Analyse data
 
-# 1. Univariate analyses ============================================
+# 1. Univariate analyses =======================================================
 
-# ~ 1.1 mixed effects models of lichen diversity vs. site -----------
+# ~ 1.1 mixed effects models of lichen diversity vs. site ----------------------
 
 # NB -- probability distributions are not really suitable for GLMMs;
 # try zero-inflated models, OR permutational ANOVA (see below).
@@ -120,7 +120,7 @@ anova_li_func_h <- Anova(lm_li_func_h, type = 'II')
 
 
 
-# ~ 1.2 PERANOVAs of lichen diversity vs. site ----------------------
+# ~ 1.2 PERANOVAs of lichen diversity vs. site ---------------------------------
 
 # output data for PERANOVA analysis in PRIMER:
 # ~ lichen taxonomic and functional group diversity:
@@ -153,9 +153,9 @@ li_func_h_ph <- read_csv('./primer/results/li_func_h_ph.csv')
 
 
 
-# 2. Unconstrained multivariate analyses ============================
+# 2. Unconstrained multivariate analyses =======================================
 
-# ~ 2.1 PERMANOVAs of lichen community structure vs. site -----------
+# ~ 2.1 PERMANOVAs of lichen community structure vs. site ----------------------
 # (NB -- R doesn't allow for specification of more complex models or
 # post-hoc pairwise comparisons... use PRIMER instead)
 
@@ -201,9 +201,9 @@ perm_li_func_ph <- read_csv('./primer/results/perm_li_func_ph.csv')
 
 
 
-# ~ 2.2 MDS ordinations of lichen community structure ---------------
+# ~ 2.2 MDS ordinations of lichen community structure --------------------------
 
-# ~~ Tree-level -----------------------------------------------------
+# ~~ Tree-level ----------------------------------------------------------------
 # (NB -- no convergence after multiple iterations;
 # unless no. of dimensions [k] is set to 3...)
 
@@ -222,7 +222,7 @@ mds_li_func <- mds(
 
 
 
-# ~~ Plot-level -----------------------------------------------------
+# ~~ Plot-level ----------------------------------------------------------------
 
 # ~~ taxonomic groups:
 mds_li_taxa_plot <- mds(  # custom mds function
@@ -239,7 +239,7 @@ mds_li_func_plot <- mds(
 
 
 
-# ~ 2.3 SIMPER tests of contributions to differences ----------------
+# ~ 2.3 SIMPER tests of contributions to differences ---------------------------
 
 # ~~ taxonomic groups:
 
@@ -283,11 +283,11 @@ simp_li_func <- simp_tab(simp_li_func_transf, simp_li_func_untransf)
 
 
 
-# 3. Constrained multivariate analyses ==============================
+# 3. Constrained multivariate analyses =========================================
 
-# ~ 3.1 Tree-level --------------------------------------------------
+# ~ 3.1 Tree-level -------------------------------------------------------------
 
-# ~~ Environmental variables ----------------------------------------
+# ~~ Environmental variables ---------------------------------------------------
 
 # create vectors of continuous/ordinal and categorical tree trait variables:
 env_vars_ord <- c('girth_m', 'bark_ord', 'buttress_ord')
@@ -295,7 +295,8 @@ env_vars_cat <- c('girth', 'bark', 'buttress', 'dipterocarp')
 
 
 
-env_cor <-  # test correlations between environmental variables
+# test correlations between environmental variables (ordinal/categorical only)
+env_cor <-
   rcorr(as.matrix(dd_trees_func[, env_vars_ord]), type = "spearman")
 # exclude if |\rho| > 0.7 ... currently, all values < 0.7
 # create vector of variables to use in subsequent analyses:
@@ -304,7 +305,8 @@ env_use <- env_vars_ord  # (currently no variables are excluded)
 
 
 
-# ~~ BIOENV for subsetting environmental variables ------------------
+# ~~ BIOENV for subsetting environmental variables -----------------------------
+# (NB -- ordinal/categorical only)
 
 # ~~~ taxonomic groups:
 bioenv_taxa <-
@@ -347,7 +349,7 @@ cond_vars_func <-  # specify conditioning variables
 
 
 
-# ~~ CAP of lichen communities vs. tree functional traits -----------
+# ~~ CAP (dbRDA) of lichen communities vs. tree functional traits --------------
 
 # (NB -- use vegan::capscale, as it allows multiple factors as constraints;
 # 'traditional' CAP [PRIMER or FORTRAN program] only allows a single factor
@@ -356,8 +358,9 @@ cond_vars_func <-  # specify conditioning variables
 
 # ~~~ taxonomic groups:
 
-env_vars <- env_vars_cat  # specify variables used in CAP
-# env_vars <- bioenv_vars_taxa
+# specify variables used in CAP:
+env_vars <- env_vars_cat
+# env_vars <- bioenv_vars_taxa  # BIOENV subset of continuous/ordinal variables
 
 
 # # ~~~~ continuous/ordinal environmental variables:
@@ -478,8 +481,9 @@ top_taxa <- rownames(cor_cap_taxa_spp[order(
 
 # ~~~ functional groups:
 
-env_vars <- env_vars_cat  # specify variables used in CAP
-# env_vars <- bioenv_vars_func
+# specify variables used in CAP:
+env_vars <- env_vars_cat
+# env_vars <- bioenv_vars_func  # BIOENV subset of continuous/ordinal variables
 
 
 # # ~~~~ continuous/ordinal environmental variables:
@@ -597,9 +601,9 @@ top_func <- rownames(cor_cap_func_spp[order(
 
 
 
-# ~ 3.2 Plot-level --------------------------------------------------
+# ~ 3.2 Plot-level -------------------------------------------------------------
 
-# ~~ Environmental variables ----------------------------------------
+# ~~ Environmental variables ---------------------------------------------------
 
 # create vectors of continuous/ordinal and categorical tree trait variables:
 env_vars_plot <- c("bark_div", "girth_l_prop", "buttress_prop", "dipterocarp_prop")
@@ -616,7 +620,7 @@ env_use_plot <- env_vars_plot  # (currently no variables are excluded)
 
 
 
-# ~~ BIOENV for subsetting environmental variables ------------------
+# ~~ BIOENV for subsetting environmental variables -----------------------------
 
 # ~~~ taxonomic groups:
 bioenv_taxa_plot <-
@@ -660,7 +664,7 @@ cond_vars_func_plot <-  # specify conditioning variables
 
 
 
-# ~~ 3.2.1 CAP of lichen communities vs. tree functional traits -----------
+# ~~ 3.2.1 CAP (dbRDA) of lichen communities vs. tree functional traits --------
 
 # ~~~ taxonomic groups:
 
@@ -872,7 +876,7 @@ top_func_plot <- rownames(cor_cap_func_plot_spp[order(
 
 
 
-# ~~ 3.2.2 CAP of lichen communities vs. site ------------------------
+# ~~ 3.2.2 CAP of lichen communities vs. site ----------------------------------
 
 # output data for CAP analysis in FORTRAN program:
 # (NB -- for testing classification success/goodness of fit, which is
@@ -927,7 +931,8 @@ axes_cap_taxa_site_plot <-
   unlist %>% matrix(
     nrow = nrow(tree_lichens_taxa_plot), ncol = 2, byrow = TRUE,
     dimnames = list(NULL, c("CAP1", "CAP2"))
-  ) %>% as.data.frame  # convert into data frame
+  ) %>% as.data.frame %>%  # convert into data frame
+  mutate_all(~ as.numeric(as.vector(.)))  # convert character to numeric
 
 
 # extract squared canonical correlation(s):
@@ -937,7 +942,7 @@ delta_sq_taxa_site_plot <-
     "Squared Correlations", cap_taxa_site_plot_raw, fixed = TRUE
   ) + 1] %>%
   # extract actual values (using presence of decimal point):
-  strsplit(" ") %>% unlist %>% grep(".", ., value = TRUE)
+  strsplit(" ") %>% unlist %>% grep(".", ., value = TRUE) %>% as.numeric
 
 
 # extract species correlations with axes:
@@ -949,7 +954,7 @@ cor_spp_start <- grep(
 # determine line number for end of table (i.e. start + no. of species):
 cor_spp_end <- cor_spp_start + length(lichen_taxa)-1
 
-cor_cap_taxa_plot_spp <-
+cor_cap_taxa_site_plot_spp <-
   # extract raw lines containing species correlation table:
   cap_taxa_site_plot_raw[cor_spp_start:cor_spp_end] %>%
   # split, remove empty elements, remove first element per line:
@@ -958,7 +963,8 @@ cor_cap_taxa_plot_spp <-
   unlist %>% matrix(
     nrow = length(lichen_taxa), ncol = 2, byrow = TRUE,
     dimnames = list(lichen_taxa, c("CAP1", "CAP2"))
-  ) %>% as.data.frame  # convert into data frame
+  ) %>% as.data.frame %>%  # convert into data frame
+  mutate_all(~ as.numeric(as.vector(.)))  # convert character to numeric
   
 
 # extract group classification success:
@@ -997,7 +1003,8 @@ axes_cap_func_site_plot <-
   unlist %>% matrix(
     nrow = nrow(tree_lichens_func_plot), ncol = 2, byrow = TRUE,
     dimnames = list(NULL, c("CAP1", "CAP2"))
-  ) %>% as.data.frame  # convert into data frame
+  ) %>% as.data.frame %>%  # convert into data frame
+  mutate_all(~ as.numeric(as.vector(.)))  # convert character to numeric
 
 
 # extract squared canonical correlation(s):
@@ -1007,7 +1014,7 @@ delta_sq_func_site_plot <-
     "Squared Correlations", cap_func_site_plot_raw, fixed = TRUE
   ) + 1] %>%
   # extract actual values (using presence of decimal point):
-  strsplit(" ") %>% unlist %>% grep(".", ., value = TRUE)
+  strsplit(" ") %>% unlist %>% grep(".", ., value = TRUE) %>% as.numeric
 
 
 # extract species correlations with axes:
@@ -1019,7 +1026,7 @@ cor_spp_start <- grep(
 # determine line number for end of table (i.e. start + no. of species):
 cor_spp_end <- cor_spp_start + length(lichen_func_grps)-1
 
-cor_cap_func_plot_spp <-
+cor_cap_func_site_plot_spp <-
   # extract raw lines containing species correlation table:
   cap_func_site_plot_raw[cor_spp_start:cor_spp_end] %>%
   # split, remove empty elements, remove first element per line:
@@ -1028,7 +1035,8 @@ cor_cap_func_plot_spp <-
   unlist %>% matrix(
     nrow = length(lichen_func_grps), ncol = 2, byrow = TRUE,
     dimnames = list(lichen_func_grps, c("CAP1", "CAP2"))
-  ) %>% as.data.frame  # convert into data frame
+  ) %>% as.data.frame %>%  # convert into data frame
+  mutate_all(~ as.numeric(as.vector(.)))  # convert character to numeric
 
 
 # extract group classification success:
@@ -1044,11 +1052,11 @@ succ_cap_func_site_plot <-
 
 
 
-#####################################################################
-
-# ~~~ taxonomic groups:
+################################################################################
 
 # (testing use of BiodiversityR::CAPdiscrim. But produces warnings.)
+
+# ~~~ taxonomic groups:
 
 dist_taxa <-  # pre-calculate dissimilarity matrix for CAPdiscrim()
   vegdist(
@@ -1082,6 +1090,47 @@ for (i in 1:m_max) {
   cap_result <- CAPdiscrim(
     dist_taxa ~ site,
     data = as.data.frame(tree_lichens_taxa_plot),
+    axes = 2, m = i)
+  points(i, cap_result$percent)
+}
+
+
+
+
+# ~~~ functional groups:
+
+dist_func <-  # pre-calculate dissimilarity matrix for CAPdiscrim()
+  vegdist(
+    # log10(x+1)-transformed data and zero-adjusted Bray-Curtis:
+    log10(cbind(tree_lichens_func_plot[, lichen_func_grps], dummy_func_plot) + 1),
+    method = "bray"
+  )
+
+cap_func_plot_site <- 
+  CAPdiscrim(  # run CAP analysis (BiodiversityR::CAPdiscrim)
+    dist_func ~ site,  # vs. site (categorical) only
+    # NB -- environmental data as data frame, not tibble:
+    data = as.data.frame(tree_lichens_func_plot),
+    # specify no. of axes resulting in highest classification success:
+    m = 4, add = TRUE, permutations = n_perm  
+  )
+
+
+
+
+m_max <- 15  # specify max no. of axes
+
+plot(  # create blank plot
+  1:m_max, rep(-1000, m_max), type = "n",
+  xlim = c(0, m_max), ylim = c(0, 100),
+  xlab = "m", ylab = "Classification success (%)"
+)
+
+# plot classification success for sequential values of m:
+for (i in 1:m_max) {
+  cap_result <- CAPdiscrim(
+    dist_func ~ site,
+    data = as.data.frame(tree_lichens_func_plot),
     axes = 2, m = i)
   points(i, cap_result$percent)
 }

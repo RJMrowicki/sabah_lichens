@@ -68,7 +68,7 @@ For all multivariate tests (both unconstrained and constrained), community dissi
 
 ### Relationships between lichen community structure and tree functional traits ('tree-level' & 'plot-level')
 
-To enable dissimilarities in lichen communities to be visualised in relation to tree functional traits, the four tree traits (= 'environmental' variables) were used in a constrained distance-based redundancy analysis (dbRDA), a variant of canonical analysis of principal coordinates (CAP; Anderson & Willis, 2003, _Ecology_ 84:511--525), using the `capscale` function in the R package `vegan` (version 2.5-6; Oksanen et al., 2019). While traditional CAP may be performed as a 'discriminant analysis' involving a single grouping variable, dbRDA allows for the inclusion of multiple categorical constraints.
+To enable dissimilarities in lichen communities to be visualised in relation to tree functional traits, the four tree traits (= 'environmental' variables) were used in a constrained distance-based redundancy analysis (dbRDA), a variant of canonical analysis of principal coordinates (CAP; Anderson & Willis, 2003, _Ecology_ 84:511--525), using the `capscale` function in the R package `vegan` (version 2.5-6; Oksanen et al., 2019). While traditional CAP may be performed as a discriminant analysis (as opposed to a canonical correlation analysis) involving a single grouping variable, dbRDA allows for the inclusion of multiple categorical constraints.
 
 This analysis, performed separately for lichen taxonomic and functional groups, was conducted at both (1) 'tree-level', whereby individual trees were treated as replicates, with tree traits expressed as categorical variables, and (2) 'plot-level', involving summed lichen abundances and continuous tree trait variables calculated for each plot as described above. To account for variation among plots in the tree-level analysis, 'plot' was included as a conditioning variable in the dbRDA model.
 
@@ -79,9 +79,7 @@ The significance of overall models (based on the sum of all eigenvalues) and of 
 
 ### Classification of sites based on lichen communities ('plot-level')
 
-A 'plot-level' CAP analysis, based on summed lichen abundances, was used to estimate the accuracy with which plots may be assigned to sites based on lichen community structure. This cross-validation method involves the 'leave-one-out' approach of Lachenbruch and Mickey (1968; _Technometrics_ 10:1--11) to determine the proportion of individual observations (in this case, plots) that are successfully allocated to the correct group.
-
-
+A 'plot-level' CAP analysis, based on summed lichen abundances, was used to estimate the accuracy with which plots may be assigned to sites based on lichen community structure. This cross-validation method involves the 'leave-one-out' approach of Lachenbruch and Mickey (1968; _Technometrics_ 10:1--11) to determine the proportion of individual observations (in this case, plots) that are successfully allocated to the correct group (Anderson & Willis, 2003). Using the CAP FORTRAN programme (Anderson, 2002, _Ecological Archives_ E084-011-S1), this analysis was performed separately for lichen taxonomic and functional groups, versus a single factor, 'site' (i.e. a discriminant analysis, rather than a canonical correlation analysis).
 
 
 (Check whether exclusion of rare taxonomic/functional groups (e.g. overall mean abundance $\leq$ 0.1) alters results substantially.)
@@ -221,16 +219,33 @@ simp_li_func[[1]] %>%
   )
 ```
 
-<!-- Tree girth and presence of buttresses/flutes were identified by BIOENV as key tree traits influencing lichen community structure, in terms of both taxonomic and functional groups (BIOENV; $\rho$ = `r rep_2dp(bioenv_taxa_rho)` and $\rho$ = `r rep_2dp(bioenv_func_rho)`, respectively). -->
+(Something about 'tree-level' dbRDA results here...)
 
-CAP axis 1 correlated positively with tree girth, while axis 2 appeared to be related to presence of buttresses/flutes and bark type; however, only tree girth was significant as a constraining variable (taxonomic groups: pseudo-_F_~2,257~ = `r rep_2dp(cap_taxa_margin_f["girth"])`, P `r rep_p(cap_taxa_margin_p["girth"])`; functional groups: pseudo-_F_~2,257~ = `r rep_2dp(cap_func_margin_f["girth"])`, P `r rep_p(cap_func_margin_p["girth"])`), suggesting that it was more important than buttress/flute presence, bark type and dipterocarp vs. non-dipterocarp in structuring lichen communities.
+When considering individual trees as replicates, tree girth (expressed as a categorical variable) and classification as dipterocarp vs. non-dipterocarp had a significant effect on the structure of lichen communities, for both taxonomic (girth: F~2,235~ = `r rep_2dp(cap_taxa_margin_f["girth"])`, P `r rep_p(cap_taxa_margin_p["girth"])`; dipterocarp: F~2,235~ = `r rep_2dp(cap_taxa_margin_f["dipterocarp"])`, P `r rep_p(cap_taxa_margin_p["dipterocarp"])`) and functional groups (girth: F~2,235~ = `r rep_2dp(cap_func_margin_f["girth"])`, P `r rep_p(cap_func_margin_p["girth"])`; dipterocarp: F~2,235~ = `r rep_2dp(cap_func_margin_f["dipterocarp"])`, P `r rep_p(cap_func_margin_p["dipterocarp"])`), as revealed by dbRDA permutation tests for marginal effects of terms.
 
-![(a) CAP ordination plot of lichen community structure (taxonomic groups) according to categorical environmental variables. (b) Spearman rank correlation coefficients between CAP axes and individual taxa for which $|\rho| \geq$ `r cor_spp_x`.](./figs/cap_taxa.pdf)
+![(a) CAP ordination plot of lichen community structure (taxonomic groups) according to categorical environmental (tree trait) variables, based on 'tree-level' data (i.e. individual trees as replicates). (b) Spearman rank correlation coefficients between CAP axes and individual taxa for which $|\rho| \geq$ `r cor_spp_x`.](./figs/cap_taxa.pdf)
 
-![(a) CAP ordination plot of lichen community structure (functional groups) according to categorical environmental variables. (b) Spearman rank correlation coefficients between CAP axes and individual functional groups for which $|\rho| \geq$ `r cor_spp_x`.](./figs/cap_func.pdf)
+![(a) CAP ordination plot of lichen community structure (functional groups) according to categorical environmental (tree trait) variables, based on 'tree-level' data (i.e. individual trees as replicates). (b) Spearman rank correlation coefficients between CAP axes and individual functional groups for which $|\rho| \geq$ `r cor_spp_x`.](./figs/cap_func.pdf)
 
-Taxonomic groups [_R-Es_, _R-Py_, _ArH_, _PoR_, _Gr-th_, _Gr-li_ and _CaT_] and functional groups [_sqhya_, _crbysp_, _crbya_, _crpen_, _crthe_, _sqhyp_ and _crlir_] appeared to be associated strongly with smaller tree girth. Groups [_Uicr_] and [_crstd_] showed some association with larger girth.
+For 'plot-level' analyses, the diversity of bark types and proportion of dipterocarps were identified as key tree traits influencing lichen community structure, in terms of both taxonomic and functional groups (BIOENV; $\rho$ = `r rep_2dp(bioenv_taxa_plot_rho)` and $\rho$ = `r rep_2dp(bioenv_func_plot_rho)`, respectively).
 
+CAP (dbRDA) axis 1 correlated negatively with both plot-level tree traits, while axis 2 appeared to be related positively to bark diversity and negatively to dipterocarp proportion; however, while neither 'trait' was significant as a constraining variable for lichen taxonomic group data, only the proportion of dipterocarps was significantly related to lichen community structure in terms of functional groups (pseudo-_F_~1,19~ = `r rep_2dp(cap_taxa_plot_margin_f["dipterocarp_prop"])`, P `r rep_p(cap_taxa_plot_margin_p["dipterocarp_prop"])`).
+
+![(a) CAP ordination plot of lichen community structure (taxonomic groups) according to continuous environmental (tree trait) variables, based on 'plot-level' data summarised for each plot. (b) Spearman rank correlation coefficients between CAP axes and individual taxa for which $|\rho| \geq$ `r cor_spp_x`.](./figs/cap_taxa_plot.pdf)
+
+![(a) CAP ordination plot of lichen community structure (functional groups) according to continuous environmental (tree trait) variables, based on 'plot-level' data summarised for each plot. (b) Spearman rank correlation coefficients between CAP axes and individual functional groups for which $|\rho| \geq$ `r cor_spp_x`.](./figs/cap_func_plot.pdf)
+
+Taxonomic groups [_ArA_, _ArT_, _CnS_, _CoC_, _Gr-th_, _PyP_, _R-Py_, _ThM_, _TryP_ and _VeFl_] and functional groups [_crapr_, _crbys_, _crmzs_, _crpeb_, _crspe_, _crthe_, _crtr_, _focyr_ and _sqhya_] appeared to be associated strongly with plot-level bark diversity. Groups [_Gr-Li_, _PiM_ and _R-Es_] and [_crbya_] were also associated with bark diversity, but showed a stronger association with the proportion of dipterocarps. Conversely, taxa [_ArC_ and _Uicr_ ] and the functional group _crstlf_ (= _Cryptothecia_) were negatively associated with both bark diversity and proportion of dipterocarps.
+
+The overall success with which plots could be classified by site based on summed lichen abundance data (CAP) was `r rep_2dp(succ_cap_taxa_site_plot)`% (16/22 plots) for taxonomic groups and `r rep_2dp(succ_cap_func_site_plot)`% (15/22 plots) for functional groups.
+
+```{r cap_table, echo = FALSE}
+# ~ taxonomic groups:
+
+# succ_table %>%
+#   kable(caption = '')
+
+```
 
 ## Queries
 

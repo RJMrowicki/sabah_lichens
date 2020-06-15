@@ -31,7 +31,7 @@ pt_sty_bark <- data.frame(  # by bark type
 
 
 
-# 1. Boxplots of lichen diversity vs. site ==========================
+# 1. Boxplots of lichen diversity vs. site =====================================
 
 # create boxplots:
 
@@ -97,9 +97,9 @@ dev.off()  # close .pdf graphics device
 
 
 
-# 2. MDS ordination plots ===========================================
+# 2. MDS ordination plots ======================================================
 
-# ~ Tree-level ------------------------------------------------------
+# ~ Tree-level -----------------------------------------------------------------
 # (NB -- MDS not converged)
 
 pdf(  # open .pdf graphics device
@@ -186,9 +186,9 @@ dev.off()  # close .pdf graphics device
 
 
 
-# CAP ordination plots ==============================================
+# CAP ordination plots =========================================================
 
-# ~ Tree-level ------------------------------------------------------
+# ~ Tree-level -----------------------------------------------------------------
 
 # ~~ taxonomic groups:
 
@@ -202,7 +202,7 @@ par( # set plotting parameters
   las = 1, mar = cap_mar)
 
 par(fig = c(0, 0.5, 0, 1))
-plot_cap_env(  # plot CAP ordination (with environmental correlations)
+plot_cap_env(  # plot CAP ordination (without environmental correlations)
   cap_obj = cap_taxa, cap_dat = dd_tree_lichens_taxa,
   spp_cor_obj = cor_taxa_spp, # env_cor_obj = cor_cap_taxa_env,
   delta_sq_obj = delta_sq_taxa, fig_cex = 0.8,
@@ -233,7 +233,7 @@ par( # set plotting parameters
   las = 1, mar = cap_mar)
 
 par(fig = c(0, 0.5, 0, 1))
-plot_cap_env(  # plot CAP ordination (with environmental correlations)
+plot_cap_env(  # plot CAP ordination (without environmental correlations)
   cap_obj = cap_func, cap_dat = dd_tree_lichens_func,
   spp_cor_obj = cor_func_spp, # env_cor_obj = cor_cap_func_env,
   delta_sq_obj = delta_sq_func, fig_cex = 0.8,
@@ -252,7 +252,7 @@ dev.off()  # close .pdf graphics device
 
 
 
-# ~ Plot-level ------------------------------------------------------
+# ~ Plot-level -----------------------------------------------------------------
 
 # ~~ taxonomic groups:
 
@@ -285,7 +285,7 @@ dev.off()  # close .pdf graphics device
 
 
 
-# ~~ taxonomic groups:
+# ~~ functional groups:
 
 pdf(  # open .pdf graphics device
   './figs/cap_func_plot.pdf',
@@ -306,7 +306,7 @@ plot_cap_env(  # plot CAP ordination (with environmental correlations)
 
 par(fig = c(0.5, 1, 0, 1), new = TRUE)
 plot_cap_spp(  # plot species correlations with CAP axes
-  spp_cor_obj = cor_cap_taxa_plot_spp, spp_cor_obj_lab = cor_taxa_plot_spp,
+  spp_cor_obj = cor_cap_func_plot_spp, spp_cor_obj_lab = cor_func_plot_spp,
   fig_cex = 0.8, plot_lab = "(b)"
 )
 
