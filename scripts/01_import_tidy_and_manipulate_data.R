@@ -1,7 +1,7 @@
 # sabah_lichens
 # Import, tidy and manipulate data
 
-# Import data =======================================================
+# Import data ==================================================================
 
 # lichen abundance data:
 # ~ taxonomic groups:
@@ -15,7 +15,7 @@ ddR_trees_func <- read_csv('./data/trees_func.csv')
 
 
 
-# Tidy data =========================================================
+# Tidy data ====================================================================
 
 # lichen abundance data:
 # ~ taxonomic groups:
@@ -35,7 +35,7 @@ dd_lichens_taxa <-  # create new data frame
   # remove `Fam code` and rename `Genus code` to `taxon`:
   select(-`Fam code`) %>% rename(`taxon` = `Genus code`) %>%
   # transpose to make rows = samples and columns = taxa:
-  gather(`tree`, `n`, `D11`:`SF12`) %>% spread(`taxon`, `n`) %>%
+  gather(`tree`, `n`, -`taxon`) %>% spread(`taxon`, `n`) %>%
   # create factors `site` and `plot` based on characters of `tree`:
   mutate(
     `site` = factor(str_sub(`tree`, end = 1)),
@@ -49,7 +49,7 @@ dd_lichens_taxa <-  # create new data frame
 # ~ functional groups:
 
 # create vector of unique lichen functional groups:
-lichen_func_grps <- unique(ddR_lichens_func$`tree no.`)
+lichen_func_grps <- unique(ddR_lichens_func$`tree no.`) %>% na.omit %>% as.vector
 
 dd_lichens_func <-  # create new data frame
   ddR_lichens_func %>%
@@ -66,7 +66,7 @@ dd_lichens_func <-  # create new data frame
   # (NB -- only if duplicate func_grp values are actual duplicates)
   group_by(`func_grp`) %>% summarise_if(is.numeric, sum) %>%
   # transpose to make rows = samples and columns = taxa:
-  gather(`tree`, `n`, `D11`:`SF12`) %>% spread(`func_grp`, `n`) %>%
+  gather(`tree`, `n`, -`func_grp`) %>% spread(`func_grp`, `n`) %>%
   # create factors `site` and `plot` based on characters of `tree`:
   mutate(
     `site` = factor(str_sub(`tree`, end = 1)),
@@ -128,9 +128,9 @@ missing_trees <- tree_nos[
 
 
 
-# Manipulate data ===================================================
+# Manipulate data ==============================================================
 
-# ~ Tree-level ------------------------------------------------------
+# ~ Tree-level -----------------------------------------------------------------
 
 # calculate lichen diversity indices:
 
@@ -172,7 +172,7 @@ dummy_func <- rep(1, nrow(dd_tree_lichens_func))
 
 
 
-# ~ Plot-level ------------------------------------------------------
+# ~ Plot-level -----------------------------------------------------------------
 
 # lichen abundance data:
 

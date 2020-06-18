@@ -1,9 +1,9 @@
 # sabah_lichens
 # Summarise data
 
-# Calculate summary statistics per site =============================
+# Calculate summary statistics per site ========================================
 
-# ~ No. of observations ---------------------------------------------
+# ~ No. of observations --------------------------------------------------------
 
 # lichen abundance data:
 # ~ taxonomic groups:
@@ -17,7 +17,7 @@ nobs_site_tr_func <- dd_trees_func %>% count(`site`)
 
 
 
-# ~ Mean lichen diversity -------------------------------------------
+# ~ Mean lichen diversity ------------------------------------------------------
 
 # taxonomic groups:
 mean_div_li_taxa <- dd_lichens_taxa %>%

@@ -212,7 +212,7 @@ perm_li_func_ph %>%
 
 ![Non-metric multidimensional scaling (MDS) plot of lichen community structure as (a) taxonomic and (b) functional groups, using 'plot-level' data summarised for each plot. Based on zero-adjusted Bray-Curtis dissimilarities calculated from $log10(x+1)$-transformed abundance data. Ellipses represent the standard deviation of points within each group.](./figs/mds_plot.pdf)
 
-Of the lichen taxonomic/functional groups making the greatest contributions to differences in community structure, [_R-Es_, _ArH_, _R-Py_, _Gr-th_, _Gr-li_ and _PyP_] and [_sqhya_, _crbysp_, _crbys_, _crthe_, _crbya_, _crlir_ and _sqhyp_] exhibited higher mean abundances in old growth sites compared to the logged site, whereas [_PoR_ and _ArC_] and [_crpen_, _crstd_, _crstlf_ and _crapo_] showed the opposite trend.
+Of the lichen taxonomic/functional groups making the greatest contributions to differences in community structure, [_R-Es_, _ArH_, _R-Py_, _Gr-th_, _Gr-li_ and _PyP_] and [_crbys_, _sqhya_,  _crthe_, _crbya_, _sqhyp_ and _crpeb_] exhibited higher mean abundances in old growth sites compared to the logged site, whereas [_PoR_ and _ArC_] and [_crtstl_, _crpen_ and _crapo_] showed the opposite trend.
 
 SIMPER tables:
 ((D,M), S: overall mean abundance in old growth and logged sites, respectively; Contrib./SD: average species contribution to group dissimilarity divided by standard deviation of contributions; Contrib.%: percent contribution of species to overall between-group dissimilarity. Only the most important species (Contrib. $\geq$ 3%) are shown.)
@@ -262,9 +262,9 @@ For 'plot-level' analyses, the diversity of bark types and proportion of diptero
 
 CAP (dbRDA) axis 1 correlated negatively with both plot-level tree traits, while axis 2 appeared to be related positively to bark diversity and negatively to dipterocarp proportion; however, while neither 'trait' was significant as a constraining variable for lichen taxonomic group data, only the proportion of dipterocarps was significantly related to lichen community structure in terms of functional groups (pseudo-_F_~1,19~ = `r rep_2dp(cap_taxa_plot_margin_f["dipterocarp_prop"])`, P `r rep_p(cap_taxa_plot_margin_p["dipterocarp_prop"])`).
 
-Taxonomic groups [_ArA_, _ArT_, _CnS_, _CoC_, _Gr-th_, _PyP_, _R-Py_, _ThM_, _TryP_ and _VeFl_] and functional groups [_crapr_, _crbys_, _crmzs_, _crpeb_, _crspe_, _crthe_, _crtr_, _focyr_ and _sqhya_] appeared to be associated strongly with plot-level bark diversity. Groups [_Gr-Li_, _PiM_ and _R-Es_] and [_crbya_] were also associated with bark diversity, but showed a stronger association with the proportion of dipterocarps. Conversely, taxa [_ArC_ and _Uicr_ ] and the functional group _crstlf_ (= _Cryptothecia_) were negatively associated with both bark diversity and proportion of dipterocarps.
+Taxonomic groups [_ArA_, _ArT_, _CnS_, _CoC_, _Gr-th_, _PyP_, _R-Py_, _ThM_, _TryP_ and _VeFl_] and functional groups [_crapr_, _crbys_, _crmzs_, _crpeb_, _crspe_, _crthe_, _crtr_, _focyr_ and _sqhya_] appeared to be associated strongly with plot-level bark diversity. Groups [_Gr-Li_, and _R-Es_] and [_crbya_] were also associated with bark diversity, but showed a stronger association with the proportion of dipterocarps. Taxon [_PiM_] in particular appeared to be strongly associated with the proportion of dipterocarps. Conversely, taxa [_ArC_ and _Uicr_ ] were negatively associated with both bark diversity and proportion of dipterocarps.
 
-The overall success with which plots could be classified by site based on summed lichen abundance data (CAP) was `r rep_2dp(succ_cap_taxa_site_plot)`% (16/22 plots) for taxonomic groups and `r rep_2dp(succ_cap_func_site_plot)`% (15/22 plots) for functional groups.
+The overall success with which plots could be classified by site based on summed lichen abundance data (CAP) was `r rep_2dp(succ_cap_taxa_site_plot)`% (15/22 plots) for taxonomic groups and `r rep_2dp(succ_cap_func_site_plot)`% (14/22 plots) for functional groups.
 
 ```{r cap_table, echo = FALSE}
 # ~ taxonomic groups:
