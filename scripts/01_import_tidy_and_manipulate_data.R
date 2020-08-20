@@ -9,6 +9,10 @@ ddR_lichens_taxa <- read_csv('./data/lichens_taxa.csv')
 # ~ functional groups:
 ddR_lichens_func <- read_csv('./data/lichens_func.csv')
 
+# lichen functional traits matrix:
+# (NB -- skip first line of 'dummy' column headers)
+ddR_lichen_traits <- read_csv('./data/lichen_traits.csv', skip = 1)
+
 # tree functional trait data:
 ddR_trees_func <- read_csv('./data/trees_func.csv')
 ddR_trees_pH <- read_csv('./data/trees_pH.csv')
@@ -77,6 +81,24 @@ dd_lichens_func <-  # create new data frame
   arrange(`site`, `plot`, `tree`) %>%
   # re-order columns so that `site`, `plot` and `tree` are at the beginning:
   select(`site`, `plot`, `tree`, all_of(lichen_func_grps))
+
+
+
+
+# lichen functional traits matrix:
+dd_lichen_traits <-  # create new data frame
+  ddR_lichen_traits %>%
+  # select and rename columns:
+  dplyr::select(
+    `code` = 1,
+    `growth_type` = 3, `thallus_pigments` = 4, `cyanobacterial_photobiont` = 5,
+    `sexual_dispersal` = 6, `fruiting_stalk` = 7, `mazzaedia` = 8,
+    `vegetative_dispersal` = 9, `surface_byssoid` = 10,
+    `fimbriate_prothallus` = 11, `hypothallus` = 12) %>%
+  # convert non-binary traits into factors:
+  mutate_at(
+    vars(c(`growth_type`, `cyanobacterial_photobiont`, `sexual_dispersal`)),
+    as_factor)
 
 
 
