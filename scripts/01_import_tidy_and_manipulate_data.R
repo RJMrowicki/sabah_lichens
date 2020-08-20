@@ -11,6 +11,7 @@ ddR_lichens_func <- read_csv('./data/lichens_func.csv')
 
 # tree functional trait data:
 ddR_trees_func <- read_csv('./data/trees_func.csv')
+ddR_trees_pH <- read_csv('./data/trees_pH.csv')
 
 
 
@@ -82,39 +83,63 @@ dd_lichens_func <-  # create new data frame
 
 # tree functional trait data:
 
+# tidy tree pH data, for later merging with tree functional trait data:
+dd_trees_pH <-  # create new data frame
+  ddR_trees_pH[-nrow(ddR_trees_pH), ] %>%
+  # convert relevant `pH` variables to numeric (removes text values):
+  mutate_at(vars(c(`pH1`, `pH2`, `pH3`)), as.numeric) %>%
+  # rename, manipulate and select `site`, `plot` and `tree` variables,
+  # and calculate mean tree pH:
+  transmute(
+    `site` = `Site`,
+    `plot` = paste0(`Site`, `Plot`), `tree` = gsub("_", "", `Tree_code`),
+    `pH_mean` = rowMeans(select(., `pH1`, `pH2`, `pH3`), na.rm = TRUE)) %>%
+  # convert `site` and `plot` to factors:
+  mutate_at(vars(c(`site`, `plot`)), as.factor) %>%
+  # convert 'NaN' (not a number) to 'NA' (missing) pH values:
+  mutate_at(vars(`pH_mean`), ~ ifelse(is.nan(.), NA_real_, .))
+
+# tidy rest of tree functional trait data, add mean pH values:
 dd_trees_func <-  # create new data frame
   ddR_trees_func %>%
-  # rename all variables:
-  rename(
+  # select (remove functional group code) and rename variables:
+  select(
     `tree` = 1,
-    `girth_m` = 2, `bark` = 3, `buttress_ord` = 4, `dipterocarp` = 6,
-    `func_grp` = 5) %>%
+    `girth_m` = 2, `bark` = 3, `buttress_ord` = 4, `dipterocarp` = 6) %>%
   # create factors `site` and `plot` based on characters of `tree`:
   mutate(
     `site` = factor(str_sub(`tree`, end = 1)),
     `plot` = factor(str_sub(`tree`, end = 2))) %>%
-  # create `girth` categorical variable, based on
+  # create `girth` categorical variable (factor), based on
   # `girth_m` cutoff values of 100 and 200 (a >= x < b):
   mutate(
-    `girth` = cut(
+    `girth` = factor(cut(
       `girth_m`, breaks = c(-Inf, 100, 200, Inf),
-      labels = c("s", "m", "l"), right = FALSE)) %>%
+      labels = c("s", "m", "l"), right = FALSE))) %>%
   # recode `bark` to numerical (ordinal) based on relative water holding:
   # (NB -- specify 'dplyr::' as opposed to 'car::')
   mutate(`bark_ord` = dplyr::recode(
     `bark`, 'DR' = 1, 'S' = 2, 'C' = 3, 'R' = 4)) %>%
   # create factor `buttress`, in addition to 'ordinal' variable:
   mutate(`buttress` = factor(buttress_ord)) %>%
+  # add mean pH values:
+  left_join(dd_trees_pH, by = c("site", "plot", "tree")) %>%
+  # create `pH` categorical variable (factor), based on
+  # `pH_mean` cutoff values of 2, 4 and 6 (a >= x < b):
+  mutate(
+    `pH` = factor(cut(
+      `pH_mean`, breaks = c(-Inf, 2, 4, 6, Inf),
+      labels = c("vl", "l", "m", "h"), right = FALSE))) %>%
   # change relevant 'character'/'double' variables to 'factors':
-  mutate_at(vars(`bark`, `girth`, `dipterocarp`, `func_grp`, `site`), factor) %>%
+  mutate_at(vars(`bark`, `dipterocarp`), factor) %>%
   # re-arrange rows by site, plot and tree:
   arrange(`site`, `plot`, `tree`) %>%
   # re-order columns so that `site`, `plot` and `tree` are at the beginning:
   select(
     `site`, `plot`, `tree`,
-    `girth_m`, `bark_ord`, `buttress_ord`,  # continuous variables
-    `girth`, `bark`, `buttress`, `dipterocarp`,  # categorical variables
-    everything())  # everything else, i.e. `func_grp`
+    `girth_m`, `bark_ord`, `buttress_ord`, `pH_mean`,  # continuous variables
+    `girth`, `bark`, `buttress`, `dipterocarp`, `pH`,  # categorical variables
+    everything())  # everything else (currently nothing)
 
 # create vector of unique tree numbers:
 tree_nos <- unique(dd_trees_func$tree)
