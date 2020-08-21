@@ -269,12 +269,13 @@ lichen_traits_dbfd <-
 
 # subset lichen func. group abundance data:
 lichens_func_plot_dbfd <-
-  lichens_func_plot %>%
+  lichens_func_plot0 %>%
   # remove data (columns) for func. groups shared with traits matrix:
   dplyr::select(all_of(lichen_func_grps_included))
 
 # calculate distance-based FD indices (for subsetted data):
 lichens_dbfd_plot <- dbFD(lichen_traits_dbfd, lichens_func_plot_dbfd)
+file.remove('vert.txt')  # remove 'vertices' file output by function
 
 
 # add to (initial) data frame of lichen functional diversity indices:
