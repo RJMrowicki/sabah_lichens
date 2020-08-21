@@ -44,7 +44,7 @@ kable(nobs_site_tr_func, caption = 'Tree functional trait data')
 
 ## Data analysis
 
-Lichen taxonomic and functional group richness (_S_) and Shannon-Wiener diversity (_H\'_) were calculated for each tree. Additionally, lichen abundance data were summed for each plot, and plot-level richness and diversity were calculated for both taxonomic and functional groups.
+Lichen taxonomic and functional group richness (_S_) and Shannon-Wiener diversity (_H\'_) were calculated for each tree. Additionally, lichen abundance data were summed for each plot, and plot-level richness and diversity were calculated for both taxonomic and functional groups. Further, the following distance-based functional diversity indices were calculated for each plot, using the function `dbFD` in the R package `FD`: functional richness (FRic), functional evenness (FEve), functional divergence (FDiv) and functional dispersion (FDis).
 
 <!-- Tree bark type was coded numerically in relation to increasing perceived water holding capacity, i.e. ancient dry = 1, smooth = 2, scaly = 3, ridged/rough = 4. (See _Queries_ below.) -->
 

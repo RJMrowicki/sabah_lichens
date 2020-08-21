@@ -21,6 +21,7 @@ cor_spp_x <- 0.5  # threshold species correlation with CAP axes
 suppressPackageStartupMessages(library(tidyverse))
 
 library(car)  # Anova()
+library(FD)  # dbFD()
 library(Hmisc)  # rcorr()
 library(lme4)  # lmer()
 library(plotrix)  # std.error()

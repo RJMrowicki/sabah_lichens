@@ -95,10 +95,12 @@ dd_lichen_traits <-  # create new data frame
     `sexual_dispersal` = 6, `fruiting_stalk` = 7, `mazzaedia` = 8,
     `vegetative_dispersal` = 9, `surface_byssoid` = 10,
     `fimbriate_prothallus` = 11, `hypothallus` = 12) %>%
-  # convert non-binary traits into factors:
+  # convert non-binary traits into factors (as required by `FD::dbFD()`):
   mutate_at(
     vars(c(`growth_type`, `cyanobacterial_photobiont`, `sexual_dispersal`)),
-    as_factor)
+    as_factor) %>% 
+  # arrange rows alphabetically by functional group code:
+  arrange(`code`)
 
 
 
@@ -185,15 +187,17 @@ missing_trees <- tree_nos[
 dd_lichens_taxa <- dd_lichens_taxa %>%
   mutate(  # vegan:specnumber(), vegan::diversity()
     `S` = specnumber(.[, lichen_taxa]),  # taxonomic richness (S)
-    `H'` = diversity(.[, lichen_taxa], "shannon")  # Shannon-Wiener (H')
-  )
+    `H'` = diversity(.[, lichen_taxa], "shannon"))  # Shannon-Wiener (H')
 
 # ~ functional groups:
 dd_lichens_func <- dd_lichens_func %>%
   mutate(
     `S` = specnumber(.[, lichen_func_grps]),  # func. group richness
-    `H'` = diversity(.[, lichen_func_grps], "shannon")  # Shannon-Wiener (H')
-  )
+    `H'` = diversity(.[, lichen_func_grps], "shannon"))  # Shannon-Wiener (H')
+
+# NB -- tree-level data insufficient for calculation of distance-based
+# Functional Diversity indices (instances of <3 functionally similar 'species');
+# calculations performed on plot-level data only (see below).
 
 
 
@@ -223,23 +227,60 @@ dummy_func <- rep(1, nrow(dd_tree_lichens_func))
 
 # lichen abundance data:
 
+# ~ taxonomic groups:
 lichens_taxa_plot <- dd_lichens_taxa %>%
   # calculate summed abundances of lichen taxonomic groups per plot:
   group_by(`plot`) %>% summarise_at(lichen_taxa, sum) %>%
   # calculate per-plot taxonomic diversity indices:
   mutate(
     `S` = specnumber(.[, lichen_taxa]),  # taxonomic richness (S)
-    `H'` = diversity(.[, lichen_taxa], "shannon")  # Shannon-Wiener (H')
-  )
+    `H'` = diversity(.[, lichen_taxa], "shannon"))  # Shannon-Wiener (H')
 
-lichens_func_plot <- dd_lichens_func %>%
+# ~ functional groups:
+
+# ~~ non-distance-based diversity indices:
+lichens_func_plot0 <- dd_lichens_func %>%
   # calculate summed abundances of lichen functional groups per plot:
   group_by(`plot`) %>% summarise_at(lichen_func_grps, sum) %>%
   # calculate per-plot functional diversity indices:
   mutate(
-    `S` = specnumber(.[, lichen_func_grps]),
-    `H'` = diversity(.[, lichen_func_grps], "shannon")
-  )
+    `S` = specnumber(.[, lichen_func_grps]),  # taxonomic richness (S)
+    `H'` = diversity(.[, lichen_func_grps], "shannon"))  # Shannon-Wiener (H')
+
+
+# ~~ distance-based diversity indices:
+
+# determine lichen functional group codes shared between traits matrix and
+# abundance data (i.e. included in calculation of Functional Diversity indices):
+lichen_func_grps_included <-
+  intersect(lichen_func_grps, dd_lichen_traits$code)
+
+# (functional group codes excluded from FD calculations [NOT IDEAL!!!]:)
+lichen_func_grps_excluded <-
+  setdiff(lichen_func_grps, lichen_func_grps_included)
+
+# subset lichen traits matrix:
+lichen_traits_dbfd <-
+  dd_lichen_traits %>%
+  # remove data (rows) for func. groups not shared with traits matrix:
+  filter(`code` %in% lichen_func_grps_included) %>%
+  # convert functional group code column to rownames:
+  column_to_rownames("code")
+
+# subset lichen func. group abundance data:
+lichens_func_plot_dbfd <-
+  lichens_func_plot %>%
+  # remove data (columns) for func. groups shared with traits matrix:
+  dplyr::select(all_of(lichen_func_grps_included))
+
+# calculate distance-based FD indices (for subsetted data):
+lichens_dbfd_plot <- dbFD(lichen_traits_dbfd, lichens_func_plot_dbfd)
+
+
+# add to (initial) data frame of lichen functional diversity indices:
+lichens_func_plot <-
+  lichens_func_plot0 %>%
+  bind_cols(lichens_dbfd_plot[c("FRic", "FEve", "FDiv", "FDis")])
 
 
 
