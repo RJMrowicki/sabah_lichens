@@ -298,6 +298,17 @@ trees_func_plot_bark_div <- dd_trees_func %>%
   # calculate Shannon-Wiener diversity of bark categories:
   summarise_at(vars(`n`), list(`bark_div` = ~diversity(., "shannon")))
 
+# ~ pH:
+trees_func_plot_pH_div <- dd_trees_func %>%
+  # remove rows for which `pH` is NA:
+  filter(!is.na(`pH`)) %>%
+  # obtain number of trees per pH category per plot:
+  group_by(`plot`, `pH`) %>% tally %>%
+  # re-group by `plot` only:
+  group_by(`plot`) %>%
+  # calculate Shannon-Wiener diversity of bark categories:
+  summarise_at(vars(`n`), list(`pH_div` = ~diversity(., "shannon")))
+
 # ~ girth?
 
 
@@ -305,17 +316,16 @@ trees_func_plot_bark_div <- dd_trees_func %>%
 trees_func_plot_props <- dd_trees_func %>%
   # first create factor for 'large' girth (i.e. >= 200 cm):
   mutate(`girth_l` = ifelse(`girth_m` >= 200, "1", "0")) %>%
+  # group by plot and calculate respective proportions:
   group_by(`plot`) %>% summarise_at(
     vars(`girth_l`, `buttress`, `dipterocarp`),
-    list(`prop` = ~length(which(. == "1")) / length(.))
-  )
+    list(`prop` = ~length(which(. == "1")) / length(.)))
 
 
-trees_func_plot <-  # combine into single data frame
-  # bark 'diversity':
-  trees_func_plot_bark_div %>%
-  # add girth, buttress and dipterocarp proportions:
-  left_join(trees_func_plot_props) %>%
+# combine into single data frame:
+trees_func_plot <- reduce(
+  list(trees_func_plot_bark_div, trees_func_plot_pH_div, trees_func_plot_props),
+  left_join) %>%
   # add column for `site` (distinct rows from main dataframe only):
   left_join(distinct(select(dd_trees_func, `plot`, `site`))) %>%
   # re-order columns so that `site` and `plot` are at the beginning:
