@@ -275,8 +275,9 @@ lichens_func_plot_dbfd <-
 
 # calculate distance-based FD indices (for subsetted data):
 lichens_dbfd_plot <- dbFD(lichen_traits_dbfd, lichens_func_plot_dbfd)
-file.remove('vert.txt')  # remove 'vertices' file output by function
-
+if (file.exists("vert.txt")) {
+  file.remove("vert.txt")  # remove 'vertices' file output by function
+}
 
 # add to (initial) data frame of lichen functional diversity indices:
 lichens_func_plot <-
