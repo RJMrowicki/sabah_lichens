@@ -4,7 +4,7 @@ Data files (in `data` folder):
 
 1.  Lichen taxonomic data: `lichens_taxa.csv` (from `Tax genus Borneo masterfile PW 26_09_19.xlsx` in `./data/raw/` folder);
 
-2.  Lichen functional group data: `lichens_func.csv` (from `Copy of Copy of Lichen data Borneo masterfile26_3_19+SAFE_PWcorr.xlsx` in `./data/raw/` folder [OR use `Copy of Copy of Lichen data Borneo masterfile5_2_19+SAFE_HT_PWfin11_3_19.xlsx` OR `FunctGroupsData_TreeLevel` sheet in `Lichen data tree level_20200821.xlsx`???]);
+2.  Lichen functional group data: `lichens_func.csv` (from `Copy of Copy of Lichen data Borneo masterfile26_3_19+SAFE_PWcorr.xlsx` in `./data/raw/` folder [OR use `Copy of Copy of Lichen data Borneo masterfile5_2_19+SAFE_HT_PWfin11_3_19.xlsx` OR `FunctGroupsData_TreeLevel` sheet in `Lichen data tree level_20200821.xlsx`???]) -- deleted extra columns (blank and 'total') before saving as .csv;
 
 2a.  Lichen functional traits matrix: `lichen_traits.csv` (from `Functional Trait Matrix.xlsx` in `./data/raw/` folder [OR use `LichenTraitsMatrix` sheet in `Lichen data tree level_20200821.xlsx`???]);
 

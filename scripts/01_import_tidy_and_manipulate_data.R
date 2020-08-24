@@ -187,17 +187,70 @@ missing_trees <- tree_nos[
 dd_lichens_taxa <- dd_lichens_taxa %>%
   mutate(  # vegan:specnumber(), vegan::diversity()
     `S` = specnumber(.[, lichen_taxa]),  # taxonomic richness (S)
-    `H'` = diversity(.[, lichen_taxa], "shannon"))  # Shannon-Wiener (H')
+    `H'` = diversity(.[, lichen_taxa], "shannon")  # Shannon-Wiener (H')
+  )
 
 # ~ functional groups:
-dd_lichens_func <- dd_lichens_func %>%
+
+# ~~ non-distance-based diversity indices:
+dd_lichens_func0 <- dd_lichens_func %>%
   mutate(
     `S` = specnumber(.[, lichen_func_grps]),  # func. group richness
-    `H'` = diversity(.[, lichen_func_grps], "shannon"))  # Shannon-Wiener (H')
+    `H'` = diversity(.[, lichen_func_grps], "shannon")  # Shannon-Wiener (H')
+  )
 
-# NB -- tree-level data insufficient for calculation of distance-based
-# Functional Diversity indices (instances of <3 functionally similar 'species');
-# calculations performed on plot-level data only (see below).
+
+# ~~ distance-based diversity indices:
+# (NB -- FEve and FDis only [FEve not calculated where <3 singular 'species'];
+# tree-level data insufficient for calculation of FRic and FDiv)
+
+# determine lichen functional group codes shared between traits matrix and
+# abundance data (i.e. included in calculation of Functional Diversity indices):
+lichen_func_grps_included <-
+  intersect(lichen_func_grps, dd_lichen_traits$code)
+
+# (functional group codes excluded from FD calculations [NOT IDEAL!!!]:)
+lichen_func_grps_excluded <-
+  setdiff(lichen_func_grps, lichen_func_grps_included)
+
+# subset lichen traits matrix:
+lichen_traits_dbfd <-
+  dd_lichen_traits %>%
+  # remove data (rows) for func. groups not shared with traits matrix:
+  filter(`code` %in% lichen_func_grps_included) %>%
+  # convert functional group code column to rownames:
+  column_to_rownames("code")
+
+# subset lichen func. group abundance data:
+lichens_func_dbfd <-
+  dd_lichens_func0 %>%
+  # remove data (columns) for func. groups shared with traits matrix:
+  dplyr::select(`tree`, all_of(lichen_func_grps_included)) %>%
+  # remove data (rows) for trees with zero summed abundance:
+  filter(rowSums(dplyr::select(., all_of(lichen_func_grps_included))) != 0)
+
+# calculate distance-based FD indices (for subsetted data):
+# (NB -- suppress calculation of FRic and FDiv [via `calc.FRic = FALSE`]
+# owing to instances of <3 functionally singular 'species')
+lichens_dbfd <-
+  dbFD(
+    lichen_traits_dbfd, dplyr::select(lichens_func_dbfd, -`tree`),
+    calc.FRic = FALSE
+  )
+if (file.exists("vert.txt")) {
+  file.remove("vert.txt")  # remove 'vertices' file output by function
+}
+
+# add to (initial) data frame of lichen functional diversity indices:
+dd_lichens_func <-
+  dd_lichens_func0 %>%
+  # left join by `tree` (combine with dbFD output first):
+  left_join(
+    bind_cols(
+      enframe(lichens_func_dbfd$tree, name = NULL, value = "tree"),
+      lichens_dbfd[c("FEve", "FDis")]
+    )
+  )
 
 
 
@@ -234,7 +287,8 @@ lichens_taxa_plot <- dd_lichens_taxa %>%
   # calculate per-plot taxonomic diversity indices:
   mutate(
     `S` = specnumber(.[, lichen_taxa]),  # taxonomic richness (S)
-    `H'` = diversity(.[, lichen_taxa], "shannon"))  # Shannon-Wiener (H')
+    `H'` = diversity(.[, lichen_taxa], "shannon")  # Shannon-Wiener (H')
+  )
 
 # ~ functional groups:
 
@@ -245,27 +299,11 @@ lichens_func_plot0 <- dd_lichens_func %>%
   # calculate per-plot functional diversity indices:
   mutate(
     `S` = specnumber(.[, lichen_func_grps]),  # taxonomic richness (S)
-    `H'` = diversity(.[, lichen_func_grps], "shannon"))  # Shannon-Wiener (H')
+    `H'` = diversity(.[, lichen_func_grps], "shannon")  # Shannon-Wiener (H')
+  )
 
 
 # ~~ distance-based diversity indices:
-
-# determine lichen functional group codes shared between traits matrix and
-# abundance data (i.e. included in calculation of Functional Diversity indices):
-lichen_func_grps_included <-
-  intersect(lichen_func_grps, dd_lichen_traits$code)
-
-# (functional group codes excluded from FD calculations [NOT IDEAL!!!]:)
-lichen_func_grps_excluded <-
-  setdiff(lichen_func_grps, lichen_func_grps_included)
-
-# subset lichen traits matrix:
-lichen_traits_dbfd <-
-  dd_lichen_traits %>%
-  # remove data (rows) for func. groups not shared with traits matrix:
-  filter(`code` %in% lichen_func_grps_included) %>%
-  # convert functional group code column to rownames:
-  column_to_rownames("code")
 
 # subset lichen func. group abundance data:
 lichens_func_plot_dbfd <-
@@ -320,13 +358,15 @@ trees_func_plot_props <- dd_trees_func %>%
   # group by plot and calculate respective proportions:
   group_by(`plot`) %>% summarise_at(
     vars(`girth_l`, `buttress`, `dipterocarp`),
-    list(`prop` = ~length(which(. == "1")) / length(.)))
+    list(`prop` = ~length(which(. == "1")) / length(.))
+    )
 
 
 # combine into single data frame:
 trees_func_plot <- reduce(
   list(trees_func_plot_bark_div, trees_func_plot_pH_div, trees_func_plot_props),
-  left_join) %>%
+  left_join
+  ) %>%
   # add column for `site` (distinct rows from main dataframe only):
   left_join(distinct(select(dd_trees_func, `plot`, `site`))) %>%
   # re-order columns so that `site` and `plot` are at the beginning:
