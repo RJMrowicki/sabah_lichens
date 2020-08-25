@@ -122,6 +122,8 @@ anova_li_func_h <- Anova(lm_li_func_h, type = 'II')
 
 # ~ 1.2 PERANOVAs of lichen diversity vs. site ---------------------------------
 
+# ~~ Tree-level (excluding dbFD indices) ---------------------------------------
+
 # output data for PERANOVA analysis in PRIMER:
 # ~ lichen taxonomic and functional group diversity:
 # (NB -- use write.csv() instead of write_csv(), as require rownames)
@@ -149,6 +151,54 @@ li_func_s <- read_csv('./primer/results/li_func_s.csv')
 li_func_s_ph <- read_csv('./primer/results/li_func_s_ph.csv')
 li_func_h <- read_csv('./primer/results/li_func_h.csv')
 li_func_h_ph <- read_csv('./primer/results/li_func_h_ph.csv')
+
+
+
+
+# ~~ Plot-level (including dbFD indices) ---------------------------------------
+
+# output data for PERANOVA analysis in PRIMER:
+# ~ lichen taxonomic/functional group diversity & distance-based FD indices:
+# (NB -- use write.csv() instead of write_csv(), as require rownames)
+write.csv(tree_lichens_taxa_plot[, "S"], './primer/li_taxa_plot_s.csv')
+write.csv(tree_lichens_taxa_plot[, "H'"], './primer/li_taxa_plot_h.csv')
+
+write.csv(tree_lichens_func_plot[, "S"], './primer/li_func_plot_s.csv')
+write.csv(tree_lichens_func_plot[, "H'"], './primer/li_func_plot_h.csv')
+write.csv(tree_lichens_func_plot[, "FRic"], './primer/li_func_plot_fric.csv')
+write.csv(tree_lichens_func_plot[, "FEve"], './primer/li_func_plot_feve.csv')
+write.csv(tree_lichens_func_plot[, "FDiv"], './primer/li_func_plot_fdiv.csv')
+write.csv(tree_lichens_func_plot[, "FDis"], './primer/li_func_plot_fdis.csv')
+
+# ~ corresponding factors (i.e. `site` only):
+# (NB -- paste manually in PRIMER)
+write_csv(tree_lichens_taxa_plot[, 'site'], './primer/factors_taxa_plot.csv')
+write_csv(tree_lichens_func_plot[, 'site'], './primer/factors_func_plot.csv')
+
+
+# ### PERANOVA analysis in PRIMER here ###
+
+
+# import results of PERANOVA analysis in PRIMER:
+# ~ PERANOVA table and post-hoc pairwise test results:
+li_taxa_plot_s <- read_csv('./primer/results/li_taxa_plot_s.csv')
+li_taxa_plot_s_ph <- read_csv('./primer/results/li_taxa_plot_s_ph.csv')
+li_taxa_plot_h <- read_csv('./primer/results/li_taxa_plot_h.csv')
+li_taxa_plot_h_ph <- read_csv('./primer/results/li_taxa_plot_h_ph.csv')
+
+li_func_plot_s <- read_csv('./primer/results/li_func_plot_s.csv')
+li_func_plot_s_ph <- read_csv('./primer/results/li_func_plot_s_ph.csv')
+li_func_plot_h <- read_csv('./primer/results/li_func_plot_h.csv')
+li_func_plot_h_ph <- read_csv('./primer/results/li_func_plot_h_ph.csv')
+
+li_func_plot_fric <- read_csv('./primer/results/li_func_plot_fric.csv')
+li_func_plot_fric_ph <- read_csv('./primer/results/li_func_plot_fric_ph.csv')
+li_func_plot_feve <- read_csv('./primer/results/li_func_plot_feve.csv')
+li_func_plot_feve_ph <- read_csv('./primer/results/li_func_plot_feve_ph.csv')
+li_func_plot_fdiv <- read_csv('./primer/results/li_func_plot_fdiv.csv')
+li_func_plot_fdiv_ph <- read_csv('./primer/results/li_func_plot_fdiv_ph.csv')
+li_func_plot_fdis <- read_csv('./primer/results/li_func_plot_fdis.csv')
+li_func_plot_fdis_ph <- read_csv('./primer/results/li_func_plot_fdis_ph.csv')
 
 
 
