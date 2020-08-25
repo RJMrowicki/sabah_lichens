@@ -51,6 +51,9 @@ dd_lichens_taxa <-  # create new data frame
   # re-order columns so that `site`, `plot` and `tree` are at the beginning:
   select(`site`, `plot`, `tree`, all_of(lichen_taxa))
 
+
+
+
 # ~ functional groups:
 
 # create vector of unique lichen functional groups:
@@ -98,7 +101,10 @@ dd_lichen_traits <-  # create new data frame
   # convert non-binary traits into factors (as required by `FD::dbFD()`):
   mutate_at(
     vars(c(`growth_type`, `cyanobacterial_photobiont`, `sexual_dispersal`)),
-    as_factor) %>% 
+    as_factor) %>%
+  # ensure all binary (i.e. numeric, in this case) traits are coded properly:
+  mutate_if(
+    is_double, ~ { (. > 0) + 0 }) %>%
   # arrange rows alphabetically by functional group code:
   arrange(`code`)
 
@@ -231,7 +237,7 @@ lichens_func_dbfd <-
 
 # calculate distance-based FD indices (for subsetted data):
 # (NB -- suppress calculation of FRic and FDiv [via `calc.FRic = FALSE`]
-# owing to instances of <3 functionally singular 'species')
+# owing to convex hull calculation errors [`geometry::convexhulln()`])
 lichens_dbfd <-
   dbFD(
     lichen_traits_dbfd, dplyr::select(lichens_func_dbfd, -`tree`),
