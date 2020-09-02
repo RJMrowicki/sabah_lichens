@@ -25,8 +25,8 @@ ddR_trees_pH <- read_csv('./data/trees_pH.csv')
 # lichen abundance data:
 # ~ taxonomic groups:
 
-# create vector of unique lichen taxa:
-lichen_taxa <- unique(ddR_lichens_taxa$`Genus code`)
+# create ordered vector of unique lichen taxa:
+lichen_taxa <- unique(ddR_lichens_taxa$`Genus code`) %>% na.omit %>% sort
 
 dd_lichens_taxa <-  # create new data frame
   ddR_lichens_taxa %>%
@@ -56,8 +56,8 @@ dd_lichens_taxa <-  # create new data frame
 
 # ~ functional groups:
 
-# create vector of unique lichen functional groups:
-lichen_func_grps <- unique(ddR_lichens_func$`tree no.`) %>% na.omit %>% as.vector
+# create ordered vector of unique lichen functional groups:
+lichen_func_grps <- unique(ddR_lichens_func$`tree no.`) %>% na.omit %>% sort
 
 dd_lichens_func <-  # create new data frame
   ddR_lichens_func %>%
@@ -94,13 +94,13 @@ dd_lichen_traits <-  # create new data frame
   # select and rename columns:
   dplyr::select(
     `code` = 1,
-    `growth_type` = 3, `thallus_pigments` = 4, `cyanobacterial_photobiont` = 5,
-    `sexual_dispersal` = 6, `fruiting_stalk` = 7, `mazzaedia` = 8,
+    `growth_type` = 3, `thallus_pigments` = 4, `photobiont` = 5,
+    `sexual_dispersal` = 6, `fruiting_stalk` = 7, `mazaedia` = 8,
     `vegetative_dispersal` = 9, `surface_byssoid` = 10,
     `fimbriate_prothallus` = 11, `hypothallus` = 12) %>%
   # convert non-binary traits into factors (as required by `FD::dbFD()`):
   mutate_at(
-    vars(c(`growth_type`, `cyanobacterial_photobiont`, `sexual_dispersal`)),
+    vars(c(`growth_type`, `photobiont`, `sexual_dispersal`)),
     as_factor) %>%
   # ensure all binary (i.e. numeric, in this case) traits are coded properly:
   mutate_if(
@@ -257,6 +257,33 @@ dd_lichens_func <-
       lichens_dbfd[c("FEve", "FDis")]
     )
   )
+
+
+
+
+# tree functional trait data:
+
+# create lookup table of overall mean pH per bark type category:
+mean_pH_bark <-
+  dd_trees_func %>%
+  # group by bark type, calculate mean (mean)pH (NB -- excluding NAs):
+  group_by(bark) %>% summarise(pH_mean = mean(pH_mean, na.rm = TRUE))
+
+# replace missing tree pH values with mean value for corresponding bark type:
+dd_trees_func <-
+  dd_trees_func %>%
+  # if pH is NA, use matching mean value for bark type, else use existing value:
+  mutate(
+    `pH_mean` = if_else(
+      is.na(`pH_mean`),
+      mean_pH_bark$pH_mean[match(`bark`, mean_pH_bark$bark)],
+      `pH_mean`
+    )) %>%
+  # update `pH` categorical variable, using same `pH_mean` cutoffs as above:
+  mutate(
+    `pH` = factor(cut(
+      `pH_mean`, breaks = c(-Inf, 2, 4, 6, Inf),
+      labels = c("vl", "l", "m", "h"), right = FALSE)))
 
 
 

@@ -22,8 +22,10 @@ nobs_site_tr_func <- dd_trees_func %>% count(`site`)
 # ~~ Tree-level ----------------------------------------------------------------
 
 # taxonomic groups:
-mean_div_li_taxa <- dd_lichens_taxa %>%
-  group_by(`site`) %>%  # group by site
+mean_div_li_taxa <-
+  dd_lichens_taxa %>%
+  # group by site:
+  group_by(`site`) %>%
   # calculate mean and SE diversity and richness:
   summarise(
     `mean_H'` = mean(`H'`), `SE_H'` = std.error(`H'`),
@@ -31,8 +33,11 @@ mean_div_li_taxa <- dd_lichens_taxa %>%
   )
 
 # functional groups:
-mean_div_li_func <- dd_lichens_func %>%
+mean_div_li_func <-
+  dd_lichens_func %>%
+  # group by site:
   group_by(`site`) %>%
+  # calculate mean and SE diversity, richness and distance-based FD indices:
   summarise(
     `mean_H'` = mean(`H'`), `SE_H'` = std.error(`H'`),
     `mean_S` = mean(`S`), `SE_S` = std.error(`S`),
@@ -46,8 +51,10 @@ mean_div_li_func <- dd_lichens_func %>%
 # ~~ Plot-level ----------------------------------------------------------------
 
 # taxonomic groups:
-mean_div_li_taxa_plot <- tree_lichens_taxa_plot %>%
-  group_by(`site`) %>%  # group by site
+mean_div_li_taxa_plot <-
+  tree_lichens_taxa_plot %>%
+  # group by site:
+  group_by(`site`) %>%
   # calculate mean and SE diversity and richness:
   summarise(
     `mean_H'` = mean(`H'`), `SE_H'` = std.error(`H'`),
@@ -55,8 +62,10 @@ mean_div_li_taxa_plot <- tree_lichens_taxa_plot %>%
   )
 
 # functional groups:
-mean_div_li_func_plot <- tree_lichens_func_plot %>%
-  group_by(`site`) %>%  # group by site
+mean_div_li_func_plot <-
+  tree_lichens_func_plot %>%
+  # group by site
+  group_by(`site`) %>%
   # calculate mean and SE diversity, richness and distance-based FD indices:
   summarise(
     `mean_H'` = mean(`H'`), `SE_H'` = std.error(`H'`),
