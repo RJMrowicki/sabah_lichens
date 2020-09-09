@@ -52,6 +52,7 @@ boxplot_li_taxa_h <- boxplot_li_taxa_s + aes(y = `H'`) +
   ylim(c(NA, 2.5))  # set upper y limit only
 
 # ~ functional groups:
+# ~~ richness:
 boxplot_li_func_s <-
   ggplot(dd_lichens_func, aes(x = `site`, y = `S`)) +
   geom_boxplot() +
@@ -65,6 +66,11 @@ boxplot_li_func_s <-
 # ~~ diversity:
 boxplot_li_func_h <- boxplot_li_func_s + aes(y = `H'`) +
   ylim(c(NA, 2.5))  # set upper y limit only
+# ~~ distance-based functional diversity indices:
+boxplot_li_func_feve <- boxplot_li_func_s + aes(y = `FEve`) +
+  ylim(c(NA, 1))  # set upper y limit only
+boxplot_li_func_fdis <- boxplot_li_func_s + aes(y = `FDis`) +
+  ylim(c(NA, 0.25))  # set upper y limit only
 
 
 
@@ -90,7 +96,10 @@ pdf(  # open .pdf graphics device
   width = 18/2.54, height = 8/2.54
 )
 
-grid.arrange(boxplot_li_func_s, boxplot_li_func_h, ncol = 2)
+grid.arrange(
+  boxplot_li_func_s, boxplot_li_func_h,
+  boxplot_li_func_feve, boxplot_li_func_fdis,
+  ncol = 2)
 
 dev.off()  # close .pdf graphics device
 

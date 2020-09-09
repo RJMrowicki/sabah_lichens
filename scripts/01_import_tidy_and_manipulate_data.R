@@ -212,10 +212,13 @@ dd_lichens_func0 <- dd_lichens_func %>%
 
 # determine lichen functional group codes shared between traits matrix and
 # abundance data (i.e. included in calculation of Functional Diversity indices):
+# (NB -- should include ALL codes; if not, some func. grps in abundance data
+# are not represented in traits matrix [or vice versa].)
 lichen_func_grps_included <-
   intersect(lichen_func_grps, dd_lichen_traits$code)
 
-# (functional group codes excluded from FD calculations [NOT IDEAL!!!]:)
+# (functional group codes excluded from FD calculations:)
+# (NB -- no lichen func. grps should be excluded; see previous comment.)
 lichen_func_grps_excluded <-
   setdiff(lichen_func_grps, lichen_func_grps_included)
 
@@ -230,7 +233,7 @@ lichen_traits_dbfd <-
 # subset lichen func. group abundance data:
 lichens_func_dbfd <-
   dd_lichens_func0 %>%
-  # remove data (columns) for func. groups shared with traits matrix:
+  # remove data (columns) for func. groups not shared with traits matrix:
   dplyr::select(`tree`, all_of(lichen_func_grps_included)) %>%
   # remove data (rows) for trees with zero summed abundance:
   filter(rowSums(dplyr::select(., all_of(lichen_func_grps_included))) != 0)
@@ -270,6 +273,8 @@ mean_pH_bark <-
   group_by(bark) %>% summarise(pH_mean = mean(pH_mean, na.rm = TRUE))
 
 # replace missing tree pH values with mean value for corresponding bark type:
+# (NB -- is this appropriate? Relies on a strong and justifiable relationship
+# between pH and bark type.)
 dd_trees_func <-
   dd_trees_func %>%
   # if pH is NA, use matching mean value for bark type, else use existing value:
@@ -341,7 +346,7 @@ lichens_func_plot0 <- dd_lichens_func %>%
 # subset lichen func. group abundance data:
 lichens_func_plot_dbfd <-
   lichens_func_plot0 %>%
-  # remove data (columns) for func. groups shared with traits matrix:
+  # remove data (columns) for func. groups not shared with traits matrix:
   dplyr::select(all_of(lichen_func_grps_included))
 
 # calculate distance-based FD indices (for subsetted data):
