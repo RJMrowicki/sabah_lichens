@@ -193,8 +193,10 @@ missing_trees <- tree_nos[
 dd_lichens_taxa <- dd_lichens_taxa %>%
   mutate(  # vegan:specnumber(), vegan::diversity()
     `S` = specnumber(.[, lichen_taxa]),  # taxonomic richness (S)
-    `H'` = diversity(.[, lichen_taxa], "shannon")  # Shannon-Wiener (H')
+    `H'` = diversity(.[, lichen_taxa], "shannon"),  # Shannon-Wiener (H')
+    `1-L` = 1 - (1/diversity(.[, lichen_taxa], "invsimpson"))  # Simpson (1-L)
   )
+
 
 # ~ functional groups:
 
@@ -202,7 +204,8 @@ dd_lichens_taxa <- dd_lichens_taxa %>%
 dd_lichens_func0 <- dd_lichens_func %>%
   mutate(
     `S` = specnumber(.[, lichen_func_grps]),  # func. group richness
-    `H'` = diversity(.[, lichen_func_grps], "shannon")  # Shannon-Wiener (H')
+    `H'` = diversity(.[, lichen_func_grps], "shannon"),  # Shannon-Wiener (H')
+    `1-L` = 1 - (1/diversity(.[, lichen_func_grps], "invsimpson"))  # Simpson (1-L)
   )
 
 
@@ -325,7 +328,8 @@ lichens_taxa_plot <- dd_lichens_taxa %>%
   # calculate per-plot taxonomic diversity indices:
   mutate(
     `S` = specnumber(.[, lichen_taxa]),  # taxonomic richness (S)
-    `H'` = diversity(.[, lichen_taxa], "shannon")  # Shannon-Wiener (H')
+    `H'` = diversity(.[, lichen_taxa], "shannon"),  # Shannon-Wiener (H')
+    `1-L` = 1 - (1/diversity(.[, lichen_taxa], "invsimpson"))  # Simpson (1-L)
   )
 
 # ~ functional groups:
@@ -337,7 +341,8 @@ lichens_func_plot0 <- dd_lichens_func %>%
   # calculate per-plot functional diversity indices:
   mutate(
     `S` = specnumber(.[, lichen_func_grps]),  # taxonomic richness (S)
-    `H'` = diversity(.[, lichen_func_grps], "shannon")  # Shannon-Wiener (H')
+    `H'` = diversity(.[, lichen_func_grps], "shannon"),  # Shannon-Wiener (H')
+    `1-L` = 1 - (1/diversity(.[, lichen_func_grps], "invsimpson"))  # Simpson (1-L)
   )
 
 

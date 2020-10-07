@@ -44,11 +44,9 @@ kable(nobs_site_tr_func, caption = 'Tree functional trait data')
 
 ## Data analysis
 
-Lichen taxonomic and functional group richness (_S_) and Shannon-Wiener diversity (_H\'_) were calculated for each tree. Additionally, lichen abundance data were summed for each plot, and plot-level richness and diversity were calculated for both taxonomic and functional groups.
+Lichen taxonomic and functional group^[It makes sense to calculate univariate diversity measures for taxonomic groups only, and not functional groups, with 'functional diversity' represented by the four distance-based FD indices.] richness (_S_), Shannon-Wiener diversity (_H\'_) and Simpson's evenness ($1-\lambda$) were calculated for each tree. Additionally, lichen abundance data were summed for each plot, and plot-level richness, diversity and evenness were calculated for both taxonomic and functional groups.^['Tree-level' calculations could be excluded altogether, with analyses focussing solely on 'plot-level' data, given that, for tree-level data, (1) some distance-based FD indices cannot be calculated and (2) MDS fails to converge (see below), and (3) in practical terms, surveys would be conducted at the scale of plots rather than individual trees.]
 
-Further, the following distance-based functional diversity indices were calculated from lichen functional group abundance data in conjunction with the functional traits matrix (Table), using the function `dbFD` in the R package `FD`: functional richness (FRic), functional evenness (FEve), functional divergence (FDiv) and functional dispersion (FDis). While all four indices were calculated for each plot based on summed abundances, only FEve and FDis were calculated for individual trees, owing to instances of <3 singular functional groups per tree.
-
-(Still, it was not possible to calculate FEve and FDis for all individual trees, again owing to a number of instances of <3 singular functional groups.)
+Further, the following distance-based functional diversity indices were calculated from lichen functional group abundance data in conjunction with the functional traits matrix (Table), using the function `dbFD` in the R package `FD`: functional richness (FRic), functional evenness (FEve), functional divergence (FDiv) and functional dispersion (FDis). While all four indices were calculated for each plot based on summed abundances, only FEve and FDis were calculated for individual trees, owing to instances of <3 singular functional groups per tree.^[Still, it was not possible to calculate FEve and FDis for all individual trees, again owing to a number of instances of <3 singular functional groups.]
 
 <!-- Tree bark type was coded numerically in relation to increasing perceived water holding capacity, i.e. ancient dry = 1, smooth = 2, scaly = 3, ridged/rough = 4. (See _Queries_ below.) -->
 
@@ -59,11 +57,9 @@ To enable plot-level characterisation of tree traits as continuous variables, we
 
 ### Differences in lichen diversity among sites
 
-Permutational analysis of variance (PERANOVA) was used to test for differences in univariate lichen taxonomic and functional group richness and diversity measures (including distance-based functional diversity indices) among the three sites. Differences in multivariate lichen community structure among sites were tested using permutational multivariate analysis of variance (PERMANOVA), separately for taxonomic and functional groups. Models included the factor 'site' (fixed, 3 levels: D, M and S), with a planned comparison (D, M) vs. S (i.e. undisturbed sites vs. disturbed site). 'Plot' (nested within site) was also included a random factor to account for potential non-independence of trees located within the same plot. Where a significant effect of 'site' was identified, pairwise permutational post-hoc tests were used to reveal differences between individual factor levels. Analyses involved 9,999 permutations of residuals under a reduced model, and tests were based on Type II Sums of Squares owing to unequal numbers of observations among groups.
+Permutational analysis of variance (PERANOVA) was used to test for differences in univariate lichen taxonomic and functional group richness, diversity and evenness measures (including distance-based functional diversity indices)^['Tree-level' data appears to be insufficient for calculating FRic and FDiv.] among the three sites. Differences in multivariate lichen community structure among sites were tested using permutational multivariate analysis of variance (PERMANOVA), separately for taxonomic and functional groups. Models included the factor 'site' (fixed, 3 levels: D, M and S), with a planned comparison (D, M) vs. S (i.e. undisturbed sites vs. disturbed site). 'Plot' (nested within site) was also included a random factor to account for potential non-independence of trees located within the same plot. Where a significant effect of 'site' was identified, pairwise permutational post-hoc tests were used to reveal differences between individual factor levels. Analyses involved 9,999 permutations of residuals under a reduced model, and tests were based on Type II Sums of Squares owing to unequal numbers of observations among groups.
 
-To complement these unconstrained multivariate analyses, overall patterns in lichen community structure were visualised using non-metric multidimensional scaling (MDS) ordination plots, based on both taxonomic and functional groups.
-
-(Although the MDS analyses [performed using the `metaMDS` function in the R package `vegan`] failed to 'converge' on a result and produced relatively high 2D stress values, they still serve as a useful representation of overall patterns -- to be interpreted with some caution.)
+To complement these unconstrained multivariate analyses, overall patterns in lichen community structure were visualised using non-metric multidimensional scaling (MDS) ordination plots, based on both taxonomic and functional groups.^[Although the MDS analyses (performed using the `metaMDS` function in the R package `vegan`) failed to 'converge' on a result and produced relatively high 2D stress values, they still serve as a useful representation of overall patterns -- to be interpreted with some caution. On the other hand, MDS converges successfully for summed 'plot-level' abundance data.]
 
 Relative contributions of individual lichen taxa or functional groups to differences in community structure between groups of sites identified by PERMANOVA were determined via similarity of percentages (SIMPER; Clarke, 1993, _Aus. J. Ecol._ 18:117--143).
 
@@ -86,7 +82,7 @@ The significance of overall models (based on the sum of all eigenvalues) and of 
 A 'plot-level' CAP analysis, based on summed lichen abundances, was used to estimate the accuracy with which plots may be assigned to sites based on lichen community structure. This cross-validation method involves the 'leave-one-out' approach of Lachenbruch and Mickey (1968; _Technometrics_ 10:1--11) to determine the proportion of individual observations (in this case, plots) that are successfully allocated to the correct group (Anderson & Willis, 2003). Using the CAP FORTRAN programme (Anderson, 2002, _Ecological Archives_ E084-011-S1), this analysis was performed separately for lichen taxonomic and functional groups, versus a single factor, 'site' (i.e. a discriminant analysis, rather than a canonical correlation analysis).
 
 
-(Check whether exclusion of rare taxonomic/functional groups (e.g. overall mean abundance $\leq$ 0.1) alters results substantially.)
+^[Check whether exclusion of rare taxonomic/functional groups (e.g. overall mean abundance $\leq$ 0.1) alters results substantially.]
 
 
 ## Preliminary results
@@ -277,6 +273,7 @@ The overall success with which plots could be classified by site based on summed
 #   kable(caption = '')
 
 ```
+
 
 ## Queries
 
