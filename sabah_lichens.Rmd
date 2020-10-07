@@ -50,9 +50,9 @@ Further, the following distance-based functional diversity indices were calculat
 
 <!-- Tree bark type was coded numerically in relation to increasing perceived water holding capacity, i.e. ancient dry = 1, smooth = 2, scaly = 3, ridged/rough = 4. (See _Queries_ below.) -->
 
-Tree girth and mean pH were converted into categorical variables (girth: s < 100 cm; m = 100--199 cm; l $\geq$ 200 cm; pH: vl < 2; l 2 $\leq x <$ 4; m 4--6; h $\geq$ 6).
+For trees missing pH data, mean pH was estimated as the overall mean pH for the relevant bark type category, justified by the expected relationship between bark type and pH.^[There doesn't appear to be a strong relationship between bark type and pH in this case.] Tree girth and mean pH were converted into categorical variables (girth: s < 100 cm; m = 100--199 cm; l $\geq$ 200 cm; pH: vl < 2; l = 2 $\leq x <$ 4; m = 4 $\leq x <$ 6; h $\geq$ 6).^[These cut-off values for pH categories are quite arbitrary, and may need adjusting.]
 
-To enable plot-level characterisation of tree traits as continuous variables, we calculated (1) the Shannon-Wiener diversity of bark type categories, and the proportion of (2) large trees (i.e. girth $\geq$ 200 cm), (3) trees with buttresses or flutes and (4) dipterocarp trees within each plot.
+To enable plot-level characterisation of tree traits as continuous variables, we calculated the Shannon-Wiener diversity of (1) bark type and (2) pH categories,^[This approach seems a bit convoluted for pH, which is already a continuous variable. Alternatively, we could simply calculate the mean pH per plot, or perhaps the proportion of high/low pH trees (e.g. >6.5 or <4.5).] and the proportion of (3) large trees (i.e. girth $\geq$ 200 cm), (4) trees with buttresses or flutes and (5) dipterocarp trees within each plot.
 
 
 ### Differences in lichen diversity among sites
