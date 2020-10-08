@@ -45,7 +45,7 @@ mds <- function (dat)  # accepts data frame of samples vs. species
   # repeat {
     mds.out <- metaMDS(
       dat, autotransform = FALSE,  # avoid standardisation
-      distance = "bray", zerodist = "add", trymax = 250)
+      distance = "bray", zerodist = "add", trymax = 100)
   #   # ensure procedure runs until solution reached:
   #   if(mds.out$converged == TRUE) break
   # }

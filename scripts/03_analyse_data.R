@@ -122,14 +122,16 @@ simp_li_taxa_plot <- simp_tab(simp_li_taxa_plot_transf, simp_li_taxa_plot_untran
 # ~~ functional groups:
 
 simp_li_func_plot_untransf <- simper(
+  # include dummy taxa to avoid empty row errors:
   cbind(tree_lichens_func_plot[, lichen_func_grps], dummy_func_plot),
-  if_else(tree_lichens_func_plot$site == 'S', 'S', '(D,M)')  # D,M vs. S
+  if_else(tree_lichens_func_plot$site == 'S', 'S', '(D,M)')  # (D,M) vs. S
 )
 # summary(simp_li_func_plot_untransf)
 
 simp_li_func_plot_transf <- simper(
+  # log10(x+1)-transform functional group data, not dummy data:
   cbind(log10(tree_lichens_func_plot[, lichen_func_grps] + 1), dummy_func_plot),
-  if_else(tree_lichens_func_plot$site == 'S', 'S', '(D,M)')  # D,M vs. S
+  if_else(tree_lichens_func_plot$site == 'S', 'S', '(D,M)')  # (D,M) vs. S
 )
 # summary(simp_li_func_plot_transf)
 
@@ -603,17 +605,15 @@ succ_cap_func_site_plot <-
 # (**excluding** dbFD indices)
 
 # output data for PERANOVA analysis in PRIMER:
-# ~ lichen taxonomic and functional group diversity:
+# ~ lichen taxonomic group richness, diversity and evenness:
 # (NB -- use write.csv() instead of write_csv(), as require rownames)
 write.csv(dd_tree_lichens_taxa[, "S"], './primer/li_taxa_s.csv')
 write.csv(dd_tree_lichens_taxa[, "H'"], './primer/li_taxa_h.csv')
-write.csv(dd_tree_lichens_func[, "S"], './primer/li_func_s.csv')
-write.csv(dd_tree_lichens_func[, "H'"], './primer/li_func_h.csv')
+write.csv(dd_tree_lichens_taxa[, "1-L"], './primer/li_taxa_1-l.csv')
 
 # ~ corresponding factors (i.e. `site` and `plot`):
 # (NB -- paste manually in PRIMER)
 write_csv(dd_tree_lichens_taxa[, c('site', 'plot')], './primer/factors_taxa.csv')
-write_csv(dd_tree_lichens_func[, c('site', 'plot')], './primer/factors_func.csv')
 
 
 # ### PERANOVA analysis in PRIMER here ###
@@ -625,10 +625,8 @@ li_taxa_s <- read_csv('./primer/results/li_taxa_s.csv')
 li_taxa_s_ph <- read_csv('./primer/results/li_taxa_s_ph.csv')
 li_taxa_h <- read_csv('./primer/results/li_taxa_h.csv')
 li_taxa_h_ph <- read_csv('./primer/results/li_taxa_h_ph.csv')
-li_func_s <- read_csv('./primer/results/li_func_s.csv')
-li_func_s_ph <- read_csv('./primer/results/li_func_s_ph.csv')
-li_func_h <- read_csv('./primer/results/li_func_h.csv')
-li_func_h_ph <- read_csv('./primer/results/li_func_h_ph.csv')
+`li_taxa_1-l` <- read_csv('./primer/results/li_taxa_1-l.csv')
+`li_taxa_1-l_ph` <- read_csv('./primer/results/li_taxa_1-l_ph.csv')
 
 
 
@@ -697,6 +695,28 @@ simp_li_taxa_transf <- simper(
 
 # produce summary table:
 simp_li_taxa <- simp_tab(simp_li_taxa_transf, simp_li_taxa_untransf)
+
+
+
+
+# ~~ functional groups:
+
+simp_li_func_untransf <- simper(
+  # include dummy taxa to avoid empty row errors:
+  cbind(dd_tree_lichens_func[, lichen_func_grps], dummy_func),
+  if_else(dd_tree_lichens_func$site == 'S', 'S', '(D,M)')  # (D,M) vs. S
+)
+# summary(simp_li_func_untransf)
+
+simp_li_func_transf <- simper(
+  # log10(x+1)-transform functional group data, not dummy data:
+  cbind(log10(dd_tree_lichens_func[, lichen_func_grps] + 1), dummy_func),
+  if_else(dd_tree_lichens_func$site == 'S', 'S', '(D,M)')  # (D,M) vs. S
+)
+# summary(simp_li_func_transf)
+
+# produce summary table:
+simp_li_func <- simp_tab(simp_li_func_transf, simp_li_func_untransf)
 
 
 
