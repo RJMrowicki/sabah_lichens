@@ -1,170 +1,23 @@
 # sabah_lichens
 # Analyse data
 
+# A. MAIN ANALYSES =============================================================
+
 # 1. Univariate analyses =======================================================
 
-# ~ 1.1 mixed effects models of lichen diversity vs. site ----------------------
+# ~ 1.1 PERANOVAs of lichen diversity vs. site ('plot-level') ------------------
+# (**including** dbFD indices)
 
-# NB -- probability distributions are not really suitable for GLMMs;
-# try zero-inflated models, OR permutational ANOVA (see below).
-
-# ~~ taxonomic groups:
-
-# ~~~ richness:
-lm_li_taxa_s <-  # make model
-  # (NB -- 'plot/site' specifies both 'plot' AND 'site:plot' as
-  # random effects; as 'site' is already a fixed effect (and cannot
-  # be a random effect as well), specify 'site:plot' only;
-  # and set REML to TRUE, as data unbalanced...?)
-  lmer(`S` ~ site + (1 | site:plot), data = dd_tree_lichens_taxa)
-
-
-
-
-# # or GLM?
-# distr_plots(dd_tree_lichens_taxa$S)
-# glm_li_taxa_s <-  # make model
-#   glmer(`S`+1 ~ site + (1 | site:plot), data = dd_tree_lichens_taxa, family = Gamma)
-
-
-
-
-# # diagnostic plots of model residuals:
-# plot(lm_li_taxa_s)
-# par(mfrow = c(1, 2))
-# qqnorm(residuals(lm_li_taxa_s)); hist(residuals(lm_li_taxa_s))
-
-# Shapiro-Wilk normality test:
-norm_li_taxa_s <- shapiro.test(residuals(lm_li_taxa_s))
-# # Levene's test for homoscedasticity:
-# het_li_taxa_s <- leveneTest(`S` ~ site, data = dd_tree_lichens_taxa)
-
-# ANOVA table (based on Type II SS):
-anova_li_taxa_s <- Anova(lm_li_taxa_s, type = 'II')
-
-
-
-
-# ~~~ diversity:
-lm_li_taxa_h <-  # make model
-  lmer(`H'` ~ site + (1 | site:plot), data = dd_tree_lichens_taxa)
-
-# distr_plots(dd_tree_lichens_taxa$`H'`)
-# glm_li_taxa_h <-  # make model
-#   glmer(`H'`+1 ~ site + (1 | site:plot), data = dd_tree_lichens_taxa, family = Gamma)
-
-# # diagnostic plots of model residuals:
-# plot(lm_li_taxa_h)
-# par(mfrow = c(1, 2))
-# qqnorm(residuals(lm_li_taxa_h)); hist(residuals(lm_li_taxa_h))
-
-# Shapiro-Wilk normality test:
-norm_li_taxa_h <- shapiro.test(residuals(lm_li_taxa_h))
-# # Levene's test for homoscedasticity:
-# het_li_taxa_h <- leveneTest(`H'` ~ site, data = dd_tree_lichens_taxa)
-
-# ANOVA table (based on Type II SS):
-anova_li_taxa_h <- Anova(lm_li_taxa_h, type = 'II')
-
-
-
-
-# ~~ functional groups:
-
-# ~~~ richness:
-lm_li_func_s <-  # make model
-  lmer(`S` ~ site + (1 | site:plot), data = dd_tree_lichens_func)
-
-# distr_plots(dd_tree_lichens_func$S)
-# glm_li_func_s <-  # make model
-#   glmer(`S`+1 ~ site + (1 | site:plot), data = dd_tree_lichens_func, family = Gamma)
-
-# # diagnostic plots of model residuals:
-# plot(lm_li_func_s)
-# par(mfrow = c(1, 2))
-# qqnorm(residuals(lm_li_func_s)); hist(residuals(lm_li_func_s))
-
-# Shapiro-Wilk normality test:
-norm_li_func_s <- shapiro.test(residuals(lm_li_func_s))
-# # Levene's test for homoscedasticity:
-# het_li_func_s <- leveneTest(`S` ~ site, data = dd_tree_lichens_func)
-
-# ANOVA table (based on Type II SS):
-anova_li_func_s <- Anova(lm_li_func_s, type = 'II')
-
-
-
-
-# ~~~ diversity:
-lm_li_func_h <-  # make model
-  # (transformation doesn't correct normality)
-  lmer(`H'` ~ site + (1 | site:plot), data = dd_tree_lichens_func)
-
-# distr_plots(dd_tree_lichens_func$`H'`)
-# glm_li_func_h <-  # make model
-#   glmer(`H'`+1 ~ site + (1 | site:plot), data = dd_tree_lichens_func, family = Gamma)
-
-# # diagnostic plots of model residuals:
-# plot(lm_li_func_h)
-# par(mfrow = c(1, 2))
-# qqnorm(residuals(lm_li_func_h)); hist(residuals(lm_li_func_h))
-
-# Shapiro-Wilk normality test:
-norm_li_func_h <- shapiro.test(residuals(lm_li_func_h))
-# # Levene's test for homoscedasticity:
-# het_li_func_h <- leveneTest(`H'` ~ site, data = dd_tree_lichens_func)
-
-# ANOVA table (based on Type II SS):
-anova_li_func_h <- Anova(lm_li_func_h, type = 'II')
-
-
-
-
-# ~ 1.2 PERANOVAs of lichen diversity vs. site ---------------------------------
-
-# ~~ Tree-level (excluding dbFD indices) ---------------------------------------
-
-# output data for PERANOVA analysis in PRIMER:
-# ~ lichen taxonomic and functional group diversity:
-# (NB -- use write.csv() instead of write_csv(), as require rownames)
-write.csv(dd_tree_lichens_taxa[, "S"], './primer/li_taxa_s.csv')
-write.csv(dd_tree_lichens_taxa[, "H'"], './primer/li_taxa_h.csv')
-write.csv(dd_tree_lichens_func[, "S"], './primer/li_func_s.csv')
-write.csv(dd_tree_lichens_func[, "H'"], './primer/li_func_h.csv')
-
-# ~ corresponding factors (i.e. `site` and `plot`):
-# (NB -- paste manually in PRIMER)
-write_csv(dd_tree_lichens_taxa[, c('site', 'plot')], './primer/factors_taxa.csv')
-write_csv(dd_tree_lichens_func[, c('site', 'plot')], './primer/factors_func.csv')
-
-
-# ### PERANOVA analysis in PRIMER here ###
-
-
-# import results of PERANOVA analysis in PRIMER:
-# ~ PERANOVA table and post-hoc pairwise test results:
-li_taxa_s <- read_csv('./primer/results/li_taxa_s.csv')
-li_taxa_s_ph <- read_csv('./primer/results/li_taxa_s_ph.csv')
-li_taxa_h <- read_csv('./primer/results/li_taxa_h.csv')
-li_taxa_h_ph <- read_csv('./primer/results/li_taxa_h_ph.csv')
-li_func_s <- read_csv('./primer/results/li_func_s.csv')
-li_func_s_ph <- read_csv('./primer/results/li_func_s_ph.csv')
-li_func_h <- read_csv('./primer/results/li_func_h.csv')
-li_func_h_ph <- read_csv('./primer/results/li_func_h_ph.csv')
-
-
-
-
-# ~~ Plot-level (including dbFD indices) ---------------------------------------
+# (NB -- R doesn't allow for specification of more complex models (e.g. nesting,
+# planned comparisons) or post-hoc pairwise comparisons... use PRIMER instead)
 
 # output data for PERANOVA analysis in PRIMER:
 # ~ lichen taxonomic/functional group diversity & distance-based FD indices:
 # (NB -- use write.csv() instead of write_csv(), as require rownames)
 write.csv(tree_lichens_taxa_plot[, "S"], './primer/li_taxa_plot_s.csv')
 write.csv(tree_lichens_taxa_plot[, "H'"], './primer/li_taxa_plot_h.csv')
+write.csv(tree_lichens_taxa_plot[, "1-L"], './primer/li_taxa_plot_1-l.csv')
 
-write.csv(tree_lichens_func_plot[, "S"], './primer/li_func_plot_s.csv')
-write.csv(tree_lichens_func_plot[, "H'"], './primer/li_func_plot_h.csv')
 write.csv(tree_lichens_func_plot[, "FRic"], './primer/li_func_plot_fric.csv')
 write.csv(tree_lichens_func_plot[, "FEve"], './primer/li_func_plot_feve.csv')
 write.csv(tree_lichens_func_plot[, "FDiv"], './primer/li_func_plot_fdiv.csv')
@@ -185,11 +38,8 @@ li_taxa_plot_s <- read_csv('./primer/results/li_taxa_plot_s.csv')
 li_taxa_plot_s_ph <- read_csv('./primer/results/li_taxa_plot_s_ph.csv')
 li_taxa_plot_h <- read_csv('./primer/results/li_taxa_plot_h.csv')
 li_taxa_plot_h_ph <- read_csv('./primer/results/li_taxa_plot_h_ph.csv')
-
-li_func_plot_s <- read_csv('./primer/results/li_func_plot_s.csv')
-li_func_plot_s_ph <- read_csv('./primer/results/li_func_plot_s_ph.csv')
-li_func_plot_h <- read_csv('./primer/results/li_func_plot_h.csv')
-li_func_plot_h_ph <- read_csv('./primer/results/li_func_plot_h_ph.csv')
+`li_taxa_plot_1-l` <- read_csv('./primer/results/li_taxa_plot_1-l.csv')
+`li_taxa_plot_1-l_ph` <- read_csv('./primer/results/li_taxa_plot_1-l_ph.csv')
 
 li_func_plot_fric <- read_csv('./primer/results/li_func_plot_fric.csv')
 li_func_plot_fric_ph <- read_csv('./primer/results/li_func_plot_fric_ph.csv')
@@ -205,16 +55,14 @@ li_func_plot_fdis_ph <- read_csv('./primer/results/li_func_plot_fdis_ph.csv')
 
 # 2. Unconstrained multivariate analyses =======================================
 
-# ~ 2.1 PERMANOVAs of lichen community structure vs. site ----------------------
-# (NB -- R doesn't allow for specification of more complex models or
-# post-hoc pairwise comparisons... use PRIMER instead)
+# ~ 2.1 PERMANOVAs of lichen community structure vs. site ('plot-level') -------
 
 # output data for PERMANOVA analysis in PRIMER:
 # ~ lichen taxonomic and functional group abundances:
 # (NB -- use write.csv() instead of write_csv(), as require rownames)
-write.csv(dd_tree_lichens_taxa[, lichen_taxa], './primer/li_taxa.csv')
-write.csv(dd_tree_lichens_func[, lichen_func_grps], './primer/li_func.csv')
-# ~ corresponding factors (i.e. `site` and `plot`) output above.
+write.csv(tree_lichens_taxa_plot[, lichen_taxa], './primer/li_taxa_plot.csv')
+write.csv(tree_lichens_func_plot[, lichen_func_grps], './primer/li_func_plot.csv')
+# ~ corresponding factors (i.e. `site` only) output above.
 
 
 # ### PERMANOVA analysis in PRIMER here ###
@@ -222,57 +70,15 @@ write.csv(dd_tree_lichens_func[, lichen_func_grps], './primer/li_func.csv')
 
 # import results of PERMANOVA analysis in PRIMER:
 # ~ PERMANOVA table and post-hoc pairwise test results:
-perm_li_taxa <- read_csv('./primer/results/perm_li_taxa.csv')
-perm_li_taxa_ph <- read_csv('./primer/results/perm_li_taxa_ph.csv')
-perm_li_func <- read_csv('./primer/results/perm_li_func.csv')
-perm_li_func_ph <- read_csv('./primer/results/perm_li_func_ph.csv')
+perm_li_taxa_plot <- read_csv('./primer/results/perm_li_taxa_plot.csv')
+perm_li_taxa_plot_ph <- read_csv('./primer/results/perm_li_taxa_plot_ph.csv')
+perm_li_func_plot <- read_csv('./primer/results/perm_li_func_plot.csv')
+perm_li_func_plot_ph <- read_csv('./primer/results/perm_li_func_plot_ph.csv')
 
 
 
 
-# # ~~ taxonomic groups:
-# perm_li_taxa <-
-#   adonis(  # run PERMANOVA (vegan::adonis)
-#     # log10(x+1)-transformed data, plus 'dummy' variable to enable
-#     # calculation of zero-adjusted Bray-Curtis dissimilarities:
-#     cbind(log10(dd_tree_lichens_taxa[, lichen_taxa] + 1), dummy_taxa) ~ site,
-#     data = dd_tree_lichens_taxa,
-#     permutations = n_perm, method = "bray"
-#   )
-# 
-# # ~~ functional groups:
-# perm_li_func <-
-#   adonis(
-#     cbind(log10(dd_tree_lichens_func[, lichen_func_grps] + 1), dummy_func) ~ site,
-#     data = dd_tree_lichens_func,
-#     permutations = n_perm, method = "bray"
-#   )
-
-
-
-
-# ~ 2.2 MDS ordinations of lichen community structure --------------------------
-
-# ~~ Tree-level ----------------------------------------------------------------
-# (NB -- no convergence after multiple iterations;
-# unless no. of dimensions [k] is set to 3...)
-
-# ~~ taxonomic groups:
-mds_li_taxa <- mds(  # custom mds function
-  # log10(x+1)-transformed data and zero-adjusted Bray-Curtis:
-  cbind(log10(dd_tree_lichens_taxa[, lichen_taxa] + 1), dummy_taxa)
-)
-
-# ~~ functional groups:
-mds_li_func <- mds(
-  # log10(x+1)-transformed data and zero-adjusted Bray-Curtis:
-  cbind(log10(dd_tree_lichens_func[, lichen_func_grps] + 1), dummy_func)
-)
-
-
-
-
-# ~~ Plot-level ----------------------------------------------------------------
+# ~ 2.2 MDS ordinations of lichen community structure ('plot-level') -----------
 
 # ~~ taxonomic groups:
 mds_li_taxa_plot <- mds(  # custom mds function
@@ -289,374 +95,61 @@ mds_li_func_plot <- mds(
 
 
 
-# ~ 2.3 SIMPER tests of contributions to differences ---------------------------
+# ~ 2.3 SIMPER tests of contributions to differences ('plot-level') ------------
 
 # ~~ taxonomic groups:
 
-simp_li_taxa_untransf <- simper(
+simp_li_taxa_plot_untransf <- simper(
   # include dummy taxa to avoid empty row errors:
-  cbind(dd_tree_lichens_taxa[, lichen_taxa], dummy_taxa),
-  if_else(dd_tree_lichens_taxa$site == 'S', 'S', '(D,M)')  # (D,M) vs. S
+  cbind(tree_lichens_taxa_plot[, lichen_taxa], dummy_taxa_plot),
+  if_else(tree_lichens_taxa_plot$site == 'S', 'S', '(D,M)')  # (D,M) vs. S
 )
-# summary(simp_li_taxa_untransf)
+# summary(simp_li_taxa_plot_untransf)
 
-simp_li_taxa_transf <- simper(
+simp_li_taxa_plot_transf <- simper(
   # log10(x+1)-transform taxonomic group data, not dummy data:
-  cbind(log10(dd_tree_lichens_taxa[, lichen_taxa] + 1), dummy_taxa),
-  if_else(dd_tree_lichens_taxa$site == 'S', 'S', '(D,M)')  # (D,M) vs. S
+  cbind(log10(tree_lichens_taxa_plot[, lichen_taxa] + 1), dummy_taxa_plot),
+  if_else(tree_lichens_taxa_plot$site == 'S', 'S', '(D,M)')  # (D,M) vs. S
 )
-# summary(simp_li_taxa_transf)
+# summary(simp_li_taxa_plot_transf)
 
 # produce summary table:
-simp_li_taxa <- simp_tab(simp_li_taxa_transf, simp_li_taxa_untransf)
+simp_li_taxa_plot <- simp_tab(simp_li_taxa_plot_transf, simp_li_taxa_plot_untransf)
 
 
 
 
 # ~~ functional groups:
 
-simp_li_func_untransf <- simper(
-  cbind(dd_tree_lichens_func[, lichen_func_grps], dummy_taxa),
-  if_else(dd_tree_lichens_func$site == 'S', 'S', '(D,M)')  # D,M vs. S
+simp_li_func_plot_untransf <- simper(
+  # include dummy taxa to avoid empty row errors:
+  cbind(tree_lichens_func_plot[, lichen_func_grps], dummy_func_plot),
+  if_else(tree_lichens_func_plot$site == 'S', 'S', '(D,M)')  # (D,M) vs. S
 )
-# summary(simp_li_func_untransf)
+# summary(simp_li_func_plot_untransf)
 
-simp_li_func_transf <- simper(
-  cbind(log10(dd_tree_lichens_func[, lichen_func_grps] + 1), dummy_taxa),
-  if_else(dd_tree_lichens_func$site == 'S', 'S', '(D,M)')  # D,M vs. S
+simp_li_func_plot_transf <- simper(
+  # log10(x+1)-transform functional group data, not dummy data:
+  cbind(log10(tree_lichens_func_plot[, lichen_func_grps] + 1), dummy_func_plot),
+  if_else(tree_lichens_func_plot$site == 'S', 'S', '(D,M)')  # (D,M) vs. S
 )
-# summary(simp_li_func_transf)
+# summary(simp_li_func_plot_transf)
 
 # produce summary table:
-simp_li_func <- simp_tab(simp_li_func_transf, simp_li_func_untransf)
+simp_li_func_plot <- simp_tab(simp_li_func_plot_transf, simp_li_func_plot_untransf)
 
 
 
 
 # 3. Constrained multivariate analyses =========================================
 
-# ~ 3.1 Tree-level -------------------------------------------------------------
-
-# ~~ Environmental variables ---------------------------------------------------
-
-# create vectors of continuous/ordinal and categorical tree trait variables:
-env_vars_ord <- c('girth_m', 'bark_ord', 'buttress_ord')
-env_vars_cat <- c('girth', 'bark', 'buttress', 'dipterocarp')
-
-
-
-# test correlations between environmental variables (ordinal/categorical only)
-env_cor <-
-  rcorr(as.matrix(dd_trees_func[, env_vars_ord]), type = "spearman")
-# exclude if |\rho| > 0.7 ... currently, all values < 0.7
-# create vector of variables to use in subsequent analyses:
-env_use <- env_vars_ord  # (currently no variables are excluded)
-
-
-
-
-# ~~ BIOENV for subsetting environmental variables -----------------------------
-# (NB -- ordinal/categorical only)
-
-# ~~~ taxonomic groups:
-bioenv_taxa <-
-  bioenv(  # run BIOENV analysis (vegan::bioenv)
-    # log10(x+1)-transformed data and zero-adjusted Bray-Curtis:
-    cbind(log10(dd_tree_lichens_taxa[, lichen_taxa] + 1), dummy_taxa),
-    # vs. z-standardised environmental data:
-    z_std(dd_tree_lichens_taxa[, env_use]),
-    method = "spearman", index = "bray", metric = "euclidean"
-  )
-
-bioenv_taxa_rho <-  # extract correlation coefficient
-  max(summary(bioenv_taxa)$correlation)
-
-bioenv_vars_taxa <-  # extract variables to use in CAP
-  summary(bioenv_taxa)$variables[bioenv_taxa$whichbest]
-bioenv_vars_taxa <- strsplit(bioenv_vars_taxa, " ")[[1]]
-
-cond_vars_taxa <-  # specify conditioning variables
-  env_use[-which(env_use %in% bioenv_vars_taxa)]
-
-# ~~~ functional groups:
-bioenv_func <-
-  bioenv(
-    cbind(log10(dd_tree_lichens_func[, lichen_func_grps] + 1), dummy_func),
-    z_std(dd_tree_lichens_func[, env_use]),
-    method = "spearman", index = "bray", metric = "euclidean"
-  )
-
-bioenv_func_rho <-  # extract correlation coefficient
-  max(summary(bioenv_func)$correlation)
-
-bioenv_vars_func <-  # extract variables to use in CAP
-  summary(bioenv_func)$variables[bioenv_func$whichbest]
-bioenv_vars_func <- strsplit(bioenv_vars_func, " ")[[1]]
-
-cond_vars_func <-  # specify conditioning variables
-  env_use[-which(env_use %in% bioenv_vars_func)]
-
-
-
-
-# ~~ CAP (dbRDA) of lichen communities vs. tree functional traits --------------
-
-# (NB -- use vegan::capscale, as it allows multiple factors as constraints;
-# 'traditional' CAP [PRIMER or FORTRAN program] only allows a single factor
-# [i.e. grouping variable for Discriminant Analysis].
-
-
-# ~~~ taxonomic groups:
-
-# specify variables used in CAP:
-env_vars <- env_vars_cat
-# env_vars <- bioenv_vars_taxa  # BIOENV subset of continuous/ordinal variables
-
-
-# # ~~~~ continuous/ordinal environmental variables:
-# cap_taxa <-
-#   capscale(  # run CAP analysis (vegan::capscale)
-#     formula(paste0(
-#       # log10(x+1)-transformed data and zero-adjusted Bray-Curtis:
-#       "cbind(log10(dd_tree_lichens_taxa[, lichen_taxa] + 1), dummy_taxa) ~ ",
-#       paste0(strsplit(env_vars, split = " "), collapse = " + "),
-#       "+ Condition(plot)"  # (NB -- `plot` as a conditioning variable)
-#     )),
-#     # vs. z-standardised environmental data:
-#     data = z_std(dd_tree_lichens_taxa[, c(env_vars, "plot")]),
-#     distance = "bray")
-
-
-# ~~~~ categorical environmental variables:
-cap_taxa <-
-  capscale(  # run CAP analysis (vegan::capscale)
-    formula(paste0(
-      # log10(x+1)-transformed data and zero-adjusted Bray-Curtis:
-      "cbind(log10(dd_tree_lichens_taxa[, lichen_taxa] + 1), dummy_taxa) ~ ",
-      paste0(strsplit(env_vars, split = " "), collapse = " + "),
-      "+ Condition(plot)"  # (NB -- `plot` as a conditioning variable)
-    )),
-    data = dd_tree_lichens_taxa[, c(env_vars, "plot")],
-    distance = "bray")
-
-
-# extract proportions explained, for total and constrained:
-# ~ axis 1:
-prop_cap1_taxa <- summary(cap_taxa)$cont[[1]][2, "CAP1"]*100
-prop_cap1_con_taxa <- summary(cap_taxa)$concont[[1]][2, "CAP1"]*100
-# ~ axis 2:
-# (NB -- if only one environmental variable used, CAP2 is irrelevant)
-if (length(env_vars) > 1) {
-  prop_cap2_taxa <- summary(cap_taxa)$cont[[1]][2, "CAP2"]*100
-  prop_cap2_con_taxa <- summary(cap_taxa)$concont[[1]][2, "CAP2"]*100
-} else {
-  prop_cap2_taxa <- prop_cap2_con_taxa <- NULL
-}
-
-# calculate squared canonical correlation(s):
-delta_sq_taxa <-  # create empty vector
-  vector(length = length(env_vars))
-
-for(i in 1:length(env_vars)) {
-  delta_sq_taxa[i] <-  # assign to relevant 
-    cor(  # calculate Pearson correlation coefficient
-      summary(cap_taxa)$sites[, i],  # site scores
-      summary(cap_taxa)$constraints[, i],  # site constraints
-      method = "pearson"
-    )^2
-}
-
-
-
-
-# test significance of overall analysis and of individual terms:
-anova_cap_taxa <-  # overall analysis
-  anova(cap_taxa, permutations = n_perm, model = "reduced")
-
-# extract F and P values:
-cap_taxa_f <- anova_cap_taxa$F[1]
-cap_taxa_p <- anova_cap_taxa$`Pr(>F)`[1]
-
-anova_cap_taxa_term <-  # terms assessed sequentially
-  anova(cap_taxa, by = "term", permutations = n_perm, model = "reduced")
-anova_cap_taxa_margin <-  # assess marginal effects of terms
-  anova(cap_taxa, by = "margin", permutations = n_perm, model = "reduced")
-
-# extract F and P values:
-cap_taxa_margin_f <- anova_cap_taxa_margin$F[1:length(env_vars)]
-cap_taxa_margin_p <- anova_cap_taxa_margin$`Pr(>F)`[1:length(env_vars)]
-# rename vector elements according to environmental variables used:
-names(cap_taxa_margin_p) <- names(cap_taxa_margin_f) <- env_vars
-
-
-
-
-# test environmental and species correlations with axes:
-
-# cor_cap_taxa_env <-  # ~ environmental
-#   #  (NB -- for ordinal/continuous variables only)
-#   as.data.frame(cor(cbind(
-#     scores(cap_taxa)$sites,  # site scores
-#     # z-standardised, subsetted environmental data:
-#     z_std(dd_tree_lichens_taxa[, env_vars_ord])),
-#     method = "spearman")[  # rank (not product-moment) correlation
-#       -(1:2), 1:2])  # subset relevant correlations
-
-cor_cap_taxa_spp <-  # ~ species
-  as.data.frame(cor(cbind(
-    scores(cap_taxa)$sites, # site scores
-    # log10(x+1)-transformed abundance data:
-    log10(dd_tree_lichens_taxa[, lichen_taxa] + 1)),
-    method = "spearman")[  # rank (not product-moment) correlation
-      -(1:2), 1:2])  # subset relevant correlations
-
-# extract relevant species:
-cor_taxa_spp <-
-  cor_cap_taxa_spp[which(  # correlation coefficient >= x
-    if (length(env_vars) > 1) {
-      abs(cor_cap_taxa_spp$CAP1) >= cor_spp_x |
-        abs(cor_cap_taxa_spp$CAP2) >= cor_spp_x
-    } else {
-      abs(cor_cap_taxa_spp$CAP1) >= cor_spp_x
-    }
-  ), ]
-
-# ordered vector of names of species with strongest correlations:
-top_taxa <- rownames(cor_cap_taxa_spp[order(
-  apply(cor_cap_taxa_spp, MARGIN = 1, function(x) {max(abs(x))}),
-  decreasing = TRUE), ])
-
-
-
-
-# ~~~ functional groups:
-
-# specify variables used in CAP:
-env_vars <- env_vars_cat
-# env_vars <- bioenv_vars_func  # BIOENV subset of continuous/ordinal variables
-
-
-# # ~~~~ continuous/ordinal environmental variables:
-# cap_func <-
-#   capscale(  # run CAP analysis (vegan::capscale)
-#     formula(paste0(
-#       # log10(x+1)-transformed data and zero-adjusted Bray-Curtis:
-#       "cbind(log10(dd_tree_lichens_func[, lichen_func_grps] + 1), dummy_func) ~ ",
-#       paste0(strsplit(env_vars, split = " "), collapse = " + "),
-#       "+ Condition(plot)"  # (NB -- `plot` as a conditioning variable)
-#     )),
-#     # vs. z-standardised environmental data:
-#     data = z_std(dd_tree_lichens_func[, c(env_vars, "plot")]),
-#     distance = "bray")
-
-
-# ~~~~ categorical environmental variables:
-cap_func <-
-  capscale(  # run CAP analysis (vegan::capscale)
-    formula(paste0(
-      # log10(x+1)-transformed data and zero-adjusted Bray-Curtis:
-      "cbind(log10(dd_tree_lichens_func[, lichen_func_grps] + 1), dummy_func) ~ ",
-      paste0(strsplit(env_vars, split = " "), collapse = " + "),
-      "+ Condition(plot)"  # (NB -- `plot` as a conditioning variable)
-    )),
-    data = dd_tree_lichens_func[, c(env_vars, "plot")],
-    distance = "bray")
-
-
-# extract proportions explained, for total and constrained:
-# ~ axis 1:
-prop_cap1_func <- summary(cap_func)$cont[[1]][2, "CAP1"]*100
-prop_cap1_con_func <- summary(cap_func)$concont[[1]][2, "CAP1"]*100
-# ~ axis 2:
-# (NB -- if only one environmental variable used, CAP2 is irrelevant)
-if (length(env_vars) > 1) {
-  prop_cap2_func <- summary(cap_func)$cont[[1]][2, "CAP2"]*100
-  prop_cap2_con_func <- summary(cap_func)$concont[[1]][2, "CAP2"]*100
-} else {
-  prop_cap2_func <- prop_cap2_con_func <- NULL
-}
-
-# calculate squared canonical correlation(s):
-delta_sq_func <-  # create empty vector
-  vector(length = length(env_vars))
-
-for(i in 1:length(env_vars)) {
-  delta_sq_func[i] <-  # assign to relevant 
-    cor(  # calculate Pearson correlation coefficient
-      summary(cap_func)$sites[, i],  # site scores
-      summary(cap_func)$constraints[, i],  # site constraints
-      method = "pearson"
-    )^2
-}
-
-
-
-
-# test significance of overall analysis and of individual terms:
-anova_cap_func <-  # overall analysis
-  anova(cap_func, permutations = n_perm, model = "reduced")
-
-# extract F and P values:
-cap_func_f <- anova_cap_func$F[1]
-cap_func_p <- anova_cap_func$`Pr(>F)`[1]
-
-anova_cap_func_term <-  # terms assessed sequentially
-  anova(cap_func, by = "term", permutations = n_perm, model = "reduced")
-anova_cap_func_margin <-  # assess marginal effects of terms
-  anova(cap_func, by = "margin", permutations = n_perm, model = "reduced")
-
-# extract F and P values:
-cap_func_margin_f <- anova_cap_func_margin$F[1:length(env_vars)]
-cap_func_margin_p <- anova_cap_func_margin$`Pr(>F)`[1:length(env_vars)]
-# rename vector elements according to environmental variables used:
-names(cap_func_margin_p) <- names(cap_func_margin_f) <- env_vars
-
-
-
-
-# test environmental and species correlations with axes:
-
-# cor_cap_func_env <-  # ~ environmental
-#   #  (NB -- for ordinal/continuous variables only)
-#   as.data.frame(cor(cbind(
-#     scores(cap_func)$sites,  # site scores
-#     # z-standardised, subsetted environmental data:
-#     z_std(dd_tree_lichens_func[, env_vars_ord])),
-#     method = "spearman")[  # rank (not product-moment) correlation
-#       -(1:2), 1:2])  # subset relevant correlations
-
-cor_cap_func_spp <-  # ~ species
-  as.data.frame(cor(cbind(
-    scores(cap_func)$sites, # site scores
-    # log10(x+1)-transformed abundance data:
-    log10(dd_tree_lichens_func[, lichen_func_grps] + 1)),
-    method = "spearman")[  # rank (not product-moment) correlation
-      -(1:2), 1:2])  # subset relevant correlations
-
-# extract relevant species:
-cor_func_spp <-
-  cor_cap_func_spp[which(  # correlation coefficient >= x
-    if (length(env_vars) > 1) {
-      abs(cor_cap_func_spp$CAP1) >= cor_spp_x |
-        abs(cor_cap_func_spp$CAP2) >= cor_spp_x
-    } else {
-      abs(cor_cap_func_spp$CAP1) >= cor_spp_x
-    }
-  ), ]
-
-# ordered vector of names of species with strongest correlations:
-top_func <- rownames(cor_cap_func_spp[order(
-  apply(cor_cap_func_spp, MARGIN = 1, function(x) {max(abs(x))}),
-  decreasing = TRUE), ])
-
-
-
-# ~ 3.2 Plot-level -------------------------------------------------------------
-
-# ~~ Environmental variables ---------------------------------------------------
-
-# create vectors of continuous/ordinal and categorical tree trait variables:
-env_vars_plot <- c("bark_div", "girth_l_prop", "buttress_prop", "dipterocarp_prop")
+# ~~ Environmental variables (continuous) --------------------------------------
+
+# create vector of continuous (summarised, per plot) tree trait variables:
+env_vars_plot <- c(
+  "bark_div", "pH_div",
+  "girth_l_prop", "buttress_prop", "dipterocarp_prop"
+)
 
 
 
@@ -695,8 +188,10 @@ cond_vars_taxa_plot <-  # specify conditioning variables
 
 # ~~~ functional groups:
 bioenv_func_plot <-
-  bioenv(
+  bioenv(  # run BIOENV analysis (vegan::bioenv)
+    # log10(x+1)-transformed data and zero-adjusted Bray-Curtis:
     cbind(log10(tree_lichens_func_plot[, lichen_func_grps] + 1), dummy_func_plot),
+    # vs. z-standardised environmental data:
     z_std(tree_lichens_func_plot[, env_use_plot]),
     method = "spearman", index = "bray", metric = "euclidean"
   )
@@ -718,17 +213,17 @@ cond_vars_func_plot <-  # specify conditioning variables
 
 # ~~~ taxonomic groups:
 
-env_vars_plot <- bioenv_vars_taxa_plot  # specify variables used in CAP
+env_vars_cap_plot <- bioenv_vars_taxa_plot  # specify variables used in CAP
 
 cap_taxa_plot <-
   capscale(  # run CAP analysis (vegan::capscale)
     formula(paste0(
       # log10(x+1)-transformed data and zero-adjusted Bray-Curtis:
       "cbind(log10(tree_lichens_taxa_plot[, lichen_taxa] + 1), dummy_taxa_plot) ~ ",
-      paste0(strsplit(env_vars_plot, split = " "), collapse = " + ")
+      paste0(strsplit(env_vars_cap_plot, split = " "), collapse = " + ")
     )),
     # vs. z-standardised environmental data:
-    data = z_std(tree_lichens_taxa_plot[, env_vars_plot]),
+    data = z_std(tree_lichens_taxa_plot[, env_vars_cap_plot]),
     distance = "bray"  # specify Bray-Curtis dissimilarity
   )
 
@@ -739,7 +234,7 @@ prop_cap1_taxa_plot <- summary(cap_taxa_plot)$cont[[1]][2, "CAP1"]*100
 prop_cap1_con_taxa_plot <- summary(cap_taxa_plot)$concont[[1]][2, "CAP1"]*100
 # ~ axis 2:
 # (NB -- if only one environmental variable used, CAP2 is irrelevant)
-if (length(env_vars) > 1) {
+if (length(env_vars_cap_plot) > 1) {
   prop_cap2_taxa_plot <- summary(cap_taxa_plot)$cont[[1]][2, "CAP2"]*100
   prop_cap2_con_taxa_plot <- summary(cap_taxa_plot)$concont[[1]][2, "CAP2"]*100
 } else {
@@ -748,9 +243,9 @@ if (length(env_vars) > 1) {
 
 # calculate squared canonical correlation(s):
 delta_sq_taxa_plot <-  # create empty vector
-  vector(length = length(env_vars_plot))
+  vector(length = length(env_vars_cap_plot))
 
-for(i in 1:length(env_vars_plot)) {
+for(i in 1:length(env_vars_cap_plot)) {
   delta_sq_taxa_plot[i] <-  # assign to relevant item
     cor(  # calculate Pearson correlation coefficient
       summary(cap_taxa_plot)$sites[, i],  # site scores
@@ -776,10 +271,10 @@ anova_cap_taxa_plot_margin <-  # assess marginal effects of terms
   anova(cap_taxa_plot, by = "margin", permutations = n_perm, model = "reduced")
 
 # extract F and P values:
-cap_taxa_plot_margin_f <- anova_cap_taxa_plot_margin$F[1:length(env_vars_plot)]
-cap_taxa_plot_margin_p <- anova_cap_taxa_plot_margin$`Pr(>F)`[1:length(env_vars_plot)]
+cap_taxa_plot_margin_f <- anova_cap_taxa_plot_margin$F[1:length(env_vars_cap_plot)]
+cap_taxa_plot_margin_p <- anova_cap_taxa_plot_margin$`Pr(>F)`[1:length(env_vars_cap_plot)]
 # rename vector elements according to environmental variables used:
-names(cap_taxa_plot_margin_p) <- names(cap_taxa_plot_margin_f) <- env_vars_plot
+names(cap_taxa_plot_margin_p) <- names(cap_taxa_plot_margin_f) <- env_vars_cap_plot
 
 
 
@@ -790,7 +285,7 @@ cor_cap_taxa_plot_env <-  # ~ environmental
   as.data.frame(cor(cbind(
     scores(cap_taxa_plot)$sites,  # site scores
     # z-standardised, subsetted environmental data:
-    z_std(tree_lichens_taxa_plot[, env_vars_plot])),
+    z_std(tree_lichens_taxa_plot[, env_vars_cap_plot])),
     method = "spearman")[  # rank (not product-moment) correlation
       -(1:2), 1:2])  # subset relevant correlations
 
@@ -805,7 +300,7 @@ cor_cap_taxa_plot_spp <-  # ~ species
 # extract relevant species:
 cor_taxa_plot_spp <-
   cor_cap_taxa_plot_spp[which(  # correlation coefficient >= x
-    if (length(env_vars) > 1) {
+    if (length(env_vars_cap_plot) > 1) {
       abs(cor_cap_taxa_plot_spp$CAP1) >= cor_spp_x |
         abs(cor_cap_taxa_plot_spp$CAP2) >= cor_spp_x
     } else {
@@ -823,17 +318,17 @@ top_taxa_plot <- rownames(cor_cap_taxa_plot_spp[order(
 
 # ~~~ functional groups:
 
-env_vars_plot <- bioenv_vars_func_plot  # specify variables used in CAP
+env_vars_cap_plot <- bioenv_vars_func_plot  # specify variables used in CAP
 
 cap_func_plot <-
   capscale(  # run CAP analysis (vegan::capscale)
     formula(paste0(
       # log10(x+1)-transformed data and zero-adjusted Bray-Curtis:
       "cbind(log10(tree_lichens_func_plot[, lichen_func_grps] + 1), dummy_func_plot) ~ ",
-      paste0(strsplit(env_vars_plot, split = " "), collapse = " + ")
+      paste0(strsplit(env_vars_cap_plot, split = " "), collapse = " + ")
     )),
     # vs. z-standardised environmental data:
-    data = z_std(tree_lichens_func_plot[, env_vars_plot]),
+    data = z_std(tree_lichens_func_plot[, env_vars_cap_plot]),
     distance = "bray"  # specify Bray-Curtis dissimilarity
   )
 
@@ -844,7 +339,7 @@ prop_cap1_func_plot <- summary(cap_func_plot)$cont[[1]][2, "CAP1"]*100
 prop_cap1_con_func_plot <- summary(cap_func_plot)$concont[[1]][2, "CAP1"]*100
 # ~ axis 2:
 # (NB -- if only one environmental variable used, CAP2 is irrelevant)
-if (length(env_vars) > 1) {
+if (length(env_vars_cap_plot) > 1) {
   prop_cap2_func_plot <- summary(cap_func_plot)$cont[[1]][2, "CAP2"]*100
   prop_cap2_con_func_plot <- summary(cap_func_plot)$concont[[1]][2, "CAP2"]*100
 } else {
@@ -853,9 +348,9 @@ if (length(env_vars) > 1) {
 
 # calculate squared canonical correlation(s):
 delta_sq_func_plot <-  # create empty vector
-  vector(length = length(env_vars_plot))
+  vector(length = length(env_vars_cap_plot))
 
-for(i in 1:length(env_vars_plot)) {
+for(i in 1:length(env_vars_cap_plot)) {
   delta_sq_func_plot[i] <-  # assign to relevant item
     cor(  # calculate Pearson correlation coefficient
       summary(cap_func_plot)$sites[, i],  # site scores
@@ -881,10 +376,10 @@ anova_cap_func_plot_margin <-  # assess marginal effects of terms
   anova(cap_func_plot, by = "margin", permutations = n_perm, model = "reduced")
 
 # extract F and P values:
-cap_func_plot_margin_f <- anova_cap_func_plot_margin$F[1:length(env_vars_plot)]
-cap_func_plot_margin_p <- anova_cap_func_plot_margin$`Pr(>F)`[1:length(env_vars_plot)]
+cap_func_plot_margin_f <- anova_cap_func_plot_margin$F[1:length(env_vars_cap_plot)]
+cap_func_plot_margin_p <- anova_cap_func_plot_margin$`Pr(>F)`[1:length(env_vars_cap_plot)]
 # rename vector elements according to environmental variables used:
-names(cap_func_plot_margin_p) <- names(cap_func_plot_margin_f) <- env_vars_plot
+names(cap_func_plot_margin_p) <- names(cap_func_plot_margin_f) <- env_vars_cap_plot
 
 
 
@@ -895,7 +390,7 @@ cor_cap_func_plot_env <-  # ~ environmental
   as.data.frame(cor(cbind(
     scores(cap_func_plot)$sites,  # site scores
     # z-standardised, subsetted environmental data:
-    z_std(tree_lichens_func_plot[, env_vars_plot])),
+    z_std(tree_lichens_func_plot[, env_vars_cap_plot])),
     method = "spearman")[  # rank (not product-moment) correlation
       -(1:2), 1:2])  # subset relevant correlations
 
@@ -910,7 +405,7 @@ cor_cap_func_plot_spp <-  # ~ species
 # extract relevant species:
 cor_func_plot_spp <-
   cor_cap_func_plot_spp[which(  # correlation coefficient >= x
-    if (length(env_vars) > 1) {
+    if (length(env_vars_cap_plot) > 1) {
       abs(cor_cap_func_plot_spp$CAP1) >= cor_spp_x |
         abs(cor_cap_func_plot_spp$CAP2) >= cor_spp_x
     } else {
@@ -1098,6 +593,402 @@ succ_cap_func_site_plot <-
   gsub("%", "", .) %>% strsplit(" ") %>% map(~.[length(.)]) %>%
   # convert to numeric vector:
   unlist %>% as.numeric
+
+
+
+
+# B. SUPPLEMENTARY ANALYSES ====================================================
+
+# 1. Univariate analyses =======================================================
+
+# ~ 1.1 PERANOVAs of lichen diversity vs. site ('tree-level') ------------------
+# (**excluding** dbFD indices)
+
+# output data for PERANOVA analysis in PRIMER:
+# ~ lichen taxonomic group richness, diversity and evenness:
+# (NB -- use write.csv() instead of write_csv(), as require rownames)
+write.csv(dd_tree_lichens_taxa[, "S"], './primer/li_taxa_s.csv')
+write.csv(dd_tree_lichens_taxa[, "H'"], './primer/li_taxa_h.csv')
+write.csv(dd_tree_lichens_taxa[, "1-L"], './primer/li_taxa_1-l.csv')
+
+# ~ corresponding factors (i.e. `site` and `plot`):
+# (NB -- paste manually in PRIMER)
+write_csv(dd_tree_lichens_taxa[, c('site', 'plot')], './primer/factors_taxa.csv')
+
+
+# ### PERANOVA analysis in PRIMER here ###
+
+
+# import results of PERANOVA analysis in PRIMER:
+# ~ PERANOVA table and post-hoc pairwise test results:
+li_taxa_s <- read_csv('./primer/results/li_taxa_s.csv')
+li_taxa_s_ph <- read_csv('./primer/results/li_taxa_s_ph.csv')
+li_taxa_h <- read_csv('./primer/results/li_taxa_h.csv')
+li_taxa_h_ph <- read_csv('./primer/results/li_taxa_h_ph.csv')
+`li_taxa_1-l` <- read_csv('./primer/results/li_taxa_1-l.csv')
+`li_taxa_1-l_ph` <- read_csv('./primer/results/li_taxa_1-l_ph.csv')
+
+
+
+
+# 2. Unconstrained multivariate analyses =======================================
+
+# ~ 2.1 PERMANOVAs of lichen community structure vs. site ('tree-level') -------
+
+# output data for PERMANOVA analysis in PRIMER:
+# ~ lichen taxonomic and functional group abundances:
+# (NB -- use write.csv() instead of write_csv(), as require rownames)
+write.csv(dd_tree_lichens_taxa[, lichen_taxa], './primer/li_taxa.csv')
+write.csv(dd_tree_lichens_func[, lichen_func_grps], './primer/li_func.csv')
+# ~ corresponding factors (i.e. `site` and `plot`) output above.
+
+
+# ### PERMANOVA analysis in PRIMER here ###
+
+
+# import results of PERMANOVA analysis in PRIMER:
+# ~ PERMANOVA table and post-hoc pairwise test results:
+perm_li_taxa <- read_csv('./primer/results/perm_li_taxa.csv')
+perm_li_taxa_ph <- read_csv('./primer/results/perm_li_taxa_ph.csv')
+perm_li_func <- read_csv('./primer/results/perm_li_func.csv')
+perm_li_func_ph <- read_csv('./primer/results/perm_li_func_ph.csv')
+
+
+
+
+# ~ 2.2 MDS ordinations of lichen community structure ('tree-level') -----------
+# (NB -- no convergence after multiple iterations;
+# unless no. of dimensions [k] is set to 3...)
+
+# ~~ taxonomic groups:
+mds_li_taxa <- mds(  # custom mds function
+  # log10(x+1)-transformed data and zero-adjusted Bray-Curtis:
+  cbind(log10(dd_tree_lichens_taxa[, lichen_taxa] + 1), dummy_taxa)
+)
+
+# ~~ functional groups:
+mds_li_func <- mds(
+  # log10(x+1)-transformed data and zero-adjusted Bray-Curtis:
+  cbind(log10(dd_tree_lichens_func[, lichen_func_grps] + 1), dummy_func)
+)
+
+
+
+
+# ~ 2.3 SIMPER tests of contributions to differences ('tree-level') ------------
+
+# ~~ taxonomic groups:
+
+simp_li_taxa_untransf <- simper(
+  # include dummy taxa to avoid empty row errors:
+  cbind(dd_tree_lichens_taxa[, lichen_taxa], dummy_taxa),
+  if_else(dd_tree_lichens_taxa$site == 'S', 'S', '(D,M)')  # (D,M) vs. S
+)
+# summary(simp_li_taxa_untransf)
+
+simp_li_taxa_transf <- simper(
+  # log10(x+1)-transform taxonomic group data, not dummy data:
+  cbind(log10(dd_tree_lichens_taxa[, lichen_taxa] + 1), dummy_taxa),
+  if_else(dd_tree_lichens_taxa$site == 'S', 'S', '(D,M)')  # (D,M) vs. S
+)
+# summary(simp_li_taxa_transf)
+
+# produce summary table:
+simp_li_taxa <- simp_tab(simp_li_taxa_transf, simp_li_taxa_untransf)
+
+
+
+
+# ~~ functional groups:
+
+simp_li_func_untransf <- simper(
+  # include dummy taxa to avoid empty row errors:
+  cbind(dd_tree_lichens_func[, lichen_func_grps], dummy_func),
+  if_else(dd_tree_lichens_func$site == 'S', 'S', '(D,M)')  # (D,M) vs. S
+)
+# summary(simp_li_func_untransf)
+
+simp_li_func_transf <- simper(
+  # log10(x+1)-transform functional group data, not dummy data:
+  cbind(log10(dd_tree_lichens_func[, lichen_func_grps] + 1), dummy_func),
+  if_else(dd_tree_lichens_func$site == 'S', 'S', '(D,M)')  # (D,M) vs. S
+)
+# summary(simp_li_func_transf)
+
+# produce summary table:
+simp_li_func <- simp_tab(simp_li_func_transf, simp_li_func_untransf)
+
+
+
+
+# 3. Constrained multivariate analyses =========================================
+
+# ~~ Environmental variables (categorical only) --------------------------------
+
+# create vector of categorical tree trait variables:
+env_vars <- c('girth', 'bark', 'pH', 'buttress', 'dipterocarp')
+
+# (NB -- may only test correlation among ordinal/continuous variables.)
+env_use <- env_vars  # (currently no variables are excluded)
+
+
+
+
+# ~~ BIOENV for subsetting environmental variables -----------------------------
+# (NB -- ordinal/categorical only)
+
+# ~~~ taxonomic groups:
+bioenv_taxa <-
+  bioenv(  # run BIOENV analysis (vegan::bioenv)
+    # log10(x+1)-transformed data and zero-adjusted Bray-Curtis:
+    cbind(log10(dd_tree_lichens_taxa[, lichen_taxa] + 1), dummy_taxa),
+    # vs. categorical environmental data:
+    dd_tree_lichens_taxa[, env_use],
+    # NB -- must use "Gower" metric for categorical environmental variables:
+    method = "spearman", index = "bray", metric = "gower"
+  )
+
+bioenv_taxa_rho <-  # extract correlation coefficient
+  max(summary(bioenv_taxa)$correlation)
+
+bioenv_vars_taxa <-  # extract variables to use in CAP
+  summary(bioenv_taxa)$variables[bioenv_taxa$whichbest]
+bioenv_vars_taxa <- strsplit(bioenv_vars_taxa, " ")[[1]]
+
+cond_vars_taxa <-  # specify conditioning variables
+  env_use[-which(env_use %in% bioenv_vars_taxa)]
+
+# ~~~ functional groups:
+bioenv_func <-
+  bioenv(  # run BIOENV analysis (vegan::bioenv)
+    # log10(x+1)-transformed data and zero-adjusted Bray-Curtis:
+    cbind(log10(dd_tree_lichens_func[, lichen_func_grps] + 1), dummy_func),
+    # vs. categorical environmental data:
+    dd_tree_lichens_func[, env_use],
+    # NB -- must use "Gower" metric for categorical environmental variables:
+    method = "spearman", index = "bray", metric = "gower"
+  )
+
+bioenv_func_rho <-  # extract correlation coefficient
+  max(summary(bioenv_func)$correlation)
+
+bioenv_vars_func <-  # extract variables to use in CAP
+  summary(bioenv_func)$variables[bioenv_func$whichbest]
+bioenv_vars_func <- strsplit(bioenv_vars_func, " ")[[1]]
+
+cond_vars_func <-  # specify conditioning variables
+  env_use[-which(env_use %in% bioenv_vars_func)]
+
+
+
+
+# ~~ CAP (dbRDA) of lichen communities vs. tree functional traits --------------
+
+# (NB -- use vegan::capscale, as it allows multiple factors as constraints;
+# 'traditional' CAP [PRIMER or FORTRAN program] only allows a single factor
+# [i.e. grouping variable for Discriminant Analysis].
+
+
+# ~~~ taxonomic groups:
+
+# specify variables used in CAP:
+env_vars_cap <- bioenv_vars_taxa  # BIOENV subset of categorical variables
+
+cap_taxa <-
+  capscale(  # run CAP analysis (vegan::capscale)
+    formula(paste0(
+      # log10(x+1)-transformed data and zero-adjusted Bray-Curtis:
+      "cbind(log10(dd_tree_lichens_taxa[, lichen_taxa] + 1), dummy_taxa) ~ ",
+      paste0(strsplit(env_vars_cap, split = " "), collapse = " + "),
+      "+ Condition(plot)"  # (NB -- `plot` as a conditioning variable)
+    )),
+    data = dd_tree_lichens_taxa[, c(env_vars_cap, "plot")],
+    distance = "bray")
+
+
+# extract proportions explained, for total and constrained:
+# ~ axis 1:
+prop_cap1_taxa <- summary(cap_taxa)$cont[[1]][2, "CAP1"]*100
+prop_cap1_con_taxa <- summary(cap_taxa)$concont[[1]][2, "CAP1"]*100
+# ~ axis 2:
+# (NB -- if only one environmental variable used, CAP2 is irrelevant)
+if (length(env_vars_cap) > 1) {
+  prop_cap2_taxa <- summary(cap_taxa)$cont[[1]][2, "CAP2"]*100
+  prop_cap2_con_taxa <- summary(cap_taxa)$concont[[1]][2, "CAP2"]*100
+} else {
+  prop_cap2_taxa <- prop_cap2_con_taxa <- NULL
+}
+
+# calculate squared canonical correlation(s):
+delta_sq_taxa <-  # create empty vector
+  vector(length = length(env_vars_cap))
+
+for(i in 1:length(env_vars_cap)) {
+  delta_sq_taxa[i] <-  # assign to relevant 
+    cor(  # calculate Pearson correlation coefficient
+      summary(cap_taxa)$sites[, i],  # site scores
+      summary(cap_taxa)$constraints[, i],  # site constraints
+      method = "pearson"
+    )^2
+}
+
+
+
+
+# test significance of overall analysis and of individual terms:
+anova_cap_taxa <-  # overall analysis
+  anova(cap_taxa, permutations = n_perm, model = "reduced")
+
+# extract F and P values:
+cap_taxa_f <- anova_cap_taxa$F[1]
+cap_taxa_p <- anova_cap_taxa$`Pr(>F)`[1]
+
+anova_cap_taxa_term <-  # terms assessed sequentially
+  anova(cap_taxa, by = "term", permutations = n_perm, model = "reduced")
+anova_cap_taxa_margin <-  # assess marginal effects of terms
+  anova(cap_taxa, by = "margin", permutations = n_perm, model = "reduced")
+
+# extract F and P values:
+cap_taxa_margin_f <- anova_cap_taxa_margin$F[1:length(env_vars_cap)]
+cap_taxa_margin_p <- anova_cap_taxa_margin$`Pr(>F)`[1:length(env_vars_cap)]
+# rename vector elements according to environmental variables used:
+names(cap_taxa_margin_p) <- names(cap_taxa_margin_f) <- env_vars_cap
+
+
+
+
+# test environmental and species correlations with axes:
+
+# ~ environmental
+#  (NB -- for ordinal/continuous variables only)
+
+cor_cap_taxa_spp <-  # ~ species
+  as.data.frame(cor(cbind(
+    scores(cap_taxa)$sites, # site scores
+    # log10(x+1)-transformed abundance data:
+    log10(dd_tree_lichens_taxa[, lichen_taxa] + 1)),
+    method = "spearman")[  # rank (not product-moment) correlation
+      -(1:2), 1:2])  # subset relevant correlations
+
+# extract relevant species:
+cor_taxa_spp <-
+  cor_cap_taxa_spp[which(  # correlation coefficient >= x
+    if (length(env_vars_cap) > 1) {
+      abs(cor_cap_taxa_spp$CAP1) >= cor_spp_x |
+        abs(cor_cap_taxa_spp$CAP2) >= cor_spp_x
+    } else {
+      abs(cor_cap_taxa_spp$CAP1) >= cor_spp_x
+    }
+  ), ]
+
+# ordered vector of names of species with strongest correlations:
+top_taxa <- rownames(cor_cap_taxa_spp[order(
+  apply(cor_cap_taxa_spp, MARGIN = 1, function(x) {max(abs(x))}),
+  decreasing = TRUE), ])
+
+
+
+
+# ~~~ functional groups:
+
+# specify variables used in CAP:
+env_vars_cap <- bioenv_vars_func  # BIOENV subset of categorical variables
+
+cap_func <-
+  capscale(  # run CAP analysis (vegan::capscale)
+    formula(paste0(
+      # log10(x+1)-transformed data and zero-adjusted Bray-Curtis:
+      "cbind(log10(dd_tree_lichens_func[, lichen_func_grps] + 1), dummy_func) ~ ",
+      paste0(strsplit(env_vars_cap, split = " "), collapse = " + "),
+      "+ Condition(plot)"  # (NB -- `plot` as a conditioning variable)
+    )),
+    data = dd_tree_lichens_func[, c(env_vars_cap, "plot")],
+    distance = "bray")
+
+
+# extract proportions explained, for total and constrained:
+# ~ axis 1:
+prop_cap1_func <- summary(cap_func)$cont[[1]][2, "CAP1"]*100
+prop_cap1_con_func <- summary(cap_func)$concont[[1]][2, "CAP1"]*100
+# ~ axis 2:
+# (NB -- if only one environmental variable used, CAP2 is irrelevant)
+if (length(env_vars_cap) > 1) {
+  prop_cap2_func <- summary(cap_func)$cont[[1]][2, "CAP2"]*100
+  prop_cap2_con_func <- summary(cap_func)$concont[[1]][2, "CAP2"]*100
+} else {
+  prop_cap2_func <- prop_cap2_con_func <- NULL
+}
+
+# calculate squared canonical correlation(s):
+delta_sq_func <-  # create empty vector
+  vector(length = length(env_vars_cap))
+
+for(i in 1:length(env_vars_cap)) {
+  delta_sq_func[i] <-  # assign to relevant 
+    cor(  # calculate Pearson correlation coefficient
+      summary(cap_func)$sites[, i],  # site scores
+      summary(cap_func)$constraints[, i],  # site constraints
+      method = "pearson"
+    )^2
+}
+
+
+
+
+# test significance of overall analysis and of individual terms:
+anova_cap_func <-  # overall analysis
+  anova(cap_func, permutations = n_perm, model = "reduced")
+
+# extract F and P values:
+cap_func_f <- anova_cap_func$F[1]
+cap_func_p <- anova_cap_func$`Pr(>F)`[1]
+
+anova_cap_func_term <-  # terms assessed sequentially
+  anova(cap_func, by = "term", permutations = n_perm, model = "reduced")
+anova_cap_func_margin <-  # assess marginal effects of terms
+  anova(cap_func, by = "margin", permutations = n_perm, model = "reduced")
+
+# extract F and P values:
+cap_func_margin_f <- anova_cap_func_margin$F[1:length(env_vars_cap)]
+cap_func_margin_p <- anova_cap_func_margin$`Pr(>F)`[1:length(env_vars_cap)]
+# rename vector elements according to environmental variables used:
+names(cap_func_margin_p) <- names(cap_func_margin_f) <- env_vars_cap
+
+
+
+
+# test environmental and species correlations with axes:
+
+# ~ environmental
+#  (NB -- for ordinal/continuous variables only)
+
+cor_cap_func_spp <-  # ~ species
+  as.data.frame(cor(cbind(
+    scores(cap_func)$sites, # site scores
+    # log10(x+1)-transformed abundance data:
+    log10(dd_tree_lichens_func[, lichen_func_grps] + 1)),
+    method = "spearman")[  # rank (not product-moment) correlation
+      -(1:2), 1:2])  # subset relevant correlations
+
+# extract relevant species:
+cor_func_spp <-
+  cor_cap_func_spp[which(  # correlation coefficient >= x
+    if (length(env_vars_cap) > 1) {
+      abs(cor_cap_func_spp$CAP1) >= cor_spp_x |
+        abs(cor_cap_func_spp$CAP2) >= cor_spp_x
+    } else {
+      abs(cor_cap_func_spp$CAP1) >= cor_spp_x
+    }
+  ), ]
+
+# ordered vector of names of species with strongest correlations:
+top_func <- rownames(cor_cap_func_spp[order(
+  apply(cor_cap_func_spp, MARGIN = 1, function(x) {max(abs(x))}),
+  decreasing = TRUE), ])
+
+
+
+
 
 
 
