@@ -143,7 +143,7 @@ simp_li_func_plot <- simp_tab(simp_li_func_plot_transf, simp_li_func_plot_untran
 
 # 3. Constrained multivariate analyses =========================================
 
-# ~~ Environmental variables (continuous) --------------------------------------
+# ~ Environmental variables (continuous) ---------------------------------------
 
 # create vector of continuous (summarised, per plot) tree trait variables:
 env_vars_plot <- c(
@@ -163,7 +163,7 @@ env_use_plot <- env_vars_plot  # (currently no variables are excluded)
 
 
 
-# ~~ BIOENV for subsetting environmental variables -----------------------------
+# ~ BIOENV for subsetting environmental variables ------------------------------
 
 # ~~~ taxonomic groups:
 bioenv_taxa_plot <-
@@ -209,7 +209,7 @@ cond_vars_func_plot <-  # specify conditioning variables
 
 
 
-# ~~ 3.2.1 CAP (dbRDA) of lichen communities vs. tree functional traits --------
+# ~ 3.1 CAP (dbRDA) of lichen communities vs. tree functional traits -----------
 
 # ~~~ taxonomic groups:
 
@@ -421,7 +421,7 @@ top_func_plot <- rownames(cor_cap_func_plot_spp[order(
 
 
 
-# ~~ 3.2.2 CAP of lichen communities vs. site ----------------------------------
+# ~ 3.2 CAP of lichen communities vs. site -------------------------------------
 
 # output data for CAP analysis in FORTRAN program:
 # (NB -- for testing classification success/goodness of fit, which is
@@ -723,7 +723,7 @@ simp_li_func <- simp_tab(simp_li_func_transf, simp_li_func_untransf)
 
 # 3. Constrained multivariate analyses =========================================
 
-# ~~ Environmental variables (categorical only) --------------------------------
+# ~ Environmental variables (categorical only) --------------------------------
 
 # create vector of categorical tree trait variables:
 env_vars <- c('girth', 'bark', 'pH', 'buttress', 'dipterocarp')
@@ -734,7 +734,7 @@ env_use <- env_vars  # (currently no variables are excluded)
 
 
 
-# ~~ BIOENV for subsetting environmental variables -----------------------------
+# ~ BIOENV for subsetting environmental variables -----------------------------
 # (NB -- ordinal/categorical only)
 
 # ~~~ taxonomic groups:
@@ -782,7 +782,7 @@ cond_vars_func <-  # specify conditioning variables
 
 
 
-# ~~ CAP (dbRDA) of lichen communities vs. tree functional traits --------------
+# ~ CAP (dbRDA) of lichen communities vs. tree functional traits --------------
 
 # (NB -- use vegan::capscale, as it allows multiple factors as constraints;
 # 'traditional' CAP [PRIMER or FORTRAN program] only allows a single factor
