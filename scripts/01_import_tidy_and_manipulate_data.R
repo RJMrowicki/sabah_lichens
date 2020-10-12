@@ -108,6 +108,9 @@ dd_lichen_traits <-  # create new data frame
   # arrange rows alphabetically by functional group code:
   arrange(`code`)
 
+# create vector of lichen trait names:
+lichen_traits <- names(dplyr::select(dd_lichen_traits, -`code`))
+
 
 
 
@@ -243,11 +246,13 @@ lichens_func_dbfd <-
 
 # calculate distance-based FD indices & trait CWMs (for subsetted data):
 # (NB -- suppress calculation of FRic and FDiv [via `calc.FRic = FALSE`]
-# owing to convex hull calculation errors [`geometry::convexhulln()`])
+# owing to convex hull calculation errors [`geometry::convexhulln()`];
+# also, calculate trait CWM as abundance of each individual class ['all'],
+# rather than dominant class ['dom' <default>], for categorical traits.)
 lichens_dbfd <-
   dbFD(
     lichen_traits_dbfd, dplyr::select(lichens_func_dbfd, -`tree`),
-    calc.FRic = FALSE
+    calc.FRic = FALSE, CWM.type = "all"
   )
 if (file.exists("vert.txt")) {
   file.remove("vert.txt")  # remove 'vertices' file output by function
@@ -263,7 +268,10 @@ dd_lichens_func <-
       lichens_dbfd[c("FEve", "FDis")],  # dbFD indices
       as_tibble(lichens_dbfd$CWM)  # trait CWMs
     )
-  )
+  ) %>%
+  # replace NAs in trait CWM columns with 0:
+  # (NB -- only if CWMs are calculated via 'all', NOT 'dom')
+  mutate_at(vars(contains(lichen_traits)), ~ replace_na(., 0))
 
 
 
@@ -358,7 +366,10 @@ lichens_func_plot_dbfd <-
 
 # calculate distance-based FD indices (for subsetted data):
 lichens_dbfd_plot <-
-  dbFD(lichen_traits_dbfd, dplyr::select(lichens_func_plot_dbfd, -`plot`))
+  dbFD(
+    lichen_traits_dbfd, dplyr::select(lichens_func_plot_dbfd, -`plot`),
+    CWM.type = "all"
+  )
 if (file.exists("vert.txt")) {
   file.remove("vert.txt")  # remove 'vertices' file output by function
 }
@@ -373,7 +384,10 @@ lichens_func_plot <-
       lichens_dbfd_plot[c("FRic", "FEve", "FDiv", "FDis")],  # dbFD indices
       as_tibble(lichens_dbfd_plot$CWM)  # trait CWMs
     )
-  )
+  ) %>%
+  # replace NAs in trait CWM columns with 0:
+  # (NB -- only if CWMs are calculated via 'all', NOT 'dom')
+  mutate_at(vars(contains(lichen_traits)), ~ replace_na(., 0))
 
 
 

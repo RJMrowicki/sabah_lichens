@@ -62,6 +62,10 @@ li_func_plot_fdis_ph <- read_csv('./primer/results/li_func_plot_fdis_ph.csv')
 # (NB -- use write.csv() instead of write_csv(), as require rownames)
 write.csv(tree_lichens_taxa_plot[, lichen_taxa], './primer/li_taxa_plot.csv')
 write.csv(tree_lichens_func_plot[, lichen_func_grps], './primer/li_func_plot.csv')
+write.csv(
+  dplyr::select(tree_lichens_func_plot, contains(lichen_traits)),
+  './primer/li_traits_plot.csv'
+)
 # ~ corresponding factors (i.e. `site` only) output above.
 
 
@@ -74,6 +78,8 @@ perm_li_taxa_plot <- read_csv('./primer/results/perm_li_taxa_plot.csv')
 perm_li_taxa_plot_ph <- read_csv('./primer/results/perm_li_taxa_plot_ph.csv')
 perm_li_func_plot <- read_csv('./primer/results/perm_li_func_plot.csv')
 perm_li_func_plot_ph <- read_csv('./primer/results/perm_li_func_plot_ph.csv')
+perm_li_traits_plot <- read_csv('./primer/results/perm_li_traits_plot.csv')
+perm_li_traits_plot_ph <- read_csv('./primer/results/perm_li_traits_plot_ph.csv')
 
 
 
@@ -90,6 +96,15 @@ mds_li_taxa_plot <- mds(  # custom mds function
 mds_li_func_plot <- mds(
   # log10(x+1)-transformed data and zero-adjusted Bray-Curtis:
   cbind(log10(tree_lichens_func_plot[, lichen_func_grps] + 1), dummy_func_plot)
+)
+
+# ~~ lichen traits:
+mds_li_traits_plot <- mds(
+  # log10(x+1)-transformed data and zero-adjusted Bray-Curtis:
+  cbind(
+    log10(dplyr::select(tree_lichens_func_plot, contains(lichen_traits)) + 1),
+    dummy_func_plot
+  )
 )
 
 
@@ -137,6 +152,34 @@ simp_li_func_plot_transf <- simper(
 
 # produce summary table:
 simp_li_func_plot <- simp_tab(simp_li_func_plot_transf, simp_li_func_plot_untransf)
+
+
+
+
+# ~~ lichen traits:
+
+simp_li_traits_plot_untransf <- simper(
+  # include dummy taxa to avoid empty row errors:
+  cbind(
+    dplyr::select(tree_lichens_func_plot, contains(lichen_traits)),
+    dummy_func_plot
+  ),
+  if_else(tree_lichens_func_plot$site == 'S', 'S', '(D,M)')  # (D,M) vs. S
+)
+# summary(simp_li_traits_plot_untransf)
+
+simp_li_traits_plot_transf <- simper(
+  # log10(x+1)-transform functional group data, not dummy data:
+  cbind(
+    log10(dplyr::select(tree_lichens_func_plot, contains(lichen_traits)) + 1),
+    dummy_func_plot
+  ),
+  if_else(tree_lichens_func_plot$site == 'S', 'S', '(D,M)')  # (D,M) vs. S
+)
+# summary(simp_li_traits_plot_transf)
+
+# produce summary table:
+simp_li_traits_plot <- simp_tab(simp_li_traits_plot_transf, simp_li_traits_plot_untransf)
 
 
 
@@ -640,6 +683,10 @@ li_taxa_h_ph <- read_csv('./primer/results/li_taxa_h_ph.csv')
 # (NB -- use write.csv() instead of write_csv(), as require rownames)
 write.csv(dd_tree_lichens_taxa[, lichen_taxa], './primer/li_taxa.csv')
 write.csv(dd_tree_lichens_func[, lichen_func_grps], './primer/li_func.csv')
+write.csv(
+  dplyr::select(dd_tree_lichens_func, contains(lichen_traits)),
+  './primer/li_traits.csv'
+)
 # ~ corresponding factors (i.e. `site` and `plot`) output above.
 
 
@@ -652,13 +699,16 @@ perm_li_taxa <- read_csv('./primer/results/perm_li_taxa.csv')
 perm_li_taxa_ph <- read_csv('./primer/results/perm_li_taxa_ph.csv')
 perm_li_func <- read_csv('./primer/results/perm_li_func.csv')
 perm_li_func_ph <- read_csv('./primer/results/perm_li_func_ph.csv')
+perm_li_traits <- read_csv('./primer/results/perm_li_traits.csv')
+perm_li_traits_ph <- read_csv('./primer/results/perm_li_traits_ph.csv')
 
 
 
 
 # ~ 2.2 MDS ordinations of lichen community structure ('tree-level') -----------
 # (NB -- no convergence after multiple iterations;
-# unless no. of dimensions [k] is set to 3...)
+# unless no. of dimensions [k] is set to 3...;
+# also, likely insufficient data for lichen traits MDS [error message].)
 
 # ~~ taxonomic groups:
 mds_li_taxa <- mds(  # custom mds function
@@ -670,6 +720,15 @@ mds_li_taxa <- mds(  # custom mds function
 mds_li_func <- mds(
   # log10(x+1)-transformed data and zero-adjusted Bray-Curtis:
   cbind(log10(dd_tree_lichens_func[, lichen_func_grps] + 1), dummy_func)
+)
+
+# ~~ lichen traits:
+mds_li_traits <- mds(
+  # log10(x+1)-transformed data and zero-adjusted Bray-Curtis:
+  cbind(
+    log10(dplyr::select(dd_tree_lichens_func, contains(lichen_traits)) + 1),
+    dummy_func
+  )
 )
 
 
