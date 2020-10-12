@@ -179,7 +179,8 @@ simp_li_traits_plot_transf <- simper(
 # summary(simp_li_traits_plot_transf)
 
 # produce summary table:
-simp_li_traits_plot <- simp_tab(simp_li_traits_plot_transf, simp_li_traits_plot_untransf)
+simp_li_traits_plot <-
+  simp_tab(simp_li_traits_plot_transf, simp_li_traits_plot_untransf)
 
 
 
@@ -776,6 +777,35 @@ simp_li_func_transf <- simper(
 
 # produce summary table:
 simp_li_func <- simp_tab(simp_li_func_transf, simp_li_func_untransf)
+
+
+
+
+# ~~ lichen traits:
+
+simp_li_traits_untransf <- simper(
+  # include dummy taxa to avoid empty row errors:
+  cbind(
+    dplyr::select(dd_tree_lichens_func, contains(lichen_traits)),
+    dummy_func
+  ),
+  if_else(dd_tree_lichens_func$site == 'S', 'S', '(D,M)')  # (D,M) vs. S
+)
+# summary(simp_li_traits_untransf)
+
+simp_li_traits_transf <- simper(
+  # log10(x+1)-transform functional group data, not dummy data:
+  cbind(
+    log10(dplyr::select(dd_tree_lichens_func, contains(lichen_traits)) + 1),
+    dummy_func
+  ),
+  if_else(dd_tree_lichens_func$site == 'S', 'S', '(D,M)')  # (D,M) vs. S
+)
+# summary(simp_li_traits_transf)
+
+# produce summary table:
+simp_li_traits <-
+  simp_tab(simp_li_traits_transf, simp_li_traits_untransf)
 
 
 
