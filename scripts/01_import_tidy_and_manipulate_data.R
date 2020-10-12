@@ -187,7 +187,7 @@ missing_trees <- tree_nos[
 
 # ~ Tree-level -----------------------------------------------------------------
 
-# calculate lichen diversity indices:
+# ~~ calculate lichen diversity indices ----------------------------------------
 
 # ~ taxonomic groups:
 dd_lichens_taxa <- dd_lichens_taxa %>%
@@ -241,7 +241,7 @@ lichens_func_dbfd <-
   # remove data (rows) for trees with zero summed abundance:
   filter(rowSums(dplyr::select(., all_of(lichen_func_grps_included))) != 0)
 
-# calculate distance-based FD indices (for subsetted data):
+# calculate distance-based FD indices & trait CWMs (for subsetted data):
 # (NB -- suppress calculation of FRic and FDiv [via `calc.FRic = FALSE`]
 # owing to convex hull calculation errors [`geometry::convexhulln()`])
 lichens_dbfd <-
@@ -260,14 +260,15 @@ dd_lichens_func <-
   left_join(
     bind_cols(
       enframe(lichens_func_dbfd$tree, name = NULL, value = "tree"),
-      lichens_dbfd[c("FEve", "FDis")]
+      lichens_dbfd[c("FEve", "FDis")],  # dbFD indices
+      as_tibble(lichens_dbfd$CWM)  # trait CWMs
     )
   )
 
 
 
 
-# tree functional trait data:
+# ~~ tree functional trait data (add missing pH) -------------------------------
 
 # create lookup table of overall mean pH per bark type category:
 mean_pH_bark <-
@@ -296,7 +297,7 @@ dd_trees_func <-
 
 
 
-# combine lichen and tree datasets:
+# ~~ combine lichen and tree datasets: -----------------------------------------
 
 dd_tree_lichens_taxa <-  # taxonomic groups
   # perform 'left join' with tree dataset as 'x':
@@ -305,6 +306,7 @@ dd_tree_lichens_taxa <-  # taxonomic groups
   filter(is.na(rowSums(.[, lichen_taxa])) == FALSE)
 
 dd_tree_lichens_func <-  # functional groups
+  # (NB -- includes abundances, dbFD indices AND trait CWMs)
   # perform 'left join' with tree dataset as 'x':
   left_join(dd_trees_func, dd_lichens_func) %>%
   # remove rows for which there are no lichen functional group data:
@@ -319,7 +321,7 @@ dummy_func <- rep(1, nrow(dd_tree_lichens_func))
 
 # ~ Plot-level -----------------------------------------------------------------
 
-# lichen abundance data:
+# ~~ sum lichen abundance data and calculate diversity indices: ----------------
 
 # ~ taxonomic groups:
 lichens_taxa_plot <- dd_lichens_taxa %>%
@@ -352,10 +354,11 @@ lichens_func_plot0 <- dd_lichens_func %>%
 lichens_func_plot_dbfd <-
   lichens_func_plot0 %>%
   # remove data (columns) for func. groups not shared with traits matrix:
-  dplyr::select(all_of(lichen_func_grps_included))
+  dplyr::select(`plot`, all_of(lichen_func_grps_included))
 
 # calculate distance-based FD indices (for subsetted data):
-lichens_dbfd_plot <- dbFD(lichen_traits_dbfd, lichens_func_plot_dbfd)
+lichens_dbfd_plot <-
+  dbFD(lichen_traits_dbfd, dplyr::select(lichens_func_plot_dbfd, -`plot`))
 if (file.exists("vert.txt")) {
   file.remove("vert.txt")  # remove 'vertices' file output by function
 }
@@ -363,12 +366,19 @@ if (file.exists("vert.txt")) {
 # add to (initial) data frame of lichen functional diversity indices:
 lichens_func_plot <-
   lichens_func_plot0 %>%
-  bind_cols(lichens_dbfd_plot[c("FRic", "FEve", "FDiv", "FDis")])
+  # left join by `tree` (combine with dbFD output first):
+  left_join(
+    bind_cols(
+      enframe(lichens_func_plot_dbfd$plot, name = NULL, value = "plot"),
+      lichens_dbfd_plot[c("FRic", "FEve", "FDiv", "FDis")],  # dbFD indices
+      as_tibble(lichens_dbfd_plot$CWM)  # trait CWMs
+    )
+  )
 
 
 
 
-# tree functional trait data:
+# ~~ summarise tree functional trait data: -------------------------------------
 
 # calculate 'diversity' of tree trait categories per plot:
 # ~ bark:
@@ -418,7 +428,7 @@ trees_func_plot <- reduce(
 
 
 
-# combine lichen and tree datasets:
+# ~~ combine lichen and tree datasets: -----------------------------------------
 
 tree_lichens_taxa_plot <-  # taxonomic groups
   # perform 'left join' with tree dataset as 'x':
