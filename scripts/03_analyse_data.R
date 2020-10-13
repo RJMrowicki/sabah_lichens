@@ -1008,6 +1008,60 @@ for (i in 1:m_max) {
 
 
 
+# 4. Indicator Value analyses ==================================================
+
+# ~ taxonomic groups:
+indval_taxa_plot <-
+  multipatt(  # run IndVal analysis (`indicspecies::multipatt`)
+    tree_lichens_taxa_plot[, lichen_taxa], tree_lichens_taxa_plot$site,
+    control = how(nperm = n_perm)  # no. permutations for significance testing
+    # (NB -- use default 'IndVal.g' index as test statistic;
+    # no minimum/maximum order of site group combinations.)
+  )
+# summary:
+# (NB -- summary output is not captured by assigning it to an object;
+# use `capture.output()`, or similar, to store output as character strings...)
+indval_taxa_plot_summ <-
+  summary(
+    indval_taxa_plot,
+    # include A ('specificity') and B ('fidelity') values;
+    # display all species associated with each group, regardless of whether
+    # the association is significant (perm. p-value; default `alpha = 0.05`)
+    # (NB -- species occurring in sites belonging to all groups are not visible,
+    # as significance cannot be tested -- check `.$sign`):
+    indvalcomp = TRUE, alpha = 1
+  )
+# (may use `strassoc()` to calculate these indices with bootstrap CIs;
+# also consider examining species **combinations** via `indicators()`.)
+
+
+
+
+# ~ functional groups:
+indval_func_plot <-
+  multipatt(  # IndVal analysis
+    tree_lichens_func_plot[, lichen_func_grps], tree_lichens_func_plot$site,
+    control = how(nperm = n_perm)
+  )
+# summary:
+indval_func_plot_summ <- summary(indval_func_plot, indvalcomp = TRUE, alpha = 1)
+
+
+
+
+# ~ lichen_traits:
+indval_traits_plot <-
+  multipatt(  # IndVal analysis
+    dplyr::select(tree_lichens_func_plot, contains(lichen_traits)),
+    tree_lichens_func_plot$site,
+    control = how(nperm = n_perm)  # no. permutations for significance testing
+  )
+# summary:
+indval_traits_plot_summ <- summary(indval_traits_plot, indvalcomp = TRUE, alpha = 1)
+
+
+
+
 # B. SUPPLEMENTARY ANALYSES ====================================================
 
 # 1. Univariate analyses =======================================================
