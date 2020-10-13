@@ -29,7 +29,9 @@ write_csv(tree_lichens_taxa_plot[, 'site'], './primer/factors_taxa_plot.csv')
 write_csv(tree_lichens_func_plot[, 'site'], './primer/factors_func_plot.csv')
 
 
+# ###
 # ### PERANOVA analysis in PRIMER here ###
+# ###
 
 
 # import results of PERANOVA analysis in PRIMER:
@@ -70,7 +72,9 @@ write.csv(
 # ~ corresponding factors (i.e. `site` only) output above.
 
 
+# ###
 # ### PERMANOVA analysis in PRIMER here ###
+# ###
 
 
 # import results of PERMANOVA analysis in PRIMER:
@@ -599,7 +603,9 @@ top_traits_plot <- rownames(cor_cap_traits_plot_spp[order(
 
 
 
-# ~ 3.2 CAP of lichen communities vs. site -------------------------------------
+# ~ 3.2 CAP of lichen communities vs. site ('plot-level') ----------------------
+
+# ~~ 3.2a FORTRAN CAP.exe ------------------------------------------------------
 
 # output data for CAP analysis in FORTRAN program:
 # (NB -- for testing classification success/goodness of fit, which is
@@ -625,7 +631,9 @@ write_csv(
 # tree_lichens_taxa_plot %>% group_by(site) %>% summarise(n = n())
 
 
+# ###
 # ### CAP analysis via FORTRAN program here ###
+# ###
 
 
 # (NB -- log10(x+1) transform data, zero-adjusted Bray-Curtis [i.e. include dummy];
@@ -862,6 +870,144 @@ succ_cap_traits_site_plot <-
 
 
 
+# ~~ 3.2b BiodiversityR::CAPdiscrim() ------------------------------------------
+
+# (NB -- log(x+1)-transformed data tends to produce warnings resulting from
+# negative Eigenvalues, and reduces overall classification success...
+# therefore use untransformed data[?])
+
+# ~~~ taxonomic groups:
+
+dist_taxa_plot <-  # pre-calculate dissimilarity matrix for CAPdiscrim()
+  vegdist(
+    # # log10(x+1)-transformed data and zero-adjusted Bray-Curtis:
+    # cbind(log10(tree_lichens_taxa_plot[, lichen_taxa] + 1), dummy_taxa_plot),
+    cbind(tree_lichens_taxa_plot[, lichen_taxa], dummy_taxa_plot),
+    method = "bray"
+  )
+
+cap_taxa_plot_site <- 
+  CAPdiscrim(  # run CAP analysis (BiodiversityR::CAPdiscrim)
+    dist_taxa_plot ~ site,  # vs. site (categorical) only
+    # NB -- environmental data as data frame, not tibble:
+    data = as.data.frame(tree_lichens_taxa_plot),
+    # allow calculation of no. of axes providing best distinction between groups
+    # (NB -- takes excessively long time if including permutation tests);
+    # otherwise, specify no. of axes resulting in highest classification success:
+    m = 0, add = TRUE #, permutations = n_perm  
+  )
+
+
+# plot classification success for sequential values of m:
+m_max <- 15  # specify max no. of axes
+
+plot(  # create blank plot
+  1:m_max, rep(-1000, m_max), type = "n",
+  xlim = c(0, m_max), ylim = c(0, 100),
+  xlab = "m", ylab = "Classification success (%)"
+)
+
+for (i in 1:m_max) {
+  cap_result <- CAPdiscrim(
+    dist_taxa_plot ~ site,
+    data = as.data.frame(tree_lichens_taxa_plot),
+    axes = 2, m = i, add = TRUE)
+  points(i, cap_result$percent)
+}
+
+
+
+
+# ~~~ functional groups:
+
+dist_func_plot <-  # pre-calculate dissimilarity matrix for CAPdiscrim()
+  vegdist(
+    # # log10(x+1)-transformed data and zero-adjusted Bray-Curtis:
+    # cbind(log10(tree_lichens_func_plot[, lichen_func_grps] + 1), dummy_func_plot),
+    cbind(tree_lichens_func_plot[, lichen_func_grps], dummy_func_plot),
+    method = "bray"
+  )
+
+cap_func_plot_site <- 
+  CAPdiscrim(  # run CAP analysis (BiodiversityR::CAPdiscrim)
+    dist_func_plot ~ site,  # vs. site (categorical) only
+    # NB -- environmental data as data frame, not tibble:
+    data = as.data.frame(tree_lichens_taxa_plot),
+    # allow calculation of no. of axes providing best distinction between groups
+    # (NB -- takes excessively long time if including permutation tests);
+    # otherwise, specify no. of axes resulting in highest classification success:
+    m = 0, add = TRUE #, permutations = n_perm  
+  )
+
+
+# plot classification success for sequential values of m:
+m_max <- 15  # specify max no. of axes
+
+plot(  # create blank plot
+  1:m_max, rep(-1000, m_max), type = "n",
+  xlim = c(0, m_max), ylim = c(0, 100),
+  xlab = "m", ylab = "Classification success (%)"
+)
+
+for (i in 1:m_max) {
+  cap_result <- CAPdiscrim(
+    dist_func_plot ~ site,
+    data = as.data.frame(tree_lichens_func_plot),
+    axes = 2, m = i, add = TRUE)
+  points(i, cap_result$percent)
+}
+
+
+
+
+# ~~~ lichen traits:
+
+dist_traits_plot <-  # pre-calculate dissimilarity matrix for CAPdiscrim()
+  vegdist(
+    # # log10(x+1)-transformed data and zero-adjusted Bray-Curtis:
+    # cbind(
+    #   log10(dplyr::select(tree_lichens_func_plot, contains(lichen_traits)) + 1),
+    #   dummy_func_plot
+    # ),
+    cbind(
+      dplyr::select(tree_lichens_func_plot, contains(lichen_traits)),
+      dummy_func_plot
+    ),
+    method = "bray"
+  )
+
+cap_traits_plot_site <- 
+  CAPdiscrim(  # run CAP analysis (BiodiversityR::CAPdiscrim)
+    dist_traits_plot ~ site,  # vs. site (categorical) only
+    # NB -- environmental data as data frame, not tibble:
+    data = as.data.frame(tree_lichens_taxa_plot),
+    # allow calculation of no. of axes providing best distinction between groups
+    # (NB -- takes excessively long time if including permutation tests);
+    # otherwise, specify no. of axes resulting in highest classification success:
+    m = 0, add = TRUE #, permutations = n_perm  
+  )
+
+
+# plot classification success for sequential values of m:
+m_max <- 15  # specify max no. of axes
+
+plot(  # create blank plot
+  1:m_max, rep(-1000, m_max), type = "n",
+  xlim = c(0, m_max), ylim = c(0, 100),
+  xlab = "m", ylab = "Classification success (%)"
+)
+
+for (i in 1:m_max) {
+  cap_result <- CAPdiscrim(
+    dist_traits_plot ~ site,
+    data = as.data.frame(tree_lichens_func_plot),
+    axes = 2, m = i, add = TRUE)
+  points(i, cap_result$percent)
+}
+
+
+
+
 # B. SUPPLEMENTARY ANALYSES ====================================================
 
 # 1. Univariate analyses =======================================================
@@ -881,7 +1027,9 @@ write.csv(dd_tree_lichens_taxa[, "1-L"], './primer/li_taxa_1-l.csv')
 write_csv(dd_tree_lichens_taxa[, c('site', 'plot')], './primer/factors_taxa.csv')
 
 
+# ###
 # ### PERANOVA analysis in PRIMER here ###
+# ###
 
 
 # import results of PERANOVA analysis in PRIMER:
@@ -913,7 +1061,9 @@ write.csv(
 # ~ corresponding factors (i.e. `site` and `plot`) output above.
 
 
+# ###
 # ### PERMANOVA analysis in PRIMER here ###
+# ###
 
 
 # import results of PERMANOVA analysis in PRIMER:
@@ -1034,7 +1184,7 @@ simp_li_traits <-
 
 # 3. Constrained multivariate analyses =========================================
 
-# ~ Environmental variables (categorical only) --------------------------------
+# ~ Environmental variables (categorical) --------------------------------------
 
 # create vector of categorical tree trait variables:
 env_vars <- c('girth', 'bark', 'pH', 'buttress', 'dipterocarp')
@@ -1422,146 +1572,3 @@ cor_traits_spp <-
 top_traits <- rownames(cor_cap_traits_spp[order(
   apply(cor_cap_traits_spp, MARGIN = 1, function(x) {max(abs(x))}),
   decreasing = TRUE), ])
-
-
-
-
-
-
-
-
-################################################################################
-
-# (testing use of BiodiversityR::CAPdiscrim. NB -- log(x+1)-transformed data
-# tends to produce warnings resulting from negative Eigenvalues, as well as
-# reducing overall classification success... therefore use untransformed data[?])
-
-
-# ~~~ taxonomic groups:
-
-dist_taxa_plot <-  # pre-calculate dissimilarity matrix for CAPdiscrim()
-  vegdist(
-    # # log10(x+1)-transformed data and zero-adjusted Bray-Curtis:
-    # cbind(log10(tree_lichens_taxa_plot[, lichen_taxa] + 1), dummy_taxa_plot),
-    cbind(tree_lichens_taxa_plot[, lichen_taxa], dummy_taxa_plot),
-    method = "bray"
-  )
-
-cap_taxa_plot_site <- 
-  CAPdiscrim(  # run CAP analysis (BiodiversityR::CAPdiscrim)
-    dist_taxa_plot ~ site,  # vs. site (categorical) only
-    # NB -- environmental data as data frame, not tibble:
-    data = as.data.frame(tree_lichens_taxa_plot),
-    # allow calculation of no. of axes providing best distinction between groups
-    # (NB -- takes excessively long time if including permutation tests);
-    # otherwise, specify no. of axes resulting in highest classification success:
-    m = 0, add = TRUE #, permutations = n_perm  
-  )
-
-
-# plot classification success for sequential values of m:
-m_max <- 15  # specify max no. of axes
-
-plot(  # create blank plot
-  1:m_max, rep(-1000, m_max), type = "n",
-  xlim = c(0, m_max), ylim = c(0, 100),
-  xlab = "m", ylab = "Classification success (%)"
-)
-
-for (i in 1:m_max) {
-  cap_result <- CAPdiscrim(
-    dist_taxa_plot ~ site,
-    data = as.data.frame(tree_lichens_taxa_plot),
-    axes = 2, m = i, add = TRUE)
-  points(i, cap_result$percent)
-}
-
-
-
-
-# ~~~ functional groups:
-
-dist_func_plot <-  # pre-calculate dissimilarity matrix for CAPdiscrim()
-  vegdist(
-    # # log10(x+1)-transformed data and zero-adjusted Bray-Curtis:
-    # cbind(log10(tree_lichens_func_plot[, lichen_func_grps] + 1), dummy_func_plot),
-    cbind(tree_lichens_func_plot[, lichen_func_grps], dummy_func_plot),
-    method = "bray"
-  )
-
-cap_func_plot_site <- 
-  CAPdiscrim(  # run CAP analysis (BiodiversityR::CAPdiscrim)
-    dist_func_plot ~ site,  # vs. site (categorical) only
-    # NB -- environmental data as data frame, not tibble:
-    data = as.data.frame(tree_lichens_taxa_plot),
-    # allow calculation of no. of axes providing best distinction between groups
-    # (NB -- takes excessively long time if including permutation tests);
-    # otherwise, specify no. of axes resulting in highest classification success:
-    m = 0, add = TRUE #, permutations = n_perm  
-  )
-
-
-# plot classification success for sequential values of m:
-m_max <- 15  # specify max no. of axes
-
-plot(  # create blank plot
-  1:m_max, rep(-1000, m_max), type = "n",
-  xlim = c(0, m_max), ylim = c(0, 100),
-  xlab = "m", ylab = "Classification success (%)"
-)
-
-for (i in 1:m_max) {
-  cap_result <- CAPdiscrim(
-    dist_func_plot ~ site,
-    data = as.data.frame(tree_lichens_func_plot),
-    axes = 2, m = i, add = TRUE)
-  points(i, cap_result$percent)
-}
-
-
-
-
-# ~~~ lichen traits:
-
-dist_traits_plot <-  # pre-calculate dissimilarity matrix for CAPdiscrim()
-  vegdist(
-    # # log10(x+1)-transformed data and zero-adjusted Bray-Curtis:
-    # cbind(
-    #   log10(dplyr::select(tree_lichens_func_plot, contains(lichen_traits)) + 1),
-    #   dummy_func_plot
-    # ),
-    cbind(
-      dplyr::select(tree_lichens_func_plot, contains(lichen_traits)),
-      dummy_func_plot
-    ),
-    method = "bray"
-  )
-
-cap_traits_plot_site <- 
-  CAPdiscrim(  # run CAP analysis (BiodiversityR::CAPdiscrim)
-    dist_traits_plot ~ site,  # vs. site (categorical) only
-    # NB -- environmental data as data frame, not tibble:
-    data = as.data.frame(tree_lichens_taxa_plot),
-    # allow calculation of no. of axes providing best distinction between groups
-    # (NB -- takes excessively long time if including permutation tests);
-    # otherwise, specify no. of axes resulting in highest classification success:
-    m = 0, add = TRUE #, permutations = n_perm  
-  )
-
-
-# plot classification success for sequential values of m:
-m_max <- 15  # specify max no. of axes
-
-plot(  # create blank plot
-  1:m_max, rep(-1000, m_max), type = "n",
-  xlim = c(0, m_max), ylim = c(0, 100),
-  xlab = "m", ylab = "Classification success (%)"
-)
-
-for (i in 1:m_max) {
-  cap_result <- CAPdiscrim(
-    dist_traits_plot ~ site,
-    data = as.data.frame(tree_lichens_func_plot),
-    axes = 2, m = i, add = TRUE)
-  points(i, cap_result$percent)
-}
