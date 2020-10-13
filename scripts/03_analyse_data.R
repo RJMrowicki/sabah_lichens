@@ -58,10 +58,11 @@ li_func_plot_fdis_ph <- read_csv('./primer/results/li_func_plot_fdis_ph.csv')
 # ~ 2.1 PERMANOVAs of lichen community structure vs. site ('plot-level') -------
 
 # output data for PERMANOVA analysis in PRIMER:
-# ~ lichen taxonomic and functional group abundances:
 # (NB -- use write.csv() instead of write_csv(), as require rownames)
+# ~ lichen taxonomic and functional group abundances:
 write.csv(tree_lichens_taxa_plot[, lichen_taxa], './primer/li_taxa_plot.csv')
 write.csv(tree_lichens_func_plot[, lichen_func_grps], './primer/li_func_plot.csv')
+# ~ lichen trait CWMs:
 write.csv(
   dplyr::select(tree_lichens_func_plot, contains(lichen_traits)),
   './primer/li_traits_plot.csv'
@@ -230,6 +231,8 @@ cond_vars_taxa_plot <-  # specify conditioning variables
   env_use_plot[-which(env_use_plot %in% bioenv_vars_taxa_plot)]
 
 
+
+
 # ~~~ functional groups:
 bioenv_func_plot <-
   bioenv(  # run BIOENV analysis (vegan::bioenv)
@@ -253,10 +256,35 @@ cond_vars_func_plot <-  # specify conditioning variables
 
 
 
+# ~~~ lichen traits:
+bioenv_traits_plot <-
+  bioenv(  # run BIOENV analysis (vegan::bioenv)
+    # log10(x+1)-transformed data and zero-adjusted Bray-Curtis:
+    cbind(
+      log10(dplyr::select(tree_lichens_func_plot, contains(lichen_traits)) + 1),
+      dummy_func_plot
+    ),
+    # vs. z-standardised environmental data:
+    z_std(tree_lichens_func_plot[, env_use_plot]),
+    method = "spearman", index = "bray", metric = "euclidean"
+  )
+
+bioenv_traits_plot_rho <-  # extract correlation coefficient
+  max(summary(bioenv_traits_plot)$correlation)
+
+bioenv_vars_traits_plot <-  # extract variables to use in CAP
+  summary(bioenv_traits_plot)$variables[bioenv_traits_plot$whichbest]
+bioenv_vars_traits_plot <- strsplit(bioenv_vars_traits_plot, " ")[[1]]
+
+cond_vars_traits_plot <-  # specify conditioning variables
+  env_use_plot[-which(env_use_plot %in% bioenv_vars_traits_plot)]
+
+
+
+
 # ~ 3.1 CAP (dbRDA) of lichen communities vs. tree functional traits -----------
 
 # ~~~ taxonomic groups:
-
 env_vars_cap_plot <- bioenv_vars_taxa_plot  # specify variables used in CAP
 
 cap_taxa_plot <-
@@ -361,7 +389,6 @@ top_taxa_plot <- rownames(cor_cap_taxa_plot_spp[order(
 
 
 # ~~~ functional groups:
-
 env_vars_cap_plot <- bioenv_vars_func_plot  # specify variables used in CAP
 
 cap_func_plot <-
@@ -465,13 +492,120 @@ top_func_plot <- rownames(cor_cap_func_plot_spp[order(
 
 
 
+# ~~~ lichen traits:
+env_vars_cap_plot <- bioenv_vars_traits_plot  # specify variables used in CAP
+
+cap_traits_plot <-
+  capscale(  # run CAP analysis (vegan::capscale)
+    formula(paste0(
+      # log10(x+1)-transformed data and zero-adjusted Bray-Curtis:
+      "cbind(
+        log10(dplyr::select(tree_lichens_func_plot, contains(lichen_traits)) + 1),
+        dummy_func_plot
+      ) ~ ",
+      paste0(strsplit(env_vars_cap_plot, split = " "), collapse = " + ")
+    )),
+    # vs. z-standardised environmental data:
+    data = z_std(tree_lichens_func_plot[, env_vars_cap_plot]),
+    distance = "bray"  # specify Bray-Curtis dissimilarity
+  )
+
+
+# extract proportions explained, for total and constrained:
+# ~ axis 1:
+prop_cap1_traits_plot <- summary(cap_traits_plot)$cont[[1]][2, "CAP1"]*100
+prop_cap1_con_traits_plot <- summary(cap_traits_plot)$concont[[1]][2, "CAP1"]*100
+# ~ axis 2:
+# (NB -- if only one environmental variable used, CAP2 is irrelevant)
+if (length(env_vars_cap_plot) > 1) {
+  prop_cap2_traits_plot <- summary(cap_traits_plot)$cont[[1]][2, "CAP2"]*100
+  prop_cap2_con_traits_plot <- summary(cap_traits_plot)$concont[[1]][2, "CAP2"]*100
+} else {
+  prop_cap2_traits_plot <- prop_cap2_con_traits_plot <- NULL
+}
+
+# calculate squared canonical correlation(s):
+delta_sq_traits_plot <-  # create empty vector
+  vector(length = length(env_vars_cap_plot))
+
+for(i in 1:length(env_vars_cap_plot)) {
+  delta_sq_traits_plot[i] <-  # assign to relevant item
+    cor(  # calculate Pearson correlation coefficient
+      summary(cap_traits_plot)$sites[, i],  # site scores
+      summary(cap_traits_plot)$constraints[, i],  # site constraints
+      method = "pearson"
+    )^2
+}
+
+
+
+
+# test significance of overall analysis and of individual terms:
+anova_cap_traits_plot <-  # overall analysis
+  anova(cap_traits_plot, permutations = n_perm, model = "reduced")
+
+# extract F and P values:
+cap_traits_plot_f <- anova_cap_traits_plot$F[1]
+cap_traits_plot_p <- anova_cap_traits_plot$`Pr(>F)`[1]
+
+anova_cap_traits_plot_term <-  # terms assessed sequentially
+  anova(cap_traits_plot, by = "term", permutations = n_perm, model = "reduced")
+anova_cap_traits_plot_margin <-  # assess marginal effects of terms
+  anova(cap_traits_plot, by = "margin", permutations = n_perm, model = "reduced")
+
+# extract F and P values:
+cap_traits_plot_margin_f <- anova_cap_traits_plot_margin$F[1:length(env_vars_cap_plot)]
+cap_traits_plot_margin_p <- anova_cap_traits_plot_margin$`Pr(>F)`[1:length(env_vars_cap_plot)]
+# rename vector elements according to environmental variables used:
+names(cap_traits_plot_margin_p) <- names(cap_traits_plot_margin_f) <- env_vars_cap_plot
+
+
+
+
+# test environmental and species correlations with axes:
+
+cor_cap_traits_plot_env <-  # ~ environmental
+  as.data.frame(cor(cbind(
+    scores(cap_traits_plot)$sites,  # site scores
+    # z-standardised, subsetted environmental data:
+    z_std(tree_lichens_func_plot[, env_vars_cap_plot])),
+    method = "spearman")[  # rank (not product-moment) correlation
+      -(1:2), 1:2])  # subset relevant correlations
+
+cor_cap_traits_plot_spp <-  # ~ species
+  as.data.frame(cor(cbind(
+    scores(cap_traits_plot)$sites, # site scores
+    # log10(x+1)-transformed abundance data:
+    log10(dplyr::select(tree_lichens_func_plot, contains(lichen_traits)) + 1)),
+    method = "spearman")[  # rank (not product-moment) correlation
+      -(1:2), 1:2])  # subset relevant correlations
+
+# extract relevant species:
+cor_traits_plot_spp <-
+  cor_cap_traits_plot_spp[which(  # correlation coefficient >= x
+    if (length(env_vars_cap_plot) > 1) {
+      abs(cor_cap_traits_plot_spp$CAP1) >= cor_spp_x |
+        abs(cor_cap_traits_plot_spp$CAP2) >= cor_spp_x
+    } else {
+      abs(cor_cap_traits_plot_spp$CAP1) >= cor_spp_x
+    }
+  ), ]
+
+# ordered vector of names of species with strongest correlations:
+top_traits_plot <- rownames(cor_cap_traits_plot_spp[order(
+  apply(cor_cap_traits_plot_spp, MARGIN = 1, function(x) {max(abs(x))}),
+  decreasing = TRUE), ])
+
+
+
+
 # ~ 3.2 CAP of lichen communities vs. site -------------------------------------
 
 # output data for CAP analysis in FORTRAN program:
 # (NB -- for testing classification success/goodness of fit, which is
 # not possible using vegan::capscale)
 
-# ~ lichen taxonomic and functional group diversity:
+# ~ lichen taxonomic and functional group abundances:
 # (NB -- without rownames [hence write_csv()] or column names)
 write_csv(  # (include dummy species)
   cbind(tree_lichens_taxa_plot[, lichen_taxa], dummy_taxa_plot),
@@ -479,6 +613,13 @@ write_csv(  # (include dummy species)
 write_csv(
   cbind(tree_lichens_func_plot[, lichen_func_grps], dummy_func_plot),
   './cap/li_func_plot.txt', col_names = FALSE)
+# ~ lichen trait CWMs:
+write_csv(
+  cbind(
+    dplyr::select(tree_lichens_func_plot, contains(lichen_traits)),
+    dummy_func_plot
+  ),
+  './cap/li_traits_plot.txt', col_names = FALSE)
 
 # (NB -- no need to output factor(s), as specify no. of groups/observations per group:)
 # tree_lichens_taxa_plot %>% group_by(site) %>% summarise(n = n())
@@ -641,6 +782,86 @@ succ_cap_func_site_plot <-
 
 
 
+# ~~ lichen traits:
+
+cap_traits_site_plot_raw <- read_lines('./cap/li_traits_plot_results.txt')
+
+
+# extract canonical axes (i.e. point coordinates):
+
+# determine line number for start of axes table:
+axes_start <- grep(
+  "Canonical Axes (constrained)",
+  cap_traits_site_plot_raw, fixed = TRUE) + 3
+# determine line number for end of table (i.e. start + no. of sites):
+axes_end <- axes_start + nrow(tree_lichens_func_plot)-1
+
+axes_cap_traits_site_plot <-
+  # extract raw lines containing axes table:
+  cap_traits_site_plot_raw[axes_start:axes_end] %>%
+  # split, remove empty elements, remove first element per line:
+  strsplit(" ") %>% map(~.[. != ""]) %>% map(~.[-1]) %>%
+  # convert into matrix:
+  unlist %>% matrix(
+    nrow = nrow(tree_lichens_func_plot), ncol = 2, byrow = TRUE,
+    dimnames = list(NULL, c("CAP1", "CAP2"))
+  ) %>% as.data.frame %>%  # convert into data frame
+  mutate_all(~ as.numeric(as.vector(.)))  # convert character to numeric
+
+
+# extract squared canonical correlation(s):
+delta_sq_traits_site_plot <-
+  # extract raw line containing delta^2 values:
+  cap_traits_site_plot_raw[grep(
+    "Squared Correlations", cap_traits_site_plot_raw, fixed = TRUE
+  ) + 1] %>%
+  # extract actual values (using presence of decimal point):
+  strsplit(" ") %>% unlist %>% grep(".", ., value = TRUE) %>% as.numeric
+
+
+# extract species correlations with axes:
+
+# determine line number for start of correlation table:
+cor_spp_start <- grep(
+  "Correlations of Canonical Axes (Q*) with Original Variables (Y)",
+  cap_traits_site_plot_raw, fixed = TRUE) + 3
+# determine line number for end of table (i.e. start + no. of species):
+cor_spp_end <-
+  cor_spp_start +
+  length(colnames(dplyr::select(tree_lichens_func_plot, contains(lichen_traits))))-1
+
+cor_cap_traits_site_plot_spp <-
+  # extract raw lines containing species correlation table:
+  cap_traits_site_plot_raw[cor_spp_start:cor_spp_end] %>%
+  # split, remove empty elements, remove first element per line:
+  strsplit(" ") %>% map(~.[. != ""]) %>% map(~.[-1]) %>%
+  # convert into matrix:
+  unlist %>% matrix(
+    nrow = length(
+      colnames(dplyr::select(tree_lichens_func_plot, contains(lichen_traits)))
+    ),
+    ncol = 2, byrow = TRUE,
+    dimnames = list(
+      colnames(dplyr::select(tree_lichens_func_plot, contains(lichen_traits))),
+      c("CAP1", "CAP2")
+    )
+  ) %>% as.data.frame %>%  # convert into data frame
+  mutate_all(~ as.numeric(as.vector(.)))  # convert character to numeric
+
+
+# extract group classification success:
+succ_cap_traits_site_plot <-
+  # extract raw line containing classification success:
+  cap_traits_site_plot_raw %>%
+  grep("Total correct", ., fixed = TRUE, value = TRUE) %>%
+  # remove %, split and extract last element:
+  gsub("%", "", .) %>% strsplit(" ") %>% map(~.[length(.)]) %>%
+  # convert to numeric vector:
+  unlist %>% as.numeric
+
+
+
+
 # B. SUPPLEMENTARY ANALYSES ====================================================
 
 # 1. Univariate analyses =======================================================
@@ -680,10 +901,11 @@ li_taxa_h_ph <- read_csv('./primer/results/li_taxa_h_ph.csv')
 # ~ 2.1 PERMANOVAs of lichen community structure vs. site ('tree-level') -------
 
 # output data for PERMANOVA analysis in PRIMER:
-# ~ lichen taxonomic and functional group abundances:
 # (NB -- use write.csv() instead of write_csv(), as require rownames)
+# ~ lichen taxonomic and functional group abundances:
 write.csv(dd_tree_lichens_taxa[, lichen_taxa], './primer/li_taxa.csv')
 write.csv(dd_tree_lichens_func[, lichen_func_grps], './primer/li_func.csv')
+# ~ lichen trait CWMs:
 write.csv(
   dplyr::select(dd_tree_lichens_func, contains(lichen_traits)),
   './primer/li_traits.csv'
@@ -871,7 +1093,33 @@ cond_vars_func <-  # specify conditioning variables
 
 
 
-# ~ CAP (dbRDA) of lichen communities vs. tree functional traits --------------
+# ~~~ lichen traits:
+bioenv_traits <-
+  bioenv(  # run BIOENV analysis (vegan::bioenv)
+    # log10(x+1)-transformed data and zero-adjusted Bray-Curtis:
+    cbind(
+      log10(dplyr::select(dd_tree_lichens_func, contains(lichen_traits)) + 1),
+      dummy_func),
+    # vs. categorical environmental data:
+    dd_tree_lichens_func[, env_use],
+    # NB -- must use "Gower" metric for categorical environmental variables:
+    method = "spearman", index = "bray", metric = "gower"
+  )
+
+bioenv_traits_rho <-  # extract correlation coefficient
+  max(summary(bioenv_traits)$correlation)
+
+bioenv_vars_traits <-  # extract variables to use in CAP
+  summary(bioenv_traits)$variables[bioenv_traits$whichbest]
+bioenv_vars_traits <- strsplit(bioenv_vars_traits, " ")[[1]]
+
+cond_vars_traits <-  # specify conditioning variables
+  env_use[-which(env_use %in% bioenv_vars_traits)]
+
+
+
+
+# ~ 3.1 CAP (dbRDA) of lichen communities vs. tree functional traits -----------
 
 # (NB -- use vegan::capscale, as it allows multiple factors as constraints;
 # 'traditional' CAP [PRIMER or FORTRAN program] only allows a single factor
@@ -879,7 +1127,6 @@ cond_vars_func <-  # specify conditioning variables
 
 
 # ~~~ taxonomic groups:
-
 # specify variables used in CAP:
 env_vars_cap <- bioenv_vars_taxa  # BIOENV subset of categorical variables
 
@@ -979,7 +1226,6 @@ top_taxa <- rownames(cor_cap_taxa_spp[order(
 
 
 # ~~~ functional groups:
-
 # specify variables used in CAP:
 env_vars_cap <- bioenv_vars_func  # BIOENV subset of categorical variables
 
@@ -1078,35 +1324,142 @@ top_func <- rownames(cor_cap_func_spp[order(
 
 
 
+# ~~~ lichen traits:
+# specify variables used in CAP:
+env_vars_cap <- bioenv_vars_traits  # BIOENV subset of categorical variables
+
+cap_traits <-
+  capscale(  # run CAP analysis (vegan::capscale)
+    formula(paste0(
+      # log10(x+1)-transformed data and zero-adjusted Bray-Curtis:
+      "cbind(
+        log10(dplyr::select(dd_tree_lichens_func, contains(lichen_traits)) + 1),
+        dummy_func
+      ) ~ ",
+      paste0(strsplit(env_vars_cap, split = " "), collapse = " + "),
+      "+ Condition(plot)"  # (NB -- `plot` as a conditioning variable)
+    )),
+    data = dd_tree_lichens_func[, c(env_vars_cap, "plot")],
+    distance = "bray")
+
+
+# extract proportions explained, for total and constrained:
+# ~ axis 1:
+prop_cap1_traits <- summary(cap_traits)$cont[[1]][2, "CAP1"]*100
+prop_cap1_con_traits <- summary(cap_traits)$concont[[1]][2, "CAP1"]*100
+# ~ axis 2:
+# (NB -- if only one environmental variable used, CAP2 is irrelevant)
+if (length(env_vars_cap) > 1) {
+  prop_cap2_traits <- summary(cap_traits)$cont[[1]][2, "CAP2"]*100
+  prop_cap2_con_traits <- summary(cap_traits)$concont[[1]][2, "CAP2"]*100
+} else {
+  prop_cap2_traits <- prop_cap2_con_traits <- NULL
+}
+
+# calculate squared canonical correlation(s):
+delta_sq_traits <-  # create empty vector
+  vector(length = length(env_vars_cap))
+
+for(i in 1:length(env_vars_cap)) {
+  delta_sq_traits[i] <-  # assign to relevant 
+    cor(  # calculate Pearson correlation coefficient
+      summary(cap_traits)$sites[, i],  # site scores
+      summary(cap_traits)$constraints[, i],  # site constraints
+      method = "pearson"
+    )^2
+}
+
+
+
+
+# test significance of overall analysis and of individual terms:
+anova_cap_traits <-  # overall analysis
+  anova(cap_traits, permutations = n_perm, model = "reduced")
+
+# extract F and P values:
+cap_traits_f <- anova_cap_traits$F[1]
+cap_traits_p <- anova_cap_traits$`Pr(>F)`[1]
+
+anova_cap_traits_term <-  # terms assessed sequentially
+  anova(cap_traits, by = "term", permutations = n_perm, model = "reduced")
+anova_cap_traits_margin <-  # assess marginal effects of terms
+  anova(cap_traits, by = "margin", permutations = n_perm, model = "reduced")
+
+# extract F and P values:
+cap_traits_margin_f <- anova_cap_traits_margin$F[1:length(env_vars_cap)]
+cap_traits_margin_p <- anova_cap_traits_margin$`Pr(>F)`[1:length(env_vars_cap)]
+# rename vector elements according to environmental variables used:
+names(cap_traits_margin_p) <- names(cap_traits_margin_f) <- env_vars_cap
+
+
+
+
+# test environmental and species correlations with axes:
+
+# ~ environmental
+#  (NB -- for ordinal/continuous variables only)
+
+cor_cap_traits_spp <-  # ~ species
+  as.data.frame(cor(cbind(
+    scores(cap_traits)$sites, # site scores
+    # log10(x+1)-transformed abundance data:
+    log10(dplyr::select(dd_tree_lichens_func, contains(lichen_traits)) + 1)),
+    method = "spearman")[  # rank (not product-moment) correlation
+      -(1:2), 1:2])  # subset relevant correlations
+
+# extract relevant species:
+cor_traits_spp <-
+  cor_cap_traits_spp[which(  # correlation coefficient >= x
+    if (length(env_vars_cap) > 1) {
+      abs(cor_cap_traits_spp$CAP1) >= cor_spp_x |
+        abs(cor_cap_traits_spp$CAP2) >= cor_spp_x
+    } else {
+      abs(cor_cap_traits_spp$CAP1) >= cor_spp_x
+    }
+  ), ]
+
+# ordered vector of names of species with strongest correlations:
+top_traits <- rownames(cor_cap_traits_spp[order(
+  apply(cor_cap_traits_spp, MARGIN = 1, function(x) {max(abs(x))}),
+  decreasing = TRUE), ])
+
+
+
+
 
 
 
 
 ################################################################################
 
-# (testing use of BiodiversityR::CAPdiscrim. But produces warnings.)
+# (testing use of BiodiversityR::CAPdiscrim. NB -- log(x+1)-transformed data
+# tends to produce warnings resulting from negative Eigenvalues, as well as
+# reducing overall classification success... therefore use untransformed data[?])
+
 
 # ~~~ taxonomic groups:
 
-dist_taxa <-  # pre-calculate dissimilarity matrix for CAPdiscrim()
+dist_taxa_plot <-  # pre-calculate dissimilarity matrix for CAPdiscrim()
   vegdist(
-    # log10(x+1)-transformed data and zero-adjusted Bray-Curtis:
-    log10(cbind(tree_lichens_taxa_plot[, lichen_taxa], dummy_taxa_plot) + 1),
+    # # log10(x+1)-transformed data and zero-adjusted Bray-Curtis:
+    # cbind(log10(tree_lichens_taxa_plot[, lichen_taxa] + 1), dummy_taxa_plot),
+    cbind(tree_lichens_taxa_plot[, lichen_taxa], dummy_taxa_plot),
     method = "bray"
   )
 
 cap_taxa_plot_site <- 
   CAPdiscrim(  # run CAP analysis (BiodiversityR::CAPdiscrim)
-    dist_taxa ~ site,  # vs. site (categorical) only
+    dist_taxa_plot ~ site,  # vs. site (categorical) only
     # NB -- environmental data as data frame, not tibble:
     data = as.data.frame(tree_lichens_taxa_plot),
-    # specify no. of axes resulting in highest classification success:
-    m = 4, add = TRUE, permutations = n_perm  
+    # allow calculation of no. of axes providing best distinction between groups
+    # (NB -- takes excessively long time if including permutation tests);
+    # otherwise, specify no. of axes resulting in highest classification success:
+    m = 0, add = TRUE #, permutations = n_perm  
   )
 
 
-
-
+# plot classification success for sequential values of m:
 m_max <- 15  # specify max no. of axes
 
 plot(  # create blank plot
@@ -1115,12 +1468,11 @@ plot(  # create blank plot
   xlab = "m", ylab = "Classification success (%)"
 )
 
-# plot classification success for sequential values of m:
 for (i in 1:m_max) {
   cap_result <- CAPdiscrim(
-    dist_taxa ~ site,
+    dist_taxa_plot ~ site,
     data = as.data.frame(tree_lichens_taxa_plot),
-    axes = 2, m = i)
+    axes = 2, m = i, add = TRUE)
   points(i, cap_result$percent)
 }
 
@@ -1129,25 +1481,27 @@ for (i in 1:m_max) {
 
 # ~~~ functional groups:
 
-dist_func <-  # pre-calculate dissimilarity matrix for CAPdiscrim()
+dist_func_plot <-  # pre-calculate dissimilarity matrix for CAPdiscrim()
   vegdist(
-    # log10(x+1)-transformed data and zero-adjusted Bray-Curtis:
-    log10(cbind(tree_lichens_func_plot[, lichen_func_grps], dummy_func_plot) + 1),
+    # # log10(x+1)-transformed data and zero-adjusted Bray-Curtis:
+    # cbind(log10(tree_lichens_func_plot[, lichen_func_grps] + 1), dummy_func_plot),
+    cbind(tree_lichens_func_plot[, lichen_func_grps], dummy_func_plot),
     method = "bray"
   )
 
 cap_func_plot_site <- 
   CAPdiscrim(  # run CAP analysis (BiodiversityR::CAPdiscrim)
-    dist_func ~ site,  # vs. site (categorical) only
+    dist_func_plot ~ site,  # vs. site (categorical) only
     # NB -- environmental data as data frame, not tibble:
-    data = as.data.frame(tree_lichens_func_plot),
-    # specify no. of axes resulting in highest classification success:
-    m = 4, add = TRUE, permutations = n_perm  
+    data = as.data.frame(tree_lichens_taxa_plot),
+    # allow calculation of no. of axes providing best distinction between groups
+    # (NB -- takes excessively long time if including permutation tests);
+    # otherwise, specify no. of axes resulting in highest classification success:
+    m = 0, add = TRUE #, permutations = n_perm  
   )
 
 
-
-
+# plot classification success for sequential values of m:
 m_max <- 15  # specify max no. of axes
 
 plot(  # create blank plot
@@ -1156,11 +1510,58 @@ plot(  # create blank plot
   xlab = "m", ylab = "Classification success (%)"
 )
 
-# plot classification success for sequential values of m:
 for (i in 1:m_max) {
   cap_result <- CAPdiscrim(
-    dist_func ~ site,
+    dist_func_plot ~ site,
     data = as.data.frame(tree_lichens_func_plot),
-    axes = 2, m = i)
+    axes = 2, m = i, add = TRUE)
+  points(i, cap_result$percent)
+}
+
+
+
+
+# ~~~ lichen traits:
+
+dist_traits_plot <-  # pre-calculate dissimilarity matrix for CAPdiscrim()
+  vegdist(
+    # # log10(x+1)-transformed data and zero-adjusted Bray-Curtis:
+    # cbind(
+    #   log10(dplyr::select(tree_lichens_func_plot, contains(lichen_traits)) + 1),
+    #   dummy_func_plot
+    # ),
+    cbind(
+      dplyr::select(tree_lichens_func_plot, contains(lichen_traits)),
+      dummy_func_plot
+    ),
+    method = "bray"
+  )
+
+cap_traits_plot_site <- 
+  CAPdiscrim(  # run CAP analysis (BiodiversityR::CAPdiscrim)
+    dist_traits_plot ~ site,  # vs. site (categorical) only
+    # NB -- environmental data as data frame, not tibble:
+    data = as.data.frame(tree_lichens_taxa_plot),
+    # allow calculation of no. of axes providing best distinction between groups
+    # (NB -- takes excessively long time if including permutation tests);
+    # otherwise, specify no. of axes resulting in highest classification success:
+    m = 0, add = TRUE #, permutations = n_perm  
+  )
+
+
+# plot classification success for sequential values of m:
+m_max <- 15  # specify max no. of axes
+
+plot(  # create blank plot
+  1:m_max, rep(-1000, m_max), type = "n",
+  xlim = c(0, m_max), ylim = c(0, 100),
+  xlab = "m", ylab = "Classification success (%)"
+)
+
+for (i in 1:m_max) {
+  cap_result <- CAPdiscrim(
+    dist_traits_plot ~ site,
+    data = as.data.frame(tree_lichens_func_plot),
+    axes = 2, m = i, add = TRUE)
   points(i, cap_result$percent)
 }
