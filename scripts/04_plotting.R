@@ -166,7 +166,7 @@ plot_mds(  # plot MDS
   mds_obj = mds_li_traits_plot,
   pt_sty_dat = pt_sty_site, pt_sty_var = "site",
   pt_ref_dat = tree_lichens_func_plot,
-  plot_lab = "(b)"
+  plot_lab = "(c)"
 )
 
 ordiellipse(  # add ellipses for site groups
@@ -415,7 +415,7 @@ if (supp) {  # if 'supplementary' (i.e. 'tree-level') analyses have been run,
     mds_obj = mds_li_traits,
     pt_sty_dat = pt_sty_site, pt_sty_var = "site",
     pt_ref_dat = dd_tree_lichens_func,
-    plot_lab = "(b)"
+    plot_lab = "(c)"
   )
   
   ordiellipse(  # add ellipses for site groups

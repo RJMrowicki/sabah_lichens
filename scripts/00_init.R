@@ -10,7 +10,7 @@ Sys.setenv(TZ = "UTC")  # set timezone (avoid `as.POSIX*` warnings)
 set.seed(123456)  # set seed for random number generation
 
 n_perm <- 9999  # specify no. permutations for multivariate analyses
-cor_spp_x <- 0.5  # threshold species correlation with CAP axes
+cor_spp_x <- 0.6  # threshold species correlation with CAP axes
 
 
 

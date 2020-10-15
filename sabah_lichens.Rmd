@@ -42,9 +42,9 @@ For trees missing pH data, mean pH was estimated as the overall mean pH for the 
 # check actual numbers of replicates per site
 # combined table of numbers of replicates vs. site for each dataset:
 list(
-  rename(nobs_site_li_taxa, 'Tax. grps' = 'n'),
-  rename(nobs_site_li_func, 'Func. grps' = 'n'),
-  rename(nobs_site_tr_func, 'Tree traits' = 'n')
+  rename(nobs_site_li_taxa, 'tax_grps' = 'n'),
+  rename(nobs_site_li_func, 'func_grps' = 'n'),
+  rename(nobs_site_tr_func, 'tree_traits' = 'n')
 ) %>%
   reduce(left_join, by = "site") %>%
   kable(caption = 'Number of replicates per site')
@@ -98,7 +98,7 @@ Further CAP analyses were used to estimate the accuracy with which plots may be 
 
 ## Main results
 
-Mean lichen diversity (taxonomic group _S_, _H\'_ and $1-\lambda$; functional group FRic, FEve, FDiv and FDis) per site, calculated at 'plot-level':
+Mean 'plot-level' lichen diversity (taxonomic group _S_, $1-\lambda$ and _H\'_; functional group FRic, FEve, FDiv and FDis) per site:
 
 ```{r mean_div_tables_plot, echo = FALSE}
 # insert summary tables for mean lichen diversity vs. site:
@@ -114,7 +114,7 @@ mean_div_li_func_plot %>%
   kable(caption = 'Functional group data')
 ```
 
-![Boxplot of lichen taxonomic group richness (_S_), diversity (_H\'_) and evenness ($1-\lambda$) versus site (D = Danum Valley Conservation Area, M = Maliau Conservation Area, S = Stability of Altered Forest Ecosystems (SAFE) Project area).](./figs/boxplots_taxa_plot.pdf)
+![Boxplot of lichen taxonomic group richness (_S_), evenness ($1-\lambda$) and diversity (_H\'_) versus site (D = Danum Valley Conservation Area, M = Maliau Conservation Area {old growth sites}, S = Stability of Altered Forest Ecosystems (SAFE) Project area {logged site}).](./figs/boxplots_taxa_plot.pdf)
 
 ![Boxplot of distance-based Functional Diversity indices (FRic, FEve, FDiv and FDis) calculated for lichen functional groups versus site.](./figs/boxplots_func_plot.pdf)
 
@@ -139,6 +139,21 @@ li_taxa_plot_s_ph %>%
   kable(caption = 'Post-hoc pairwise tests')
 ```
 
+```{r `peranova_tables_taxa_plot_1-l`, echo = FALSE}
+options(knitr.kable.NA = '')  # ensure NAs printed as blanks
+
+# ~~ diversity:
+`li_taxa_plot_1-l` %>%
+  mutate_at(3:5, ~ formatC(., digits = 2, format = "f")) %>%
+  mutate_at(c(6, 8), ~ formatC(., digits = 3, format = "f")) %>%
+  kable(caption = 'Lichen taxonomic group $1-\\lambda$ vs. site')
+
+`li_taxa_plot_1-l_ph` %>%
+  mutate_at(2, ~ formatC(., digits = 2, format = "f")) %>%
+  mutate_at(c(3, 5), ~ formatC(., digits = 3, format = "f")) %>%
+  kable(caption = 'Post-hoc pairwise tests')
+```
+
 ```{r peranova_tables_taxa_plot_h, echo = FALSE}
 options(knitr.kable.NA = '')  # ensure NAs printed as blanks
 
@@ -149,21 +164,6 @@ li_taxa_plot_h %>%
   kable(caption = 'Lichen taxonomic group _H\'_ vs. site')
 
 li_taxa_plot_h_ph %>%
-  mutate_at(2, ~ formatC(., digits = 2, format = "f")) %>%
-  mutate_at(c(3, 5), ~ formatC(., digits = 3, format = "f")) %>%
-  kable(caption = 'Post-hoc pairwise tests')
-```
-
-```{r `peranova_tables_taxa_plot_1-l`, echo = FALSE}
-options(knitr.kable.NA = '')  # ensure NAs printed as blanks
-
-# ~~ diversity:
-`li_taxa_plot_1-l` %>%
-  mutate_at(3:5, ~ formatC(., digits = 2, format = "f")) %>%
-  mutate_at(c(6, 8), ~ formatC(., digits = 3, format = "f")) %>%
-  kable(caption = 'Lichen taxonomic group $1-\\\\lambda$ vs. site')
-
-`li_taxa_plot_1-l_ph` %>%
   mutate_at(2, ~ formatC(., digits = 2, format = "f")) %>%
   mutate_at(c(3, 5), ~ formatC(., digits = 3, format = "f")) %>%
   kable(caption = 'Post-hoc pairwise tests')
@@ -234,7 +234,7 @@ li_func_plot_fdis_ph %>%
   kable(caption = 'Post-hoc pairwise tests')
 ```
 
-There were highly significant differences in overall lichen community structure (in terms of both taxonomic and functional groups) between old growth and logged sites, but not between Danum and Maliau Conservation Areas (Tables _x_). This pattern was evident from MDS plots showing separation between the SAFE Project area and the other two sites (Figure _x_).
+There were highly significant differences in overall lichen community structure (in terms of both taxonomic and functional groups) and functional trait composition (as trait CWMs) between old growth and logged sites, but not between Danum and Maliau Conservation Areas (Tables _x_). This pattern was evident from MDS plots showing strong separation between the SAFE Project area and the other two sites (Figure _x_).
 
 PERMANOVA tables and post-hoc pairwise test results (taxonomic groups):
 
@@ -271,25 +271,42 @@ perm_li_func_plot_ph %>%
   kable(caption = 'Post-hoc pairwise tests')
 ```
 
-![Non-metric multidimensional scaling (MDS) plot of lichen community structure as (a) taxonomic and (b) functional groups, using 'plot-level' data summarised for each plot. Based on zero-adjusted Bray-Curtis dissimilarities calculated from $log10(x+1)$-transformed abundance data. Ellipses represent the standard deviation of points within each group.](./figs/mds_plot.pdf)
+PERMANOVA tables and post-hoc pairwise test results (trait classes):
+
+```{r permanova_tables_traits_plot, echo = FALSE}
+options(knitr.kable.NA = '')  # ensure NAs printed as blanks
+
+# ~ trait CWMs:
+perm_li_traits_plot %>%
+  mutate_at(3:5, ~ formatC(., digits = 2, format = "f")) %>%
+  mutate_at(c(6, 8), ~ formatC(., digits = 3, format = "f")) %>%
+  kable(caption = 'Lichen functional trait composition vs. site')
+
+perm_li_traits_plot_ph %>%
+  mutate_at(2, ~ formatC(., digits = 2, format = "f")) %>%
+  mutate_at(c(3, 5), ~ formatC(., digits = 3, format = "f")) %>%
+  kable(caption = 'Post-hoc pairwise tests')
+```
+
+![Non-metric multidimensional scaling (MDS) plot of lichen community structure as (a) taxonomic and (b) functional groups, and (c) functional trait composition, using 'plot-level' data summarised for each plot. Based on Bray-Curtis dissimilarities (zero-adjusted for taxonomic and functional group abundances) calculated from $\log_{10}(x+1)$-transformed data. Ellipses represent the standard deviation of points within each group.](./figs/mds_plot.pdf)
 
 Of the lichen taxonomic/functional groups making the greatest contributions to differences in community structure, [_R-Es_, _Gr-th_, _ArH_, _Gr-li_, _R-Py_, _PyP_, _CoL_, _CoC_ and _PiM_] and [_sqhya_, _crthe_, _crbya_, _crbysp_, _crlir_, _crpeb_, _sqhyp_, _focyb_, _focyr_, _crmzp_ and _cata_] exhibited higher mean abundances in old growth sites compared to the logged site, whereas [_ArC_, _RoBi_ and _UiCr_] and [_crstlf_, _crsco_ and _crapo_] showed the opposite trend.
 
-SIMPER tables:
-((D,M), S: overall mean abundance in old growth and logged sites, respectively; Contrib./SD: average species contribution to group dissimilarity divided by standard deviation of contributions; Contrib.%: percent contribution of species to overall between-group dissimilarity. Only the most important species (Contrib. $\geq$ 3%) are shown.)
+SIMPER table (taxonomic groups):
 
 ```{r simper_table_taxa_plot, echo = FALSE}
-# insert SIMPER table:
+# insert SIMPER tables:
 # ~ taxonomic groups:
 simp_li_taxa_plot[[1]] %>%
   rownames_to_column("Tax. group") %>%
   mutate_at(c(2:4), ~ formatC(., digits = 2, format = "f")) %>%
   mutate_at(5, ~ formatC(., digits = 1, format = "f")) %>%
   kable(
-    caption = 'Lichen taxonomic group contributions to differences in community structure',
-    longtable = FALSE
+    caption = 'Lichen taxonomic group contributions to differences in community structure. (D,M), S: overall mean abundance in old growth and logged sites, respectively; Contrib./SD: average taxon contribution to group dissimilarity divided by standard deviation of contributions; Contrib.%: percent contribution of taxon to overall between-group dissimilarity. Only the most important taxa (Contrib. $\\geq$ 3%) are shown.'
   )
 ```
+
+SIMPER table (functional groups):
 
 ```{r simper_table_func_plot, echo = FALSE}
 # ~ functional groups:
@@ -298,33 +315,81 @@ simp_li_func_plot[[1]] %>%
   mutate_at(c(2:4), ~ formatC(., digits = 2, format = "f")) %>%
   mutate_at(5, ~ formatC(., digits = 1, format = "f")) %>%
   kable(
-    caption = 'Lichen functional group contributions to differences in community structure',
-    longtable = FALSE
+    caption = 'Lichen functional group contributions to differences in community structure'
   )
 ```
+
+The following lichen functional traits exhibited greater CWM values in old growth sites compared to logged site: vegetative dispersal structures (i.e. soredia/isidia/pseudisidia), squamulose growth type, absence of fimbriate prothallus, non-byssoid surface structure, unknown Chlorophyta photobiont, apothecia with margins, and thelotremoid apothecia. Conversely, the following traits exhibited greater CWM values in the logged site: fimbriate prothallus, ?absence of sexual dispersal structures, byssoid surface structure, ?absence of vegetative dispersal structures, non-carbonised perithecia, crustose growth type, and Trentepohliaceae photobiont.
+
+SIMPER table (trait classes):
+
+```{r simper_table_traits_plot, echo = FALSE}
+# ~ trait classes:
+simp_li_traits_plot[[1]] %>%
+  rownames_to_column("Trait class") %>%
+  mutate_at(c(2:4), ~ formatC(., digits = 2, format = "f")) %>%
+  mutate_at(5, ~ formatC(., digits = 1, format = "f")) %>%
+  kable(
+    caption = 'Lichen trait class contributions to differences in community structure. (D,M), S: overall mean CWM (community-level weighted mean value) in old growth and logged sites, respectively; Contrib./SD: average trait class contribution to group dissimilarity divided by standard deviation of contributions; Contrib.%: percent contribution of trait class to overall between-group dissimilarity. Only the most important trait classes (Contrib. $\\geq$ 3%) are shown.'
+  )
+```
+
+Indicator Value analyses revealed a number of lichen taxonomic/functional groups and functional traits that were significantly associated with the combination of Danau and Maliau sites (i.e. old growth sites), rather than with each site separately; namely taxonomic groups [_Gr-th_, _Gr-li_, _PyP_ and _CoC_], functional groups [_crthe_, _crbya_, _crlir_, _crpeb_ and _focyr_] and traits [thelotremoid apothecia, lirellae, carbonised perithecia and Rhizonema photobiont]. Additionally, taxon [_ArC_] and functional group [_crstlf_] were significantly associated with the logged site.
+
+Indicator Value analysis output (taxonomic groups):
+
+```{r indval_summary_taxa_plot, echo = FALSE}
+# insert Indicator Value summary output:
+# ~ taxonomic groups:
+cat(indval_taxa_plot_summ, sep = "\n")
+```
+
+Indicator Value analysis output (functional groups):
+
+```{r indval_summary_func_plot, echo = FALSE}
+# ~ functional groups:
+cat(indval_func_plot_summ, sep = "\n")
+```
+
+Indicator Value analysis output (trait classes):
+
+```{r indval_summary_traits_plot, echo = FALSE}
+# ~ trait classes:
+cat(indval_traits_plot_summ, sep = "\n")
+```
+
+The diversity of bark types and proportion of dipterocarps within plots were identified as key tree functional traits influencing lichen community structure, in terms of both taxonomic and functional groups (BIOENV; $\rho$ = `r rep_2dp(bioenv_taxa_plot_rho)` and $\rho$ = `r rep_2dp(bioenv_func_plot_rho)`, respectively) and lichen trait classes ($\rho$ = `r rep_2dp(bioenv_traits_plot_rho)`).
+
+In all three cases, CAP (dbRDA) axis 1 correlated negatively with both plot-level tree traits, while axis 2 appeared to be related positively to bark diversity and negatively to dipterocarp proportion; the overall analysis was significant, as determined by permutation tests (taxonomic groups: P `r rep_p(cap_taxa_plot_p)`; functional groups: P `r rep_p(cap_func_plot_p)`; trait classes: P `r rep_p(cap_traits_plot_p)`).
+
+however, while neither 'trait' was significant as a constraining variable for either lichen taxonomic groups or trait classes, only the proportion of dipterocarps was significantly related to lichen community structure in terms of functional groups (pseudo-_F_~1,19~ = `r rep_2dp(cap_func_plot_margin_f["dipterocarp_prop"])`, P `r rep_p(cap_func_plot_margin_p["dipterocarp_prop"])`).
+
+Taxonomic groups [_ArA_, _ArT_, _CnS_, _CoC_, _Gr-th_, _PyP_, _R-Py_, _ThM_, _TryP_ and _VeFl_] and functional groups [_crbya_, _crbys_, _crlir_, _crmzs_, _crpeb_, _crspe_, _crthe_, _focyr_ and _sqhya_] appeared to be associated strongly with plot-level bark diversity. Taxa [_Gr-Li_, and _R-Es_] were also associated with bark diversity, but showed a stronger association with the proportion of dipterocarps. Conversely, groups [_ArC_ and _Uicr_] and [_crstlf_] were negatively associated with both bark diversity and proportion of dipterocarps.
+
+In terms of lichen traits, carbonised perithecia, apothecia without margins and thelotremoid apothecia were associated with bark diversity and, to a lesser degree, the proportion of dipterocarps; unknown Chlorophyta photobiont, presence of hypothallus, squamulose growth type and vegetative dispersal structures were associated more strongly with proportion of dipterocarps. Crustose growth type, Trentepohliaceae photobiont, ?absence of vegetative dispersal structures and absence of hypothallus exhibited a strongly negative association with the proportion of dipterocarps.
 
 ![(a) CAP ordination plot of lichen community structure (taxonomic groups) according to continuous environmental (tree trait) variables, based on 'plot-level' data summarised for each plot. (b) Spearman rank correlation coefficients between CAP axes and individual taxa for which $|\rho| \geq$ `r cor_spp_x`.](./figs/cap_taxa_plot.pdf)
 
 ![(a) CAP ordination plot of lichen community structure (functional groups) according to continuous environmental (tree trait) variables, based on 'plot-level' data summarised for each plot. (b) Spearman rank correlation coefficients between CAP axes and individual functional groups for which $|\rho| \geq$ `r cor_spp_x`.](./figs/cap_func_plot.pdf)
 
+![(a) CAP ordination plot of lichen functional trait composition according to continuous environmental (tree trait) variables, based on 'plot-level' data summarised for each plot. (b) Spearman rank correlation coefficients between CAP axes and individual functional groups for which $|\rho| \geq$ `r cor_spp_x`.](./figs/cap_traits_plot.pdf)
 
-\newpage
+The overall success with which plots could be classified by site based on lichen community structure and trait composition (CAP) was `r rep_2dp(cap_taxa_plot_site$percent)`% (`r round(cap_taxa_plot_site$percent*22/100)`/22 plots) for taxonomic groups, `r rep_2dp(cap_func_plot_site$percent)`% (`r round(cap_func_plot_site$percent*22/100)`/22 plots) for functional groups and `r rep_2dp(cap_traits_plot_site$percent)`% (`r round(cap_traits_plot_site$percent*22/100)`/22 plots) for trait classes.
 
-The diversity of bark types and proportion of dipterocarps were identified as key tree traits influencing lichen community structure, in terms of both taxonomic and functional groups (BIOENV; $\rho$ = `r rep_2dp(bioenv_taxa_plot_rho)` and $\rho$ = `r rep_2dp(bioenv_func_plot_rho)`, respectively).
-
-CAP (dbRDA) axis 1 correlated negatively with both plot-level tree traits, while axis 2 appeared to be related positively to bark diversity and negatively to dipterocarp proportion; however, while neither 'trait' was significant as a constraining variable for lichen taxonomic group data, only the proportion of dipterocarps was significantly related to lichen community structure in terms of functional groups (pseudo-_F_~1,19~ = `r rep_2dp(cap_func_plot_margin_f["dipterocarp_prop"])`, P `r rep_p(cap_func_plot_margin_p["dipterocarp_prop"])`).
-
-Taxonomic groups [_ArA_, _ArT_, _CnS_, _CoC_, _Gr-th_, _PyP_, _R-Py_, _ThM_, _TryP_ and _VeFl_] and functional groups [_crbya_, _crbys_, _crlir_, _crmzs_, _crpeb_, _crspe_, _crthe_, _focyr_ and _sqhya_] appeared to be associated strongly with plot-level bark diversity. Taxa [_Gr-Li_, and _R-Es_] were also associated with bark diversity, but showed a stronger association with the proportion of dipterocarps. Conversely, groups [_ArC_ and _Uicr_] and [_crstlf_] were negatively associated with both bark diversity and proportion of dipterocarps.
-
-The overall success with which plots could be classified by site based on summed lichen abundance data (CAP) was `r rep_2dp(succ_cap_taxa_site_plot)`% (15/22 plots) for taxonomic groups and `r rep_2dp(succ_cap_func_site_plot)`% (12/22 plots) for functional groups.
-
-```{r cap_table, echo = FALSE}
-# ~ taxonomic groups:
-
-# succ_table %>%
-#   kable(caption = '')
-
+```{r cap_table_plot, echo = FALSE}
+# insert CAP classification success summary table:
+rbind(
+  'Taxonomic groups' = cap_taxa_plot_site$percent.level,
+  'Functional groups' = cap_func_plot_site$percent.level,
+  'Trait classes' = cap_traits_plot_site$percent.level
+) %>%
+  as.data.frame %>%
+  rownames_to_column('data') %>%
+  mutate_at(c(2:4), ~ formatC(., digits = 1, format = "f")) %>%
+  kable(caption = 'Percent classification success of plots to sites based on lichen taxonomic and functional group abundances and trait CWMs.')
 ```
+
+
 
 
 ## Queries

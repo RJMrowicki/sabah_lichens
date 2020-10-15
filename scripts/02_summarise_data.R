@@ -29,8 +29,8 @@ mean_div_li_taxa <-
   # calculate mean & SE diversity, richness and evenness:
   summarise(
     `mean_S` = mean(`S`), `SE_S` = std.error(`S`),
-    `mean_H'` = mean(`H'`), `SE_H'` = std.error(`H'`),
-    `mean_1-L` = mean(`1-L`), `SE_1-L` = std.error(`1-L`)
+    `mean_1-L` = mean(`1-L`), `SE_1-L` = std.error(`1-L`),
+    `mean_H'` = mean(`H'`), `SE_H'` = std.error(`H'`)
   )
 
 # functional groups:
@@ -57,8 +57,8 @@ mean_div_li_taxa_plot <-
   # calculate mean & SE diversity, richness and evenness:
   summarise(
     `mean_S` = mean(`S`), `SE_S` = std.error(`S`),
-    `mean_H'` = mean(`H'`), `SE_H'` = std.error(`H'`),
-    `mean_1-L` = mean(`1-L`), `SE_1-L` = std.error(`1-L`)
+    `mean_1-L` = mean(`1-L`), `SE_1-L` = std.error(`1-L`),
+    `mean_H'` = mean(`H'`), `SE_H'` = std.error(`H'`)
   )
 
 # functional groups:

@@ -898,22 +898,22 @@ cap_taxa_plot_site <-
   )
 
 
-# plot classification success for sequential values of m:
-m_max <- 15  # specify max no. of axes
-
-plot(  # create blank plot
-  1:m_max, rep(-1000, m_max), type = "n",
-  xlim = c(0, m_max), ylim = c(0, 100),
-  xlab = "m", ylab = "Classification success (%)"
-)
-
-for (i in 1:m_max) {
-  cap_result <- CAPdiscrim(
-    dist_taxa_plot ~ site,
-    data = as.data.frame(tree_lichens_taxa_plot),
-    axes = 2, m = i, add = TRUE)
-  points(i, cap_result$percent)
-}
+# # plot classification success for sequential values of m:
+# m_max <- 15  # specify max no. of axes
+# 
+# plot(  # create blank plot
+#   1:m_max, rep(-1000, m_max), type = "n",
+#   xlim = c(0, m_max), ylim = c(0, 100),
+#   xlab = "m", ylab = "Classification success (%)"
+# )
+# 
+# for (i in 1:m_max) {
+#   cap_result <- CAPdiscrim(
+#     dist_taxa_plot ~ site,
+#     data = as.data.frame(tree_lichens_taxa_plot),
+#     axes = 2, m = i, add = TRUE)
+#   points(i, cap_result$percent)
+# }
 
 
 
@@ -940,22 +940,22 @@ cap_func_plot_site <-
   )
 
 
-# plot classification success for sequential values of m:
-m_max <- 15  # specify max no. of axes
-
-plot(  # create blank plot
-  1:m_max, rep(-1000, m_max), type = "n",
-  xlim = c(0, m_max), ylim = c(0, 100),
-  xlab = "m", ylab = "Classification success (%)"
-)
-
-for (i in 1:m_max) {
-  cap_result <- CAPdiscrim(
-    dist_func_plot ~ site,
-    data = as.data.frame(tree_lichens_func_plot),
-    axes = 2, m = i, add = TRUE)
-  points(i, cap_result$percent)
-}
+# # plot classification success for sequential values of m:
+# m_max <- 15  # specify max no. of axes
+# 
+# plot(  # create blank plot
+#   1:m_max, rep(-1000, m_max), type = "n",
+#   xlim = c(0, m_max), ylim = c(0, 100),
+#   xlab = "m", ylab = "Classification success (%)"
+# )
+# 
+# for (i in 1:m_max) {
+#   cap_result <- CAPdiscrim(
+#     dist_func_plot ~ site,
+#     data = as.data.frame(tree_lichens_func_plot),
+#     axes = 2, m = i, add = TRUE)
+#   points(i, cap_result$percent)
+# }
 
 
 
@@ -988,22 +988,22 @@ cap_traits_plot_site <-
   )
 
 
-# plot classification success for sequential values of m:
-m_max <- 15  # specify max no. of axes
-
-plot(  # create blank plot
-  1:m_max, rep(-1000, m_max), type = "n",
-  xlim = c(0, m_max), ylim = c(0, 100),
-  xlab = "m", ylab = "Classification success (%)"
-)
-
-for (i in 1:m_max) {
-  cap_result <- CAPdiscrim(
-    dist_traits_plot ~ site,
-    data = as.data.frame(tree_lichens_func_plot),
-    axes = 2, m = i, add = TRUE)
-  points(i, cap_result$percent)
-}
+# # plot classification success for sequential values of m:
+# m_max <- 15  # specify max no. of axes
+# 
+# plot(  # create blank plot
+#   1:m_max, rep(-1000, m_max), type = "n",
+#   xlim = c(0, m_max), ylim = c(0, 100),
+#   xlab = "m", ylab = "Classification success (%)"
+# )
+# 
+# for (i in 1:m_max) {
+#   cap_result <- CAPdiscrim(
+#     dist_traits_plot ~ site,
+#     data = as.data.frame(tree_lichens_func_plot),
+#     axes = 2, m = i, add = TRUE)
+#   points(i, cap_result$percent)
+# }
 
 
 
@@ -1021,7 +1021,7 @@ indval_taxa_plot <-
 # summary:
 # (NB -- summary output is not captured by assigning it to an object;
 # use `capture.output()` to store output as character strings and
-# `cat(., sep = "\n"` to print without quote or index numbers.)
+# `cat(., sep = "\n")` to print without quote or index numbers.)
 indval_taxa_plot_summ <- capture.output(
   summary(
     indval_taxa_plot,
@@ -1655,7 +1655,7 @@ if (supp) {  # if 'supplementary' (i.e. 'tree-level') analyses are to be run,
   # summary:
   # (NB -- summary output is not captured by assigning it to an object;
   # use `capture.output()` to store output as character strings and
-  # `cat(., sep = "\n"` to print without quote or index numbers.)
+  # `cat(., sep = "\n")` to print without quote or index numbers.)
   indval_taxa_summ <- capture.output(
     summary(
       indval_taxa,
