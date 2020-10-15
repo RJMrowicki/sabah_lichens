@@ -305,7 +305,7 @@ dd_trees_func <-
 
 
 
-# ~~ combine lichen and tree datasets: -----------------------------------------
+# ~~ combine lichen and tree datasets ------------------------------------------
 
 dd_tree_lichens_taxa <-  # taxonomic groups
   # perform 'left join' with tree dataset as 'x':
@@ -392,7 +392,7 @@ lichens_func_plot <-
 
 
 
-# ~~ summarise tree functional trait data: -------------------------------------
+# ~~ summarise tree functional trait data --------------------------------------
 
 # calculate 'diversity' of tree trait categories per plot:
 # ~ bark:
@@ -442,7 +442,7 @@ trees_func_plot <- reduce(
 
 
 
-# ~~ combine lichen and tree datasets: -----------------------------------------
+# ~~ combine lichen and tree datasets ------------------------------------------
 
 tree_lichens_taxa_plot <-  # taxonomic groups
   # perform 'left join' with tree dataset as 'x':

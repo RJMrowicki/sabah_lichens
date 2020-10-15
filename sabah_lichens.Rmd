@@ -12,6 +12,7 @@ output:
 
 ```{r init, include = FALSE}
 source('./scripts/00_init.R')  # run initialisation script
+supp <- FALSE  # should 'supplementary' (i.e. 'tree-level') analyses be run?
 ```
 
 ```{r source_scripts, include = FALSE}
@@ -22,67 +23,77 @@ source('./scripts/03_analyse_data.R')
 source('./scripts/04_plotting.R')
 ```
 
+
 ## Field sites
 
 Sampling was conducted at three sites within different areas of lowland forest in northeast Borneo, including two old growth reserve sites, (1) Danum Valley Conservation Area ('D') and (2) Maliau Conservation Area ('M'), and one selectively logged site, (3) the Stability of Altered Forest Ecosystems (SAFE) Project area ('S').
 
-At each site, ... (D and M = 96; S = 72).
+At each site, $\dots$ (number of trees: D and M = 96, S = 72; number of plots: D and M = 8, S = 6).
 
-The following functional traits were recorded for each tree: (1) girth, measured as $\dots$; (2) bark type (DR = dry ancient, S = smooth, C = scaly, R = ridged/rough); (3) the presence of buttresses or flutes; and (4) dipterocarp vs. non-dipterocarp species. For most, but not all, trees, pH was determined from the mean of up to three readings, measured by $\dots$.
+Lichens were categorised according to both (1) taxonomic and (2) functional group. Further, for each functional group, lichen functional traits were classified as follows: $\dots$ (Table _x_).
+
+The following functional traits were recorded for each tree: (1) girth, measured by $\dots$; (2) bark type (DR = dry ancient, S = smooth, C = scaly, R = ridged/rough); (3) the presence of buttresses or flutes; and (4) dipterocarp vs. non-dipterocarp species. Additionally, for the majority of trees, (5) bark pH was determined from the mean of up to three readings, measured by $\dots$.
+
+Tree girth and mean pH were converted into categorical variables (girth: s < 100 cm; m = 100--199 cm; l $\geq$ 200 cm; pH: vl < 2; l = 2 $\leq x <$ 4; m = 4 $\leq x <$ 6; h $\geq$ 6).^[These cut-off values for pH categories are quite arbitrary, and may need adjusting. Perhaps they could be based on the overall distribution of mean pH values, e.g. quartiles.]
+
+For trees missing pH data, mean pH was estimated as the overall mean pH for the corresponding bark type category, justified by the expected relationship between bark type and pH,^[There doesn't appear to be a strong relationship between bark type and pH in this case. Also, modelling one tree trait based on another tree trait seems a bit circular, and may introduce unwanted covariance among 'environmental' variables in constrained multivariate analyses.], and then categorised accordingly.
 
 ```{r nobs_tables, eval = FALSE, echo = FALSE}
 # check actual numbers of replicates per site
-# tables for numbers of observations vs. site:
-# ~ lichen taxonomic groups:
-kable(nobs_site_li_taxa, caption = 'Lichen taxonomic group data')
-# ~ lichen functional groups:
-kable(nobs_site_li_func, caption = 'Lichen functional group data')
-# ~ tree functional traits:
-kable(nobs_site_tr_func, caption = 'Tree functional trait data')
+# combined table of numbers of replicates vs. site for each dataset:
+list(
+  rename(nobs_site_li_taxa, 'Tax. grps' = 'n'),
+  rename(nobs_site_li_func, 'Func. grps' = 'n'),
+  rename(nobs_site_tr_func, 'Tree traits' = 'n')
+) %>%
+  reduce(left_join, by = "site") %>%
+  kable(caption = 'Number of replicates per site')
 ```
 
 
-## Data analysis
+## Data analyses
 
-Lichen taxonomic and functional group^[It makes sense to calculate univariate diversity measures for taxonomic groups only, and not functional groups, with 'functional diversity' represented by the four distance-based FD indices.] richness (_S_), Shannon-Wiener diversity (_H\'_) and Simpson's evenness ($1-\lambda$) were calculated for each tree. Additionally, lichen abundance data were summed for each plot, and plot-level richness, diversity and evenness were calculated for both taxonomic and functional groups.^['Tree-level' calculations could be excluded altogether, with analyses focussing solely on 'plot-level' data, given that, for tree-level data, (1) some distance-based FD indices cannot be calculated and (2) MDS fails to converge (see below), and (3) in practical terms, surveys would be conducted at the scale of plots rather than individual trees.]
+Data analyses were conducted at 'plot-level', whereby plots, rather than individual trees, were treated as replicates.^[Increasingly, I felt that 'tree-level' analyses should be excluded altogether, with analyses focussing solely on 'plot-level' calculations, given that, for tree-level data, (1) some distance-based FD indices cannot be calculated and (2) MDS fails to converge (see below); also, (3) there was some concern over the non-independence of data when considering individual trees within the same plot as replicates, and (4) in practical terms, environmental assessments would be conducted at the scale of plots rather than individual trees. But perhaps tree-level results could still be included as Supplementary Material.] Thus, lichen taxonomic and functional group abundance data were summed for each plot;^[It might be worth checking whether exclusion of rare taxonomic/functional groups (e.g. overall mean abundance $\leq$ 0.1, or presence in <15% of plots) alters results substantially.] additionally, to enable plot-level characterisation of tree traits as continuous variables, we calculated the Shannon-Wiener diversity of (1) bark type and (2) pH categories,^[This approach seems a bit convoluted for pH, which is already a continuous variable. Alternatively, we could simply calculate the mean pH per plot, or perhaps the proportion of high/low pH trees (e.g. >6.5 or <4.5).] and the proportion of (3) large trees (i.e. girth $\geq$ 200 cm), (4) trees with buttresses or flutes and (5) dipterocarp trees within each plot.
 
-Further, the following distance-based functional diversity indices were calculated from lichen functional group abundance data in conjunction with the functional traits matrix (Table), using the function `dbFD` in the R package `FD`: functional richness (FRic), functional evenness (FEve), functional divergence (FDiv) and functional dispersion (FDis). While all four indices were calculated for each plot based on summed abundances, only FEve and FDis were calculated for individual trees, owing to instances of <3 singular functional groups per tree.^[Still, it was not possible to calculate FEve and FDis for all individual trees, again owing to a number of instances of <3 singular functional groups.]
+Lichen taxonomic group^[It makes sense to calculate the three univariate diversity measures (richness, evenness and diversity) for taxonomic groups only, and not functional groups, with 'functional diversity' represented by the four distance-based FD indices.] richness (_S_), Simpson's evenness ($1-\lambda$) and Shannon-Wiener diversity (_H\'_) were calculated for each plot. Additionally, the following distance-based functional diversity indices were calculated from lichen functional group abundance data in conjunction with the functional traits matrix (Table _x_), using the function `dbFD` in the R package `FD`: functional richness (FRic), functional evenness (FEve), functional divergence (FDiv) and functional dispersion (FDis).^[Although all four distance-based FD indices were calculated successfully for each plot based on summed abundances, calculation of FRic and FDiv fails when using tree-level data, apparently owing to instances of <3 singular functional groups per tree. Further, it was not possible to calculate FEve and FDis for all individual trees, for similar reasons relating to data insufficiency.]
 
-<!-- Tree bark type was coded numerically in relation to increasing perceived water holding capacity, i.e. ancient dry = 1, smooth = 2, scaly = 3, ridged/rough = 4. (See _Queries_ below.) -->
+The community-level weighted means (CWMs) of lichen functional traits were also calculated for each plot, based on the summed abundances of trait classes (i.e. the product of the functional group abundance and functional trait classification matrices; see e.g. Garnier _et al._, 2004, _Ecology_ 85, 2630--2637; Lavorel _et al._, 2008, _Funct. Ecol._ 22:134--147; Koch _et al._, 2013, _Ecol. Indic._ 34:22--30), via the `dbFD::functcomp` function.
 
-For trees missing pH data, mean pH was estimated as the overall mean pH for the relevant bark type category, justified by the expected relationship between bark type and pH.^[There doesn't appear to be a strong relationship between bark type and pH in this case. Also, modelling one tree trait based on another tree trait seems a bit circular, and may introduce unwanted covariance among 'environmental' variables in constrained multivariate analyses.] Tree girth and mean pH were converted into categorical variables (girth: s < 100 cm; m = 100--199 cm; l $\geq$ 200 cm; pH: vl < 2; l = 2 $\leq x <$ 4; m = 4 $\leq x <$ 6; h $\geq$ 6).^[These cut-off values for pH categories are quite arbitrary, and may need adjusting.]
-
-To enable plot-level characterisation of tree traits as continuous variables, we calculated the Shannon-Wiener diversity of (1) bark type and (2) pH categories,^[This approach seems a bit convoluted for pH, which is already a continuous variable. Alternatively, we could simply calculate the mean pH per plot, or perhaps the proportion of high/low pH trees (e.g. >6.5 or <4.5).] and the proportion of (3) large trees (i.e. girth $\geq$ 200 cm), (4) trees with buttresses or flutes and (5) dipterocarp trees within each plot.
+Prior to multivariate analyses (PERMANOVA, SIMPER, BIOENV and dbRDA -- see below),^[For some reason, $\log_{10}(x+1)$-transforming lichen abundance data prior to CAP site classification analyses tends to produce warnings resulting from negative Eigenvalues, and reduces overall classification success. Therefore these analyses are currently based on untransformed data.] lichen taxonomic and functional group abundance data were $\log_{10}(x+1)$-transformed to reduce the influence of numerically dominant taxonomic or functional groups.
 
 
-### Differences in lichen diversity among sites
+### Differences in lichen diversity, community structure and traits among sites
 
-Permutational analysis of variance (PERANOVA)^[Probability distributions are not really suitable for GLMMs, hence the use of PERANOVA. Another alternative is to use zero-inflated models.] was used to test for differences in univariate lichen diversity measures (including taxonomic richness, diversity and evenness, and distance-based functional diversity indices)^['Tree-level' data appear to be insufficient for calculating FRic and FDiv.] among the three sites. Differences in multivariate lichen community structure among sites were tested using permutational multivariate analysis of variance (PERMANOVA), separately for taxonomic and functional groups. Models included the factor 'site' (fixed, 3 levels: D, M and S), with a planned comparison (D, M) vs. S (i.e. undisturbed sites vs. disturbed site).^[For previous tree-level analyses, 'plot' (nested within 'site') was also included as a random factor to account for potential non-independence of trees located within the same plot.] Where a significant effect of 'site' was identified, pairwise permutational post-hoc tests were used to reveal differences between individual factor levels. Analyses involved 9,999 permutations of residuals under a reduced model, and tests were based on Type II Sums of Squares owing to unequal numbers of observations among groups.
+Permutational analysis of variance (PerANOVA)^[Probability distributions are not really suitable for GLMMs, hence the use of PerANOVA. Another alternative is to use zero-inflated models, but  this introduces additional complications.] was used to test for differences in univariate lichen diversity measures (i.e. taxonomic richness, evenness and diversity, and distance-based functional diversity indices) among the three sites.
 
-To complement these unconstrained multivariate analyses, overall patterns in lichen community structure were visualised using non-metric multidimensional scaling (MDS) ordination plots, based on both taxonomic and functional groups.^[Although the 'tree-level' MDS analyses (performed using the `metaMDS` function in the R package `vegan`) failed to 'converge' on a result and produced relatively high 2D stress values, they may still serve as a useful representation of overall patterns -- to be interpreted with some caution. On the other hand, MDS converges successfully for summed 'plot-level' abundance data.]
+Differences in multivariate lichen community structure and trait composition among sites were tested using permutational multivariate analysis of variance (PERMANOVA), separately for taxonomic and functional groups, as well as for trait CWMs. Models included the factor 'site' (fixed, 3 levels: D, M and S), with a planned comparison (D, M) vs. S (i.e. old growth sites vs. logged site).^[For previous tree-level analyses, 'plot' (nested within 'site') was also included as a random factor to account for potential non-independence of trees located within the same plot.] Where a significant effect of 'site' was identified, pairwise permutational post-hoc tests were used to reveal differences between individual factor levels.^[It is probably better to use either the _a priori_ planned comparisons or post-hoc pairwise tests, and not both. The former is more appropriate if the aim of this study is to compare old growth vs. logged sites explicitly. But, more generally, adhering to 'old growth vs. logged' comparisons throughout would result in highly unbalanced analyses (i.e. 16 vs. 6 plots, or 192 vs. 72 trees).] Analyses involved 9,999 permutations of residuals under a reduced model, and tests were based on Type II Sums of Squares to account for unequal numbers of observations among groups.
 
-Relative contributions of individual lichen taxa or functional groups to differences in community structure between groups of sites identified by PERMANOVA were determined via similarity of percentages (SIMPER; Clarke, 1993, _Aus. J. Ecol._ 18:117--143).
+To complement these unconstrained multivariate analyses, overall patterns in lichen community structure were visualised using non-metric multidimensional scaling (MDS) ordination plots, again based on both taxonomic and functional group abundances in addition to trait CWMs.^[The previous tree-level MDS analyses (performed using the `metaMDS` function in the R package `vegan`) failed to 'converge' on a result and produced relatively high 2D stress values, they may still serve as a useful representation of overall patterns -- to be interpreted with some caution. On the other hand, MDS converges successfully for summed plot-level abundance data.]
 
-Univariate PERANOVAs were based on Euclidean distance matrices calculated from untransformed data. For all multivariate tests (both unconstrained and constrained -- see below), community dissimilarities were calculated using the zero-adjusted Bray-Curtis coefficient (Clarke _et al._, 2006, _J. Exp. Mar. Biol. Ecol._ 330:55--80), based on $log10(x+1)$-transformed abundance data to reduce the influence of numerically dominant taxonomic/functional groups. Euclidean distances were calculated from environmental data, which were _z_-standardised to account for scaling differences between variables.
+Relative contributions of individual lichen taxonomic and functional groups and trait classes to differences in community structure between groups of sites identified by PERMANOVA were subsequently determined via similarity of percentages (SIMPER; Clarke, 1993, _Aus. J. Ecol._ 18:117--143).
 
-
-### Relationships between lichen community structure and tree functional traits
-
-To enable dissimilarities in lichen communities to be visualised in relation to tree functional traits, the five tree traits (= 'environmental' variables) were used in a constrained distance-based redundancy analysis (dbRDA), a variant of canonical analysis of principal coordinates (CAP; Anderson & Willis, 2003, _Ecology_ 84:511--525), using the `capscale` function in the R package `vegan` (version 2.5-6; Oksanen et al., 2019). While traditional CAP may be performed as a discriminant analysis (as opposed to a canonical correlation analysis) involving a single grouping variable, dbRDA allows for the inclusion of multiple categorical constraints.
-
-This analysis was performed separately for lichen taxonomic and functional groups, using summed lichen abundances and continuous tree trait variables calculated for each plot as described above.^[If conducting these analyses at 'tree-level', whereby individual trees are treated as replicates, to account for variation among plots in the tree-level analysis, 'plot' may be included as a conditioning variable in the dbRDA model.]
-
-Prior to analyses, pairwise Spearman rank correlations were used to assess the extent of collinearity among tree traits. There were no strong pairwise correlations between bark type and pH diversity and proportions of large trees, trees with buttresses/flutes and dipterocarp trees ($|\rho| \leq\ 0.70$), therefore all five variables were included in subsequent analyses. The biota--environment (BIOENV; Clarke & Ainsworth, 1993, _Mar. Ecol. Prog. Ser._ 92:205--219) routine was used to identify the optimal subset of environmental variables accounting for variability in lichen community structure, via maximisation of the rank correlation between environmental and biological distance matrices. The variables identified by the BIOENV analysis were then used in the dbRDA analysis. The resulting ordination plots incorporated vectors representing Spearman rank correlations between continuous environmental variables and the first two CAP axes.
-
-The significance of overall models (based on the sum of all eigenvalues) and of constraining variables (marginal terms) were assessed via ANOVA-like permutation tests involving `r format(n_perm, big.mark = ",")` permutations. Spearman rank correlation coefficients between individual taxonomic or functional group abundances and CAP axes were calculated to identify the most important groups (i.e. $|\rho| \geq$ `r cor_spp_x`) contributing to variability in lichen assemblage structure.
+Univariate PerANOVAs were based on Euclidean distance matrices calculated from untransformed data. For all multivariate tests (both unconstrained and constrained, including dbRDA and CAP -- see below) community dissimilarities were calculated using the zero-adjusted Bray-Curtis coefficient (Clarke _et al._, 2006, _J. Exp. Mar. Biol. Ecol._ 330:55--80).^[The use of a 'zero-adjusted' dissimilarity coefficient is necessary for tree-level abundance data, which include a number of 'blank' samples; but we could probably just use standard Bray-Curtis for plot-level data.]
 
 
-### Classification of sites based on lichen communities
+### Associations of lichen taxa, functional groups and trait classes with sites
 
-A CAP analysis, again based on summed lichen abundances, were used to estimate the accuracy with which plots may be assigned to sites based on lichen community structure. This cross-validation method involves the 'leave-one-out' approach of Lachenbruch and Mickey (1968; _Technometrics_ 10:1--11) to determine the proportion of individual observations (in this case, plots) that are successfully allocated to the correct group (Anderson & Willis, 2003). Using the CAP FORTRAN programme (Anderson, 2002, _Ecological Archives_ E084-011-S1), this analysis was performed separately for lichen taxonomic and functional groups, versus a single factor, 'site' (i.e. a discriminant analysis, rather than a canonical correlation analysis).
+The extent to which lichen taxonomic and functional groups, as well as functional traits, were associated with different combinations of sites was examined using extended Indicator Value analysis (De Cáceres _et al._, 2010, _Oikos_ 119:1674--1684), via the `multipatt` function in the R package `indicspecies` (v1.7.9; De Cáceres & Legendre, 2009). Analyses were based on the 'IndVal' index (Dufrêne & Legendre, 1997, _Ecol. Monogr._ 67:345--366), with the significance of associations tested using 9,999 permutations.
 
 
-^[Check whether exclusion of rare taxonomic/functional groups (e.g. overall mean abundance $\leq$ 0.1) alters results substantially.]
+### Relationships of lichen communities and traits with tree functional traits
+
+To enable dissimilarities in lichen communities and traits to be visualised in relation to tree functional traits, the five tree traits (= 'environmental' variables) were used in a constrained distance-based redundancy analysis (dbRDA), a variant of canonical analysis of principal coordinates (CAP; Anderson & Willis, 2003, _Ecology_ 84:511--525), using the `capscale` function in the R package `vegan` (version 2.5-6; Oksanen et al., 2019).^[While traditional CAP may be performed as a discriminant analysis (as opposed to a canonical correlation analysis) involving a single grouping variable, dbRDA allows for the inclusion of multiple categorical constraints.]
+
+This analysis was performed separately for lichen taxonomic and functional groups and trait classes, using summed lichen group abundances, trait CWMs and continuous tree trait variables calculated for each plot as described above.^[If conducting these analyses at 'tree-level', to account for variation among plots in the tree-level analysis, 'plot' may be included as a conditioning variable in the dbRDA model.]
+
+Prior to analyses, pairwise Spearman rank correlations were used to assess the extent of collinearity among tree traits. There were no strong pairwise correlations between bark type and pH diversity and proportions of large trees, trees with buttresses/flutes and dipterocarp trees ($|\rho| \leq\ 0.70$), therefore all five variables were included in subsequent analyses. The biota--environment (BIOENV; Clarke & Ainsworth, 1993, _Mar. Ecol. Prog. Ser._ 92:205--219) routine was used to identify the optimal subset of environmental variables accounting for variability in lichen community structure, via maximisation of the rank correlation between environmental and biological distance matrices. The variables identified by the BIOENV analysis were then used in the dbRDA analysis.^[I'm wondering whether or not to remove this part of the procedure, and simply include all 'environmental' variables in the constrained analysis.] Euclidean distances were calculated from environmental data, which were _z_-standardised to account for scaling differences between variables. The resulting ordination plots incorporated vectors representing Spearman rank correlations between continuous environmental variables and the first two CAP axes.
+
+The significance of overall models (based on the sum of all eigenvalues) and of constraining variables (marginal terms) were assessed via ANOVA-like permutation tests involving `r format(n_perm, big.mark = ",")` permutations. Spearman rank correlation coefficients between individual taxonomic or functional group abundances and CAP axes were calculated to identify the most important groups and trait classes (i.e. $|\rho| \geq$ `r cor_spp_x`) contributing to variability in lichen communities.
+
+
+### Classification of sites based on lichen communities and functional traits
+
+Further CAP analyses were used to estimate the accuracy with which plots may be assigned to sites based on lichen community structure and trait composition. This cross-validation method involves the 'leave-one-out' approach of Lachenbruch & Mickey (1968; _Technometrics_ 10:1--11) to determine the proportion of individual observations (in this case, plots) that are successfully allocated to the correct group (Anderson & Willis, 2003). Using the `CAPdiscrim` function in the R package `BiodiversityR`,^[Previously, these analyses were conducted using the CAP FORTRAN programme (Anderson, 2002, _Ecological Archives_ E084-011-S1).] this analysis was performed separately for lichen taxonomic and functional groups and trait CWMs, versus a single factor, 'site' (i.e. a discriminant analysis, rather than a canonical correlation analysis). The appropriate numbers of principal coordinate axes (_m_) involved in the discriminant analyses were selected automatically based on the minimum misclassification error.
 
 
 ## Main results
@@ -109,11 +120,11 @@ mean_div_li_func_plot %>%
 
 Lichen taxonomic diversity and evenness were significantly lower at the logged site (S) compared to the two old growth sites (D and M), which in turn did not differ from each other (Figure _x_). For richness, although there was only a marginally significant effect of site (P `r rep_p(as.numeric(li_taxa_plot_s[li_taxa_plot_s$Source=="site", "P(MC)"]))`) and post-hoc pairwise comparisons revealed no significant difference between M and S, the planned comparison between logged and old growth sites suggested that richness was greater at the latter (`r rep_p(as.numeric(li_taxa_plot_s[li_taxa_plot_s$Source=="(D,M) vs. S", "P(MC)"]))`).
 
-PERANOVA tables and post-hoc pairwise test results (taxonomic groups):
+PerANOVA tables and post-hoc pairwise test results (taxonomic groups):
 
 ```{r peranova_tables_taxa_plot_s, echo = FALSE}
 options(knitr.kable.NA = '')  # ensure NAs printed as blanks
-# insert PERANOVA tables:
+# insert PerANOVA tables:
 
 # ~ taxonomic groups:
 # ~~ richness:
@@ -158,9 +169,9 @@ options(knitr.kable.NA = '')  # ensure NAs printed as blanks
   kable(caption = 'Post-hoc pairwise tests')
 ```
 
-None of the four distance-based Functional Diversity indices showed clear differences between logged and old growth sites. Only for FDis was there a significant effect of site, whereby planned comparisons indicated a lower FDis at logged vs. old growth sites (P = `r rep_p(as.numeric(li_func_plot_fdis[li_func_plot_fdis$Source=="(D,M) vs. S", "P(MC)"]))`); however, post-hoc pairwise comparisons were inconclusive. Although planned comparisons suggested that FRic was lower in the logged site compared to the old growth sites (P = `r rep_p(as.numeric(li_func_plot_fric[li_func_plot_fric$Source=="(D,M) vs. S", "P(MC)"]))`), post-hoc comparisons were again inconclusive.^[One disadvantage of using 'plot-level' data for analyses is a loss of statistical power compared to when individual trees are treated as replicates.]
+None of the four distance-based Functional Diversity indices showed clear differences between logged and old growth sites. Only for FDis was there a significant effect of site, whereby planned comparisons indicated a lower FDis at logged vs. old growth sites (P `r rep_p(as.numeric(li_func_plot_fdis[li_func_plot_fdis$Source=="(D,M) vs. S", "P(MC)"]))`); however, post-hoc pairwise comparisons were inconclusive. Although planned comparisons suggested that FRic was lower in the logged site compared to the old growth sites (P `r rep_p(as.numeric(li_func_plot_fric[li_func_plot_fric$Source=="(D,M) vs. S", "P(MC)"]))`), post-hoc comparisons were again inconclusive.^[One disadvantage of using 'plot-level' data for analyses is a loss of statistical power compared to when individual trees are treated as replicates.]
 
-PERANOVA tables and post-hoc pairwise test results (functional groups):
+PerANOVA tables and post-hoc pairwise test results (functional groups):
 
 ```{r peranova_tables_func_plot_fric, echo = FALSE}
 options(knitr.kable.NA = '')  # ensure NAs printed as blanks
