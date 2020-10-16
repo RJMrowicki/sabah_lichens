@@ -93,23 +93,20 @@ perm_li_traits_plot_ph <- read_csv('./primer/results/perm_li_traits_plot_ph.csv'
 
 # ~~ taxonomic groups:
 mds_li_taxa_plot <- mds(  # custom mds function
-  # log10(x+1)-transformed data and zero-adjusted Bray-Curtis:
-  cbind(log10(tree_lichens_taxa_plot[, lichen_taxa] + 1), dummy_taxa_plot)
+  # log10(x+1)-transformed data and Bray-Curtis:
+  log10(tree_lichens_taxa_plot[, lichen_taxa] + 1)
 )
 
 # ~~ functional groups:
 mds_li_func_plot <- mds(
-  # log10(x+1)-transformed data and zero-adjusted Bray-Curtis:
-  cbind(log10(tree_lichens_func_plot[, lichen_func_grps] + 1), dummy_func_plot)
+  # log10(x+1)-transformed data and Bray-Curtis:
+  log10(tree_lichens_func_plot[, lichen_func_grps] + 1)
 )
 
 # ~~ lichen traits:
 mds_li_traits_plot <- mds(
-  # log10(x+1)-transformed data and zero-adjusted Bray-Curtis:
-  cbind(
-    log10(dplyr::select(tree_lichens_func_plot, contains(lichen_traits)) + 1),
-    dummy_func_plot
-  )
+  # log10(x+1)-transformed data and Bray-Curtis:
+  log10(dplyr::select(tree_lichens_func_plot, contains(lichen_traits)) + 1)
 )
 
 
@@ -121,14 +118,14 @@ mds_li_traits_plot <- mds(
 
 simp_li_taxa_plot_untransf <- simper(
   # include dummy taxa to avoid empty row errors:
-  cbind(tree_lichens_taxa_plot[, lichen_taxa], dummy_taxa_plot),
+  tree_lichens_taxa_plot[, lichen_taxa],
   if_else(tree_lichens_taxa_plot$site == 'S', 'S', '(D,M)')  # (D,M) vs. S
 )
 # summary(simp_li_taxa_plot_untransf)
 
 simp_li_taxa_plot_transf <- simper(
   # log10(x+1)-transform taxonomic group data, not dummy data:
-  cbind(log10(tree_lichens_taxa_plot[, lichen_taxa] + 1), dummy_taxa_plot),
+  log10(tree_lichens_taxa_plot[, lichen_taxa] + 1),
   if_else(tree_lichens_taxa_plot$site == 'S', 'S', '(D,M)')  # (D,M) vs. S
 )
 # summary(simp_li_taxa_plot_transf)
@@ -143,14 +140,14 @@ simp_li_taxa_plot <- simp_tab(simp_li_taxa_plot_transf, simp_li_taxa_plot_untran
 
 simp_li_func_plot_untransf <- simper(
   # include dummy taxa to avoid empty row errors:
-  cbind(tree_lichens_func_plot[, lichen_func_grps], dummy_func_plot),
+  tree_lichens_func_plot[, lichen_func_grps],
   if_else(tree_lichens_func_plot$site == 'S', 'S', '(D,M)')  # (D,M) vs. S
 )
 # summary(simp_li_func_plot_untransf)
 
 simp_li_func_plot_transf <- simper(
   # log10(x+1)-transform functional group data, not dummy data:
-  cbind(log10(tree_lichens_func_plot[, lichen_func_grps] + 1), dummy_func_plot),
+  log10(tree_lichens_func_plot[, lichen_func_grps] + 1),
   if_else(tree_lichens_func_plot$site == 'S', 'S', '(D,M)')  # (D,M) vs. S
 )
 # summary(simp_li_func_plot_transf)
@@ -165,20 +162,14 @@ simp_li_func_plot <- simp_tab(simp_li_func_plot_transf, simp_li_func_plot_untran
 
 simp_li_traits_plot_untransf <- simper(
   # include dummy taxa to avoid empty row errors:
-  cbind(
-    dplyr::select(tree_lichens_func_plot, contains(lichen_traits)),
-    dummy_func_plot
-  ),
+  dplyr::select(tree_lichens_func_plot, contains(lichen_traits)),
   if_else(tree_lichens_func_plot$site == 'S', 'S', '(D,M)')  # (D,M) vs. S
 )
 # summary(simp_li_traits_plot_untransf)
 
 simp_li_traits_plot_transf <- simper(
   # log10(x+1)-transform functional group data, not dummy data:
-  cbind(
-    log10(dplyr::select(tree_lichens_func_plot, contains(lichen_traits)) + 1),
-    dummy_func_plot
-  ),
+  log10(dplyr::select(tree_lichens_func_plot, contains(lichen_traits)) + 1),
   if_else(tree_lichens_func_plot$site == 'S', 'S', '(D,M)')  # (D,M) vs. S
 )
 # summary(simp_li_traits_plot_transf)
@@ -217,8 +208,8 @@ env_use_plot <- env_vars_plot  # (currently no variables are excluded)
 # ~~~ taxonomic groups:
 bioenv_taxa_plot <-
   bioenv(  # run BIOENV analysis (vegan::bioenv)
-    # log10(x+1)-transformed data and zero-adjusted Bray-Curtis:
-    cbind(log10(tree_lichens_taxa_plot[, lichen_taxa] + 1), dummy_taxa_plot),
+    # log10(x+1)-transformed data and Bray-Curtis:
+    log10(tree_lichens_taxa_plot[, lichen_taxa] + 1),
     # vs. z-standardised environmental data:
     z_std(tree_lichens_taxa_plot[, env_use_plot]),
     method = "spearman", index = "bray", metric = "euclidean"
@@ -240,8 +231,8 @@ cond_vars_taxa_plot <-  # specify conditioning variables
 # ~~~ functional groups:
 bioenv_func_plot <-
   bioenv(  # run BIOENV analysis (vegan::bioenv)
-    # log10(x+1)-transformed data and zero-adjusted Bray-Curtis:
-    cbind(log10(tree_lichens_func_plot[, lichen_func_grps] + 1), dummy_func_plot),
+    # log10(x+1)-transformed data and Bray-Curtis:
+    log10(tree_lichens_func_plot[, lichen_func_grps] + 1),
     # vs. z-standardised environmental data:
     z_std(tree_lichens_func_plot[, env_use_plot]),
     method = "spearman", index = "bray", metric = "euclidean"
@@ -263,11 +254,8 @@ cond_vars_func_plot <-  # specify conditioning variables
 # ~~~ lichen traits:
 bioenv_traits_plot <-
   bioenv(  # run BIOENV analysis (vegan::bioenv)
-    # log10(x+1)-transformed data and zero-adjusted Bray-Curtis:
-    cbind(
-      log10(dplyr::select(tree_lichens_func_plot, contains(lichen_traits)) + 1),
-      dummy_func_plot
-    ),
+    # log10(x+1)-transformed data and Bray-Curtis:
+    log10(dplyr::select(tree_lichens_func_plot, contains(lichen_traits)) + 1),
     # vs. z-standardised environmental data:
     z_std(tree_lichens_func_plot[, env_use_plot]),
     method = "spearman", index = "bray", metric = "euclidean"
@@ -294,8 +282,8 @@ env_vars_cap_plot <- bioenv_vars_taxa_plot  # specify variables used in CAP
 cap_taxa_plot <-
   capscale(  # run CAP analysis (vegan::capscale)
     formula(paste0(
-      # log10(x+1)-transformed data and zero-adjusted Bray-Curtis:
-      "cbind(log10(tree_lichens_taxa_plot[, lichen_taxa] + 1), dummy_taxa_plot) ~ ",
+      # log10(x+1)-transformed data and Bray-Curtis:
+      "log10(tree_lichens_taxa_plot[, lichen_taxa] + 1) ~ ",
       paste0(strsplit(env_vars_cap_plot, split = " "), collapse = " + ")
     )),
     # vs. z-standardised environmental data:
@@ -398,8 +386,8 @@ env_vars_cap_plot <- bioenv_vars_func_plot  # specify variables used in CAP
 cap_func_plot <-
   capscale(  # run CAP analysis (vegan::capscale)
     formula(paste0(
-      # log10(x+1)-transformed data and zero-adjusted Bray-Curtis:
-      "cbind(log10(tree_lichens_func_plot[, lichen_func_grps] + 1), dummy_func_plot) ~ ",
+      # log10(x+1)-transformed data and Bray-Curtis:
+      "log10(tree_lichens_func_plot[, lichen_func_grps] + 1) ~ ",
       paste0(strsplit(env_vars_cap_plot, split = " "), collapse = " + ")
     )),
     # vs. z-standardised environmental data:
@@ -502,11 +490,8 @@ env_vars_cap_plot <- bioenv_vars_traits_plot  # specify variables used in CAP
 cap_traits_plot <-
   capscale(  # run CAP analysis (vegan::capscale)
     formula(paste0(
-      # log10(x+1)-transformed data and zero-adjusted Bray-Curtis:
-      "cbind(
-        log10(dplyr::select(tree_lichens_func_plot, contains(lichen_traits)) + 1),
-        dummy_func_plot
-      ) ~ ",
+      # log10(x+1)-transformed data and Bray-Curtis:
+      "log10(dplyr::select(tree_lichens_func_plot, contains(lichen_traits)) + 1) ~ ",
       paste0(strsplit(env_vars_cap_plot, split = " "), collapse = " + ")
     )),
     # vs. z-standardised environmental data:
@@ -613,18 +598,15 @@ top_traits_plot <- rownames(cor_cap_traits_plot_spp[order(
 
 # ~ lichen taxonomic and functional group abundances:
 # (NB -- without rownames [hence write_csv()] or column names)
-write_csv(  # (include dummy species)
-  cbind(tree_lichens_taxa_plot[, lichen_taxa], dummy_taxa_plot),
+write_csv(
+  tree_lichens_taxa_plot[, lichen_taxa],
   './cap/li_taxa_plot.txt', col_names = FALSE)
 write_csv(
-  cbind(tree_lichens_func_plot[, lichen_func_grps], dummy_func_plot),
+  tree_lichens_func_plot[, lichen_func_grps],
   './cap/li_func_plot.txt', col_names = FALSE)
 # ~ lichen trait CWMs:
 write_csv(
-  cbind(
-    dplyr::select(tree_lichens_func_plot, contains(lichen_traits)),
-    dummy_func_plot
-  ),
+  dplyr::select(tree_lichens_func_plot, contains(lichen_traits)),
   './cap/li_traits_plot.txt', col_names = FALSE)
 
 # (NB -- no need to output factor(s), as specify no. of groups/observations per group:)
@@ -636,7 +618,7 @@ write_csv(
 # ###
 
 
-# (NB -- log10(x+1) transform data, zero-adjusted Bray-Curtis [i.e. include dummy];
+# (NB -- log10(x+1) transform data, Bray-Curtis dissimilarity;
 # Discriminant Analysis [groups] rather than Canonical Correlation Analysis [variables];
 # allow program to choose m automatically;
 # run tests with 9,999 permutations, specify random seed as 123)
@@ -880,9 +862,9 @@ succ_cap_traits_site_plot <-
 
 dist_taxa_plot <-  # pre-calculate dissimilarity matrix for CAPdiscrim()
   vegdist(
-    # # log10(x+1)-transformed data and zero-adjusted Bray-Curtis:
-    # cbind(log10(tree_lichens_taxa_plot[, lichen_taxa] + 1), dummy_taxa_plot),
-    cbind(tree_lichens_taxa_plot[, lichen_taxa], dummy_taxa_plot),
+    # log10(x+1)-transformed data and Bray-Curtis:
+    log10(tree_lichens_taxa_plot[, lichen_taxa] + 1),
+    # tree_lichens_taxa_plot[, lichen_taxa],
     method = "bray"
   )
 
@@ -922,9 +904,9 @@ cap_taxa_plot_site <-
 
 dist_func_plot <-  # pre-calculate dissimilarity matrix for CAPdiscrim()
   vegdist(
-    # # log10(x+1)-transformed data and zero-adjusted Bray-Curtis:
-    # cbind(log10(tree_lichens_func_plot[, lichen_func_grps] + 1), dummy_func_plot),
-    cbind(tree_lichens_func_plot[, lichen_func_grps], dummy_func_plot),
+    # log10(x+1)-transformed data and Bray-Curtis:
+    log10(tree_lichens_func_plot[, lichen_func_grps] + 1),
+    # tree_lichens_func_plot[, lichen_func_grps],
     method = "bray"
   )
 
@@ -964,15 +946,9 @@ cap_func_plot_site <-
 
 dist_traits_plot <-  # pre-calculate dissimilarity matrix for CAPdiscrim()
   vegdist(
-    # # log10(x+1)-transformed data and zero-adjusted Bray-Curtis:
-    # cbind(
-    #   log10(dplyr::select(tree_lichens_func_plot, contains(lichen_traits)) + 1),
-    #   dummy_func_plot
-    # ),
-    cbind(
-      dplyr::select(tree_lichens_func_plot, contains(lichen_traits)),
-      dummy_func_plot
-    ),
+    # log10(x+1)-transformed data and Bray-Curtis:
+    log10(dplyr::select(tree_lichens_func_plot, contains(lichen_traits)) + 1),
+    # dplyr::select(tree_lichens_func_plot, contains(lichen_traits)),
     method = "bray"
   )
 
@@ -1013,6 +989,7 @@ cap_traits_plot_site <-
 # ~ taxonomic groups:
 indval_taxa_plot <-
   multipatt(  # run IndVal analysis (`indicspecies::multipatt`)
+    # (NB -- untransformed abundance data.)
     tree_lichens_taxa_plot[, lichen_taxa], tree_lichens_taxa_plot$site,
     control = how(nperm = n_perm)  # no. permutations for significance testing
     # (NB -- use default 'IndVal.g' index as test statistic;
@@ -1149,19 +1126,19 @@ if (supp) {  # if 'supplementary' (i.e. 'tree-level') analyses are to be run,
   
   # ~~ taxonomic groups:
   mds_li_taxa <- mds(  # custom mds function
-    # log10(x+1)-transformed data and zero-adjusted Bray-Curtis:
+    # log10(x+1)-transformed data and **zero-adjusted** Bray-Curtis:
     cbind(log10(dd_tree_lichens_taxa[, lichen_taxa] + 1), dummy_taxa)
   )
   
   # ~~ functional groups:
   mds_li_func <- mds(
-    # log10(x+1)-transformed data and zero-adjusted Bray-Curtis:
+    # log10(x+1)-transformed data and **zero-adjusted** Bray-Curtis:
     cbind(log10(dd_tree_lichens_func[, lichen_func_grps] + 1), dummy_func)
   )
   
   # ~~ lichen traits:
   mds_li_traits <- mds(
-    # log10(x+1)-transformed data and zero-adjusted Bray-Curtis:
+    # log10(x+1)-transformed data and **zero-adjusted** Bray-Curtis:
     cbind(
       log10(dplyr::select(dd_tree_lichens_func, contains(lichen_traits)) + 1),
       dummy_func
@@ -1265,7 +1242,7 @@ if (supp) {  # if 'supplementary' (i.e. 'tree-level') analyses are to be run,
   # ~~~ taxonomic groups:
   bioenv_taxa <-
     bioenv(  # run BIOENV analysis (vegan::bioenv)
-      # log10(x+1)-transformed data and zero-adjusted Bray-Curtis:
+      # log10(x+1)-transformed data and **zero-adjusted** Bray-Curtis:
       cbind(log10(dd_tree_lichens_taxa[, lichen_taxa] + 1), dummy_taxa),
       # vs. categorical environmental data:
       dd_tree_lichens_taxa[, env_use],
@@ -1286,7 +1263,7 @@ if (supp) {  # if 'supplementary' (i.e. 'tree-level') analyses are to be run,
   # ~~~ functional groups:
   bioenv_func <-
     bioenv(  # run BIOENV analysis (vegan::bioenv)
-      # log10(x+1)-transformed data and zero-adjusted Bray-Curtis:
+      # log10(x+1)-transformed data and **zero-adjusted** Bray-Curtis:
       cbind(log10(dd_tree_lichens_func[, lichen_func_grps] + 1), dummy_func),
       # vs. categorical environmental data:
       dd_tree_lichens_func[, env_use],
@@ -1310,7 +1287,7 @@ if (supp) {  # if 'supplementary' (i.e. 'tree-level') analyses are to be run,
   # ~~~ lichen traits:
   bioenv_traits <-
     bioenv(  # run BIOENV analysis (vegan::bioenv)
-      # log10(x+1)-transformed data and zero-adjusted Bray-Curtis:
+      # log10(x+1)-transformed data and **zero-adjusted** Bray-Curtis:
       cbind(
         log10(dplyr::select(dd_tree_lichens_func, contains(lichen_traits)) + 1),
         dummy_func),
@@ -1347,7 +1324,7 @@ if (supp) {  # if 'supplementary' (i.e. 'tree-level') analyses are to be run,
   cap_taxa <-
     capscale(  # run CAP analysis (vegan::capscale)
       formula(paste0(
-        # log10(x+1)-transformed data and zero-adjusted Bray-Curtis:
+        # log10(x+1)-transformed data and **zero-adjusted** Bray-Curtis:
         "cbind(log10(dd_tree_lichens_taxa[, lichen_taxa] + 1), dummy_taxa) ~ ",
         paste0(strsplit(env_vars_cap, split = " "), collapse = " + "),
         "+ Condition(plot)"  # (NB -- `plot` as a conditioning variable)
@@ -1446,7 +1423,7 @@ if (supp) {  # if 'supplementary' (i.e. 'tree-level') analyses are to be run,
   cap_func <-
     capscale(  # run CAP analysis (vegan::capscale)
       formula(paste0(
-        # log10(x+1)-transformed data and zero-adjusted Bray-Curtis:
+        # log10(x+1)-transformed data and **zero-adjusted** Bray-Curtis:
         "cbind(log10(dd_tree_lichens_func[, lichen_func_grps] + 1), dummy_func) ~ ",
         paste0(strsplit(env_vars_cap, split = " "), collapse = " + "),
         "+ Condition(plot)"  # (NB -- `plot` as a conditioning variable)
@@ -1545,7 +1522,7 @@ if (supp) {  # if 'supplementary' (i.e. 'tree-level') analyses are to be run,
   cap_traits <-
     capscale(  # run CAP analysis (vegan::capscale)
       formula(paste0(
-        # log10(x+1)-transformed data and zero-adjusted Bray-Curtis:
+        # log10(x+1)-transformed data and **zero-adjusted** Bray-Curtis:
         "cbind(
         log10(dplyr::select(dd_tree_lichens_func, contains(lichen_traits)) + 1),
         dummy_func
