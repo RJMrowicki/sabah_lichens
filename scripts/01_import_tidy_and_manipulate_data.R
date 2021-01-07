@@ -30,15 +30,17 @@ lichen_taxa <- unique(ddR_lichens_taxa$`Genus code`) %>% na.omit %>% sort
 
 dd_lichens_taxa <-  # create new data frame
   ddR_lichens_taxa %>%
+  # convert 'logical' (i.e. empty numeric) columns to numeric:
+  mutate_if(is.logical, as.numeric) %>% 
   # rename `D810` to `D710` and `D810_1` to `D810`:
   # (NB -- assuming that `D710` is mistakenly named `D810`)
   rename(`D710` = `D810`, `D810` = `D810_1`) %>%
   # # OR remove `D810` (empty duplicate) and rename `D810_1` to `D810`:
   # select(-`D810`) %>% rename(`D810` = `D810_1`) %>%
-  # replace all NA values with 0:
-  replace(is.na(.), 0) %>%
   # remove `Fam code` and rename `Genus code` to `taxon`:
   select(-`Fam code`) %>% rename(`taxon` = `Genus code`) %>%
+  # replace all NA values with 0:
+  replace(is.na(.), 0) %>%
   # transpose to make rows = samples and columns = taxa:
   gather(`tree`, `n`, -`taxon`) %>% spread(`taxon`, `n`) %>%
   # create factors `site` and `plot` based on characters of `tree`:
@@ -61,6 +63,8 @@ lichen_func_grps <- unique(ddR_lichens_func$`tree no.`) %>% na.omit %>% sort
 
 dd_lichens_func <-  # create new data frame
   ddR_lichens_func %>%
+  # convert 'logical' (i.e. empty numeric) columns to numeric:
+  mutate_if(is.logical, as.numeric) %>% 
   # rename `D810` to `D710` and `D810_1` to `D810`:
   # (NB -- assuming that `D710` is mistakenly named `D810`)
   rename(`D710` = `D810`, `D810` = `D810_1`) %>%
@@ -158,10 +162,10 @@ dd_trees_func <-  # create new data frame
   # add mean pH values:
   left_join(dd_trees_pH, by = c("site", "plot", "tree")) %>%
   # create `pH` categorical variable (factor), based on
-  # `pH_mean` cutoff values of 2, 4 and 6 (a >= x < b):
+  # `pH_mean` quartile cut-off values (a >= x < b):
   mutate(
     `pH` = factor(cut(
-      `pH_mean`, breaks = c(-Inf, 2, 4, 6, Inf),
+      `pH_mean`, breaks = quantile(`pH_mean`, na.rm = TRUE),
       labels = c("vl", "l", "m", "h"), right = FALSE))) %>%
   # change relevant 'character'/'double' variables to 'factors':
   mutate_at(vars(`bark`, `dipterocarp`), factor) %>%
@@ -279,29 +283,30 @@ dd_lichens_func <-
 
 # ~~ tree functional trait data (add missing pH) -------------------------------
 
-# create lookup table of overall mean pH per bark type category:
-mean_pH_bark <-
-  dd_trees_func %>%
-  # group by bark type, calculate mean (mean)pH (NB -- excluding NAs):
-  group_by(bark) %>% summarise(pH_mean = mean(pH_mean, na.rm = TRUE))
-
-# replace missing tree pH values with mean value for corresponding bark type:
-# (NB -- is this appropriate? Relies on a strong and justifiable relationship
-# between pH and bark type.)
-dd_trees_func <-
-  dd_trees_func %>%
-  # if pH is NA, use matching mean value for bark type, else use existing value:
-  mutate(
-    `pH_mean` = if_else(
-      is.na(`pH_mean`),
-      mean_pH_bark$pH_mean[match(`bark`, mean_pH_bark$bark)],
-      `pH_mean`
-    )) %>%
-  # update `pH` categorical variable, using same `pH_mean` cutoffs as above:
-  mutate(
-    `pH` = factor(cut(
-      `pH_mean`, breaks = c(-Inf, 2, 4, 6, Inf),
-      labels = c("vl", "l", "m", "h"), right = FALSE)))
+# # create lookup table of overall mean pH per bark type category:
+# mean_pH_bark <-
+#   dd_trees_func %>%
+#   # group by bark type, calculate mean (mean)pH (NB -- excluding NAs):
+#   group_by(bark) %>% summarise(pH_mean = mean(pH_mean, na.rm = TRUE))
+# 
+# # replace missing tree pH values with mean value for corresponding bark type:
+# # (NB -- is this appropriate? Relies on a strong and justifiable relationship
+# # between pH and bark type; also possible implications of non-independence/
+# # collinearity between pH and bark type environmental variables.)
+# dd_trees_func <-
+#   dd_trees_func %>%
+#   # if pH is NA, use matching mean value for bark type, else use existing value:
+#   mutate(
+#     `pH_mean` = if_else(
+#       is.na(`pH_mean`),
+#       mean_pH_bark$pH_mean[match(`bark`, mean_pH_bark$bark)],
+#       `pH_mean`
+#     )) %>%
+#   # update `pH` categorical variable, using same `pH_mean` cut-offs as above:
+#   mutate(
+#     `pH` = factor(cut(
+#       `pH_mean`, breaks = quantile(`pH_mean`, na.rm = TRUE),
+#       labels = c("vl", "l", "m", "h"), right = FALSE)))
 
 
 
@@ -415,8 +420,6 @@ trees_func_plot_pH_div <- dd_trees_func %>%
   group_by(`plot`) %>%
   # calculate Shannon-Wiener diversity of bark categories:
   summarise_at(vars(`n`), list(`pH_div` = ~diversity(., "shannon")))
-
-# ~ girth?
 
 
 # calculate proportions of girth >200cm, buttresses & dipterocarp trees:
