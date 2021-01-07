@@ -17,6 +17,29 @@ nobs_site_tr_func <- dd_trees_func %>% count(`site`)
 
 
 
+# ~ Mean tree functional traits (plot-level) -----------------------------------
+
+mean_tr_func_plot <-
+  tree_lichens_taxa_plot %>% 
+  # group by site
+  group_by(`site`) %>%
+  # calculate mean & SE plot-summarised tree functional trait values:
+  summarise(
+    `mean_bark_div` = mean(`bark_div`, na.rm = TRUE),
+    `SE_bark_div` = std.error(`bark_div`),
+    `mean_pH_div` = mean(`pH_div`, na.rm = TRUE),
+    `SE_pH_div` = std.error(`pH_div`),
+    `mean_girth_l_prop` = mean(`girth_l_prop`, na.rm = TRUE),
+    `SE_girth_l_prop` = std.error(`girth_l_prop`),
+    `mean_buttress_prop` = mean(`buttress_prop`, na.rm = TRUE),
+    `SE_buttress_prop` = std.error(`buttress_prop`),
+    `mean_dipterocarp_prop` = mean(`dipterocarp_prop`, na.rm = TRUE),
+    `SE_dipterocarp_prop` = std.error(`dipterocarp_prop`)
+  )
+
+
+
+
 # ~ Mean lichen diversity ------------------------------------------------------
 
 # ~~ Tree-level ----------------------------------------------------------------
@@ -73,27 +96,3 @@ mean_div_li_func_plot <-
     `mean_FDiv` = mean(`FDiv`, na.rm = TRUE), `SE_FDiv` = std.error(`FDiv`),
     `mean_FDis` = mean(`FDis`, na.rm = TRUE), `SE_FDis` = std.error(`FDis`)
   )
-
-
-
-
-# ~ Mean tree functional traits (plot-level) -----------------------------------
-
-mean_tr_func_plot <-
-  tree_lichens_taxa_plot %>% 
-  # group by site
-  group_by(`site`) %>%
-  # calculate mean & SE plot-summarised tree functional trait values:
-  summarise(
-    `mean_bark_div` = mean(`bark_div`, na.rm = TRUE),
-    `SE_bark_div` = std.error(`bark_div`),
-    `mean_pH_div` = mean(`pH_div`, na.rm = TRUE),
-    `SE_pH_div` = std.error(`pH_div`),
-    `mean_girth_l_prop` = mean(`girth_l_prop`, na.rm = TRUE),
-    `SE_girth_l_prop` = std.error(`girth_l_prop`),
-    `mean_buttress_prop` = mean(`buttress_prop`, na.rm = TRUE),
-    `SE_buttress_prop` = std.error(`buttress_prop`),
-    `mean_dipterocarp_prop` = mean(`dipterocarp_prop`, na.rm = TRUE),
-    `SE_dipterocarp_prop` = std.error(`dipterocarp_prop`)
-  )
-

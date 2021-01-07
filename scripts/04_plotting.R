@@ -30,9 +30,9 @@ boxplot_tr_func_plot_bark <-
   geom_boxplot() +
   scale_x_discrete(name = "Site") +
   ylim(c(NA, 1.25)) +  # set upper y limit only
-  geom_jitter(
-    shape = 16, colour = grey(0.25), alpha = 0.5,
-    position = position_jitter(width = 0.1, height = 0)) +
+  # geom_jitter(
+  #   shape = 16, colour = grey(0.25), alpha = 0.5,
+  #   position = position_jitter(width = 0.1, height = 0)) +
   theme_rob()
 
 # ~~ pH diversity:
@@ -57,7 +57,7 @@ boxplot_tr_func_plot_dipterocarp <- boxplot_tr_func_plot_bark + aes(y = `diptero
 
 pdf(  # open .pdf graphics device
   './figs/boxplots_tr_func_plot.pdf',
-  width = 18/2.54, height = 6/2.54
+  width = 18/2.54, height = 4/2.54
 )
 
 grid.arrange(
@@ -84,9 +84,9 @@ boxplot_li_taxa_plot_s <-  # assign to object
   geom_boxplot() +
   scale_x_discrete(name = "Site") +
   ylim(c(NA, 22.5)) +  # set upper y limit only
-  geom_jitter(
-    shape = 16, colour = grey(0.25), alpha = 0.5,
-    position = position_jitter(width = 0.1, height = 0)) +
+  # geom_jitter(
+  #   shape = 16, colour = grey(0.25), alpha = 0.5,
+  #   position = position_jitter(width = 0.1, height = 0)) +
   theme_rob()
 
 # ~~ diversity:
@@ -111,9 +111,9 @@ boxplot_li_func_plot_fric <-
   geom_boxplot() +
   scale_x_discrete(name = "Site") +
   ylim(c(NA, 8e-05)) +  # set upper y limit only
-  geom_jitter(
-    shape = 16, colour = grey(0.25), alpha = 0.5,
-    position = position_jitter(width = 0.1, height = 0)) +
+  # geom_jitter(
+  #   shape = 16, colour = grey(0.25), alpha = 0.5,
+  #   position = position_jitter(width = 0.1, height = 0)) +
   theme_rob()
 
 # ~~ FEve:
