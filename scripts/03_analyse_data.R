@@ -316,7 +316,10 @@ cond_vars_traits_plot <-  # specify conditioning variables
 # ~ 3.1 CAP (dbRDA) of lichen communities vs. tree functional traits -----------
 
 # ~~~ taxonomic groups:
-env_vars_cap_plot <- bioenv_vars_taxa_plot  # specify variables used in CAP
+
+# specify variables used in CAP:
+env_vars_cap_plot <- bioenv_vars_taxa_plot  # BIOENV variables
+# env_vars_cap_plot <- env_vars_plot  # all variables
 
 cap_taxa_plot <-
   capscale(  # run CAP analysis (vegan::capscale)
@@ -420,7 +423,9 @@ top_taxa_plot <- rownames(cor_cap_taxa_plot_spp[order(
 
 
 # ~~~ functional groups:
-env_vars_cap_plot <- bioenv_vars_func_plot  # specify variables used in CAP
+# specify variables used in CAP:
+env_vars_cap_plot <- bioenv_vars_func_plot  # BIOENV variables
+# env_vars_cap_plot <- env_vars_plot  # all variables
 
 cap_func_plot <-
   capscale(  # run CAP analysis (vegan::capscale)
@@ -524,7 +529,9 @@ top_func_plot <- rownames(cor_cap_func_plot_spp[order(
 
 
 # ~~~ lichen traits:
-env_vars_cap_plot <- bioenv_vars_traits_plot  # specify variables used in CAP
+# specify variables used in CAP:
+env_vars_cap_plot <- bioenv_vars_traits_plot  # BIOENV variables
+# env_vars_cap_plot <- env_vars_plot  # all variables
 
 cap_traits_plot <-
   capscale(  # run CAP analysis (vegan::capscale)
@@ -636,7 +643,7 @@ top_traits_plot <- rownames(cor_cap_traits_plot_spp[order(
 # not possible using vegan::capscale)
 
 # ~ lichen taxonomic and functional group abundances:
-# (NB -- without rownames [hence write_csv()] or column names)
+# (NB -- without row names [hence `write_csv()`] or column names)
 write_csv(
   tree_lichens_taxa_plot[, lichen_taxa],
   './cap/li_taxa_plot.txt', col_names = FALSE)
