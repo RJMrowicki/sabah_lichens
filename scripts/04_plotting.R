@@ -21,6 +21,57 @@ pt_sty_site <- data.frame(  # by site
 
 # A. MAIN PLOTS ================================================================
 
+# 0. Boxplots of tree functional traits vs. site ('plot-level') ----------------
+# (NB -- include in Supplementary Plots instead???)
+
+# ~ bark diversity:
+boxplot_tr_func_plot_bark <-
+  ggplot(tree_lichens_func_plot, aes(x = `site`, y = `bark_div`)) +
+  geom_boxplot() +
+  scale_x_discrete(name = "Site") +
+  ylim(c(NA, 1.25)) +  # set upper y limit only
+  geom_jitter(
+    shape = 16, colour = grey(0.25), alpha = 0.5,
+    position = position_jitter(width = 0.1, height = 0)) +
+  theme_rob()
+
+# ~~ pH diversity:
+boxplot_tr_func_plot_pH <- boxplot_tr_func_plot_bark + aes(y = `pH_div`) +
+  ylim(c(NA, 1.5))  # set upper y limit only
+
+# ~~ girth proportion:
+boxplot_tr_func_plot_girth <- boxplot_tr_func_plot_bark + aes(y = `girth_l_prop`) +
+  ylim(c(NA, 0.5))  # set upper y limit only
+
+# ~~ buttress proportion:
+boxplot_tr_func_plot_buttress <- boxplot_tr_func_plot_bark + aes(y = `buttress_prop`) +
+  ylim(c(NA, 0.4))  # set upper y limit only
+
+# ~~ dipterocarp proportion:
+boxplot_tr_func_plot_dipterocarp <- boxplot_tr_func_plot_bark + aes(y = `dipterocarp_prop`) +
+  ylim(c(NA, 0.6))  # set upper y limit only
+
+
+
+# output boxplots:
+
+pdf(  # open .pdf graphics device
+  './figs/boxplots_tr_func_plot.pdf',
+  width = 18/2.54, height = 6/2.54
+)
+
+grid.arrange(
+  boxplot_tr_func_plot_bark, boxplot_tr_func_plot_pH,
+  boxplot_tr_func_plot_girth, boxplot_tr_func_plot_buttress,
+  boxplot_tr_func_plot_dipterocarp,
+  nrow = 1
+)
+
+dev.off()  # close .pdf graphics device
+
+
+
+
 # 1. Boxplots of lichen diversity vs. site ('plot-level') ----------------------
 
 # create boxplots:

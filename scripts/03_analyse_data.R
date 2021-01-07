@@ -5,15 +5,54 @@
 
 # 1. Univariate analyses =======================================================
 
-# ~ 1.1 PERANOVAs of lichen diversity vs. site ('plot-level') ------------------
-# (**including** dbFD indices)
-
 # (NB -- R doesn't allow for specification of more complex models (e.g. nesting,
 # planned comparisons) or post-hoc pairwise comparisons... use PRIMER instead)
 
+
+# ~ 1.0 PERANOVAs of tree functional traits vs. site ('plot-level') ------------
+# (NB -- include in Supplementary Analyses instead???)
+
+# output data for PERANOVA analysis in PRIMER:
+# ~ tree functional trait data:
+# (NB -- use `write.csv()` instead of `write_csv()`, as require rownames)
+write.csv(tree_lichens_taxa_plot[, "bark_div"], './primer/tr_func_plot_bark.csv')
+write.csv(tree_lichens_taxa_plot[, "pH_div"], './primer/tr_func_plot_pH.csv')
+write.csv(tree_lichens_taxa_plot[, "girth_l_prop"], './primer/tr_func_plot_girth.csv')
+write.csv(tree_lichens_taxa_plot[, "buttress_prop"], './primer/tr_func_plot_buttress.csv')
+write.csv(tree_lichens_taxa_plot[, "dipterocarp_prop"], './primer/tr_func_plot_dipterocarp.csv')
+
+# ~ corresponding factors (i.e. `site` only):
+# (NB -- paste manually in PRIMER)
+write_csv(tree_lichens_taxa_plot[, 'site'], './primer/factors_taxa_plot.csv')
+
+
+# ###
+# ### PERANOVA analysis in PRIMER here ###
+# ###
+
+
+# import results of PERANOVA analysis in PRIMER:
+# ~ PERANOVA table and post-hoc pairwise test results:
+tr_func_plot_bark <- read_csv('./primer/results/tr_func_plot_bark.csv')
+tr_func_plot_bark_ph <- read_csv('./primer/results/tr_func_plot_bark_ph.csv')
+tr_func_plot_pH <- read_csv('./primer/results/tr_func_plot_pH.csv')
+tr_func_plot_pH_ph <- read_csv('./primer/results/tr_func_plot_pH_ph.csv')
+tr_func_plot_girth <- read_csv('./primer/results/tr_func_plot_girth.csv')
+tr_func_plot_girth_ph <- read_csv('./primer/results/tr_func_plot_girth_ph.csv')
+tr_func_plot_buttress <- read_csv('./primer/results/tr_func_plot_buttress.csv')
+tr_func_plot_buttress_ph <- read_csv('./primer/results/tr_func_plot_buttress_ph.csv')
+tr_func_plot_dipterocarp <- read_csv('./primer/results/tr_func_plot_dipterocarp.csv')
+tr_func_plot_dipterocarp_ph <- read_csv('./primer/results/tr_func_plot_dipterocarp_ph.csv')
+
+
+
+
+# ~ 1.1 PERANOVAs of lichen diversity vs. site ('plot-level') ------------------
+# (**including** dbFD indices)
+
 # output data for PERANOVA analysis in PRIMER:
 # ~ lichen taxonomic/functional group diversity & distance-based FD indices:
-# (NB -- use write.csv() instead of write_csv(), as require rownames)
+# (NB -- use `write.csv()` instead of `write_csv()`, as require rownames)
 write.csv(tree_lichens_taxa_plot[, "S"], './primer/li_taxa_plot_s.csv')
 write.csv(tree_lichens_taxa_plot[, "H'"], './primer/li_taxa_plot_h.csv')
 write.csv(tree_lichens_taxa_plot[, "1-L"], './primer/li_taxa_plot_1-l.csv')
