@@ -422,10 +422,20 @@ trees_func_plot_pH_div <- dd_trees_func %>%
   summarise_at(vars(`n`), list(`pH_div` = ~diversity(., "shannon")))
 
 
+# # histograms of tree girth in logged (S) vs. unlogged (D, M) forests, to
+# # determine cut-off for 'large' trees (point at which tree girth declines
+# # dramatically in logged forest compared to unlogged forests -- 150 cm):
+# dd_trees_func %>%
+#   mutate(`group` = ifelse(`site` == "S", "logged", "unlogged")) %>% 
+#   ggplot(aes(`girth_m`)) +
+#   facet_wrap(~ `group`) +
+#   geom_histogram(breaks = c(seq(0, 600, 50)), closed = "left")
+
+
 # calculate proportions of girth >200cm, buttresses & dipterocarp trees:
 trees_func_plot_props <- dd_trees_func %>%
-  # first create factor for 'large' girth (i.e. >= 200 cm):
-  mutate(`girth_l` = ifelse(`girth_m` >= 200, "1", "0")) %>%
+  # first create factor for 'large' girth (i.e. >= 150 cm):
+  mutate(`girth_l` = ifelse(`girth_m` >= 150, "1", "0")) %>%
   # group by plot and calculate respective proportions:
   group_by(`plot`) %>% summarise_at(
     vars(`girth_l`, `buttress`, `dipterocarp`),
