@@ -32,6 +32,7 @@ library(wordcloud)
 
 library(gridExtra)  # grid.arrange()
 library(knitr)  # kable()
+library(scales)  # label_number()
 
 
 

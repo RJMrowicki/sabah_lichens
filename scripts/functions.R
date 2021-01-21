@@ -154,7 +154,7 @@ plot_cap_env <- function(
       x0 = 0, y0 = 0,
       x1 = env_cor_obj$CAP1*((xdist/2)*sf),  # use scaling factor
       y1 = env_cor_obj$CAP2*((xdist/2)*sf),  # (correspond with circle perimeter)
-      code = 2, length = 0.05, lwd = 1.5, col = "blue"
+      code = 2, length = 0.05, lwd = 1, col = "black"
     )
     text(  # add environmental labels
       env_cor_obj$CAP1*((xdist/2)*sf), env_cor_obj$CAP2*((xdist/2)*sf),
@@ -165,7 +165,7 @@ plot_cap_env <- function(
           } else { # if |x| < |y|
             if (x["CAP2"] < 0) {1} else {3}  # if y < 0, label below point
           }})),
-      offset = 0.15, col = "blue", cex = fig_cex
+      offset = 0.15, col = "black", cex = fig_cex
     )
   }
   
@@ -305,14 +305,14 @@ plot_mds <- function(
   if(stress == TRUE) {  # plot stress value
     text(
       usr[2]-((usr[2]-usr[1])/100), usr[4]-((usr[4]-usr[3])/100),
-      adj = c(1, 1), cex = 0.8,
+      adj = c(1, 1), cex = 0.7,
       labels = paste("2D stress =", formatC(mds_obj$stress, 2, format = "f"))
     )
   }
   
   if(legend == TRUE) {
     legend(  # add legend for points
-      "topright", inset = c(0, 0.05), bty = "n",
+      "bottomleft", inset = c(0, 0), bty = "n",
       title = leg_title, legend = pt_sty_dat[, pt_sty_var],
       pch = pt_sty_dat$pch, col = as.character(pt_sty_dat$col),
       pt.cex = 0.8*pt_sty_dat$cex, y.intersp = 0.8, cex = 0.8
